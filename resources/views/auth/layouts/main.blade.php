@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="{{ asset('fedash/css/daterangepicker') }}.css">
     <!-- App CSS -->
     <link rel="stylesheet" href="{{ asset('fedash/css/app-light.css') }}" id="lightTheme" disabled>
-    <link rel="stylesheet" href="{{ asset('fedash/css/app-dark.css') }}" id="darkTheme">
+    <link rel="stylesheet" href="{{ asset('fedash/css/app-dark.css') }}" id="darkTheme" >
   </head>
   <body class="dark ">
     

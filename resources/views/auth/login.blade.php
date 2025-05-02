@@ -16,11 +16,11 @@
             </a>
             <h1 class="h6 mb-3">Sign in</h1>
             @if ($errors->any())
+            <div class="alert alert-danger" role="alert">
                 @foreach ($errors->all() as $error)
-                    <div class="alert alert-danger" role="alert">
-                        <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ $error }}
-                    </div>
+                <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ $error }}
                 @endforeach
+            </div>
             @endif
             <div class="form-group">
             <label for="inputEmail" class="sr-only">Email address</label>
@@ -30,13 +30,21 @@
             <label for="inputPassword" class="sr-only">Password</label>
             <input type="password" id="inputPassword" name="password" class="form-control form-control-lg" placeholder="Password" required="">
             </div>
-            <div class="checkbox mb-3">
-            <label>
-                <input type="checkbox" value="remember-me"> Stay logged in </label>
+            <div class="form-row">
+                <div class="col-md-6 mb-3">
+                    <div class="custom-control custom-checkbox text-left mb-3">
+                        <input type="checkbox" class="custom-control-input" id="customControlValidation1" value="remember-me">
+                        <label class="custom-control-label" for="customControlValidation1">Stay logged in </label>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <p class="text-right"><a class="mb-3" href="#}"> Forgot password?</a></p>
+                </div>
             </div>
-            <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Let me in</button>
+           
+            <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Login</button>
             <p>Don't have an account? - <a class="mb-3" href="{{ route('register') }}"> Sign Up</a></p>
-            <p class="mt-5 mb-3 text-muted">© 2020</p>
+            <p class="mt-5 mb-3 text-muted">&copy; <script>document.write(new Date().getFullYear('Y'))</script></p>
         </form>
         </div>
     </div>

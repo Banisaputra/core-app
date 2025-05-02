@@ -1,0 +1,13 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Employee extends Model
+{
+    protected $guarded = [];
+    protected $fillable = ['code', 'name', 'position', 'address', 'no_telp', 'image_path'];
+
+    
+}

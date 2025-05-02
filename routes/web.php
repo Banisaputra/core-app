@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 use App\Http\Middleware\LoginAuth;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmployeeController;
 
 
 
@@ -17,4 +18,8 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/', function() {
         return view('dashboard');
     });
+    // employees
+    Route::resource('employees', EmployeeController::class);
+    // category
+    Route::resource('categories', CategoryController::class);
 });

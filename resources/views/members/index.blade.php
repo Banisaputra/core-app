@@ -48,13 +48,13 @@
                 <table class="table datatables" id="members">
                   <thead>
                     <tr>
-                      <th>No.</th>
-                      <th>NIP</th>
-                      <th>Nama</th>
-                      <th>No.Telp</th>
+                      <th width="5%">No.</th>
+                      <th width="15%">NIP</th>
+                      <th width="20%">Nama</th>
+                      <th width="15%">No.Telp</th>
                       <th>Alamat</th>
                       <th>Saldo</th>
-                      <th>Action</th>
+                      <th width="5%">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -73,10 +73,10 @@
                           <div class="dropdown-menu dropdown-menu-right">
                             <a class="dropdown-item" href="{{ route('members.show', $member->id) }}">View</a>
                             <a class="dropdown-item" href="{{ route('members.edit', $member->id) }}">Edit</a>
-                            <form action="{{ route('members.destroy', $member->id) }}" method="POST" style="display: inline;">
+                            <form action="{{ route('members.destroy', $member->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="dropdown-item">Delete</button>
+                                <button type="submit" id="btnDelete" class="dropdown-item">Delete</button>
                             </form>
                           </div>
                         </td> 
@@ -104,6 +104,12 @@
         [10, 25, 50, -1],
         [10, 25, 50, "All"]
       ]
+    });
+
+    $('#deleteForm').on('submit', function(e) {
+      if (!confirm('Are you sure you want to delete this member?')) {
+          e.preventDefault();
+      }
     });
 </script>
 @endsection

@@ -106,6 +106,7 @@
             <div class="custom-file">
               <input type="file" class="custom-file-input" id="profile_photo" name="profile_photo">
               <label class="custom-file-label" for="profile_photo" id="label_photo">Choose file</label>
+              <small>*Format file jpg/jpeg,png dengan ukuran max:2MB</small>
             </div>
             <!-- Preview container -->
             <div class="mt-2">

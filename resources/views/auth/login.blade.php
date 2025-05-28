@@ -22,6 +22,11 @@
                 @endforeach
             </div>
             @endif
+            @if (session()->has('credentials'))
+            <div class="alert alert-danger" role="alert">
+                <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ session('credentials') }}
+            </div>
+            @endif
             <div class="form-group">
             <label for="inputEmail" class="sr-only">Email address</label>
             <input type="email" id="inputEmail" name="email" class="form-control form-control-lg" placeholder="Email address" required="" autofocus="">

@@ -11,19 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('instalments', function (Blueprint $table) {
+        Schema::create('loan_payments', function (Blueprint $table) {
             $table->id();
-            $table->string('ins_code', 50)->unique();
+            $table->string('lp_code', 50)->unique();
             $table->foreignId('loan_id')->references('id')->on('loans')->onDelete('cascade');
-            $table->string('ins_date', 8);
-            $table->string('ins_value', 100);
+            $table->string('lp_date', 8);
+            $table->string('lp_value', 100);
             $table->integer('loan_remaining');
-            $table->integer('tenor');
+            $table->integer('tenor_month');
             $table->string('status', 25);
             $table->text('remark')->nullable();
             $table->string('proof_of_payment')->comment('url payment');
             $table->string('loan_interest', 100);
-            $table->integer('forfeit');
+            $table->integer('lp_forfeit');
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('instalments');
+        Schema::dropIfExists('loan_payments');
     }
 };

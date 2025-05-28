@@ -11,18 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('deposits', function (Blueprint $table) {
-            $table->id();
-            $table->string('dept_code');
-            $table->string('dept_date');
-            $table->foreignId('member_id')->references('id')->on('members')->onDelete('cascade');
-            $table->foreignId('dept_type_id')->references('id')->on('deposit_types')->onDelete('cascade');
-            $table->string('dept_value');
-            $table->string('proof_of_payment');
+        Schema::create('saving_types', function (Blueprint $table) {
+            $table->id(); 
+            $table->string('name', 100);
+            $table->text('description')->nullable();
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->string('dept_status');
-            $table->text('remark')->nullable();
             $table->timestamps();
         });
     }
@@ -32,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('deposits');
+        Schema::dropIfExists('saving_types');
     }
 };

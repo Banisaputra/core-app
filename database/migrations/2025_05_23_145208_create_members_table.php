@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('telphone', 20);
             $table->string('religion', 20)->nullable();
             $table->string('gender', 20);
-            $table->date('date_of_birth')->nullable();
+            $table->date('date_of_birth');
             $table->string('employment', 100)->nullable();
             $table->text('address')->nullable();
             $table->string('image', 255)->nullable();

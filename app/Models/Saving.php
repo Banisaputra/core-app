@@ -5,9 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Deposit_type extends Model
+class Saving extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'created_by', 'updated_by'];
+    protected $guarded = [];
+
+    public function member()
+    {
+        return $this->belongsTo(Member::class);
+    }
+
 }

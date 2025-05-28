@@ -33,12 +33,12 @@
                 </a>
                 <ul class="collapse list-unstyled pl-4 w-100" id="ui-elements">
                     <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('employees.index')}}">
-                            <span class="ml-1 item-text">Karyawan</span>
+                        <a class="nav-link pl-3" href="#">
+                            <span class="ml-1 item-text">Role</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link pl-3" href="#">
+                        <a class="nav-link pl-3" href="{{ route('members.index')}}">
                             <span class="ml-1 item-text">Anggota</span>
                         </a>
                     </li>
@@ -47,7 +47,6 @@
             
             <li class="nav-item dropdown">
                 <a href="#forms" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    {{-- <i class="fe fe-credit-card fe-16"></i> --}}
                     <i class="fe fe-box fe-16"></i>
                     <span class="ml-3 item-text">Inventori</span>
                 </a>
@@ -66,7 +65,7 @@
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
             <li class="nav-item w-100">
-                <a class="nav-link" href="calendar.html">
+                <a class="nav-link" href="#">
                     <i class="fe fe-monitor fe-16"></i>
                     <span class="ml-3 item-text">POS</span>
                 </a>
@@ -78,13 +77,13 @@
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
             <li class="nav-item w-100">
-                <a class="nav-link" href="calendar.html">
+                <a class="nav-link" href="{{ route('savings.index')}}">
                     <i class="fe fe-arrow-down-circle fe-16"></i>
                     <span class="ml-3 item-text">Simpanan</span>
                 </a>
             </li>
             <li class="nav-item w-100">
-                <a class="nav-link" href="calendar.html">
+                <a class="nav-link" href="#">
                     <i class="fe fe-arrow-up-circle fe-16"></i>
                     <span class="ml-3 item-text">Pinjaman</span>
                 </a>

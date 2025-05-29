@@ -77,7 +77,7 @@ class RoleController extends Controller
         return view('roles.asign', compact('roles'));
     }
 
-    public function roleSearch(Request $request)
+    public function search(Request $request)
     {
         $search = $request->q;
 
@@ -87,19 +87,6 @@ class RoleController extends Controller
             ->get();
 
         return response()->json($roles);
-    }
-
-    public function userSearch(Request $request)
-    {
-        $search = $request->q;
-
-        $users = User::where('name', 'like', "%$search%")
-            ->orwhere('email', 'like', "%$search%")
-            ->select('id', 'name')
-            ->limit(10)
-            ->get();
-
-        return response()->json($users);
     }
 
     public function updateRoles(Request $request) 

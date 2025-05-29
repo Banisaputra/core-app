@@ -190,4 +190,17 @@ class MemberController extends Controller
         return redirect()->back()->with('success', "Data dan akun anggota berhasil dihapus");
         
     }
+
+    public function search(Request $request)
+    {
+        $search = $request->q;
+
+        $members = Member::where('name', 'like', "%$search%")
+            ->orwhere('nip', 'like', "%$search%")
+            ->select('id', 'name')
+            ->limit(10)
+            ->get();
+
+        return response()->json($members);
+    }
 }

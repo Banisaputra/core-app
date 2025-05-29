@@ -141,7 +141,7 @@
     const fileNameDisplay = document.getElementById('label_photo');
     
     // Tampilkan nama file
-    fileNameDisplay.textContent = file ? file.name : 'Choose file';
+    fileNameDisplay.textContent = file ? file.name.substr(1, 70) : 'Choose file';
 
     // Tampilkan preview gambar
     if (file) {

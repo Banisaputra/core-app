@@ -33,7 +33,7 @@
                 </a>
                 <ul class="collapse list-unstyled pl-4 w-100" id="ui-elements">
                     <li class="nav-item">
-                        <a class="nav-link pl-3" href="#">
+                        <a class="nav-link pl-3" href="{{ route('roles.index')}}">
                             <span class="ml-1 item-text">Role</span>
                         </a>
                     </li>

@@ -4,6 +4,7 @@ use App\Http\Middleware\LoginAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\EmployeeController;
@@ -32,7 +33,17 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit');
     Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');
     Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('members.destroy');
-
+    
+    // role
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::get('/roles/asign', [RoleController::class, 'asign'])->name('roles.asign');
+    Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::post('/roles/asign', [RoleController::class, 'updateRoles'])->name('roles.asigned');
+    Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::put('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
+    Route::get('/api/users/search', [RoleController::class, 'userSearch']);
+    Route::get('/api/roles/search', [RoleController::class, 'roleSearch']);
 
     // savings
     Route::get('/savings', [SavingController::class, 'index'])->name('savings.index');

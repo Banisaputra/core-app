@@ -10,4 +10,9 @@ class SavingType extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'description', 'created_by', 'updated_by'];
+
+    public function savings() 
+    {
+        return $this->hasMany(Saving::class);
+    }
 }

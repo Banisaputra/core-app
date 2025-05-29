@@ -6,12 +6,12 @@
     <div class="col-12 col-xl-10">
       <div class="row align-items-center my-4">
         <div class="col">
-          <h2 class="h3 mb-0 page-title">Tambah Simpanan</h2>
+          <h2 class="h3 mb-0 page-title">Edit Simpanan</h2>
         </div>
-        
       </div>
-      <form action="{{ route('savings.store')}}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('savings.update', $saving->id)}}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
         <hr class="my-4">
         @if ($errors->any())
         <div class="alert alert-danger" role="alert">
@@ -33,32 +33,36 @@
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="svDate">Kode</label>
-            <h5>{{ $sv_code }}</h5>
+            <h5>{{ $saving->sv_code }}</h5>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="simple-select2">Anggota</label>
-            <select id="memberSelect" name="member_id" class="form-control"></select>
+            <select id="memberSelect" name="member_id" class="form-control">
+              <option value="{{ $saving->member_id }}" selected>
+                {{ $saving->member->name ?? 'Search anggota...' }}
+              </option>
+            </select>
           </div>
           <div class="form-group col-md-3">
             <label for="simple-select2">Jenis Simpanan</label>
             <select id="svType" name="sv_type_id" class="form-control">
               <option value="">-- Pilih jenis simpanan</option>
               @foreach ($sv_types as $type)
-                  <option value="{{ $type->id }}">{{ ucwords($type->name) }}</option>
+                  <option value="{{ $type->id }}" {{ $saving->sv_type_id == $type->id ? 'selected' : ''}}>{{ ucwords($type->name) }}</option>
               @endforeach
             </select>
           </div>
           <div class="form-group col-md-3">
             <label for="sv_date">Tanggal Simpanan</label>
-            <input type="date" class="form-control" id="sv_date" name="sv_date" value="{{old('sv_date')}}">
+            <input type="date" class="form-control" id="sv_date" name="sv_date" value="{{old('sv_date', date('Y-m-d', strtotime($saving->sv_date)) ?? '')}}">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="sv_value">Jumlah</label>
-            <input type="number" class="form-control" id="sv_amount" name="sv_value" value="{{old('sv_value')}}">
+            <input type="number" class="form-control" id="sv_amount" name="sv_value" value="{{old('sv_value', $saving->sv_value*1 ?? '')}}">
           </div>
           <div class="form-group col-md-6">
             <label for="profile_photo">Payment Photo</label>
@@ -69,7 +73,7 @@
             </div>
             <!-- Preview container -->
             <div class="mt-2">
-                <img id="preview-image" src="" alt="Preview" style="max-width: 300px;" hidden>
+                <img id="preview-image" src="{{ asset('storage/'. $saving->proof_of_payment)}}" alt="Preview" style="max-width: 300px;">
             </div>
           </div>
         </div>

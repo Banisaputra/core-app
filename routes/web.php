@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\EmployeeController;
@@ -25,6 +26,12 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
         return view('dashboard');
     })->middleware([PermissionMiddleware::class . ':dashboard']);
 
+    // search
+    Route::get('/api/users/search', [UserController::class, 'search']);
+    Route::get('/api/roles/search', [RoleController::class, 'search']);
+    Route::get('/api/members/search', [MemberController::class, 'search']);
+
+
     // member
     Route::get('/members', [MemberController::class, 'index'])->name('members.index');
     Route::get('/members/create', [MemberController::class, 'create'])->name('members.create');
@@ -42,15 +49,15 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('roles.edit');
     Route::put('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
     Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
-    Route::get('/api/users/search', [RoleController::class, 'userSearch']);
-    Route::get('/api/roles/search', [RoleController::class, 'roleSearch']);
 
     // savings
     Route::get('/savings', [SavingController::class, 'index'])->name('savings.index');
     Route::get('/savings/create', [SavingController::class, 'create'])->name('savings.create');
     Route::post('/savings', [SavingController::class, 'store'])->name('savings.store');
+    Route::get('/savings/{id}', [SavingController::class, 'show'])->name('savings.show');
     Route::get('/savings/{id}/edit', [SavingController::class, 'edit'])->name('savings.edit');
     Route::put('/savings/{id}', [SavingController::class, 'update'])->name('savings.update');
     Route::delete('/savings/{id}', [SavingController::class, 'destroy'])->name('savings.destroy');
+
 });
 

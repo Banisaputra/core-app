@@ -9,7 +9,7 @@
     <div class="row justify-content-center">
       <div class="col-12">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">Tambah Karyawan</h2>
+            <h2 class="h3 mb-0 page-title">Daftar Simpanan</h2>
             <p class="card-text">Daftar Simpanan Anggota.</p>
         </div>
         <div class="row align-items-center my-4">
@@ -22,6 +22,23 @@
                 <button type="button" class="btn btn-success"><span class="fe fe-16 mr-2 fe-download"></span>Import Data <small>(soon)</small></button>
             </div>
         </div>
+         @if ($errors->any())
+        <div class="alert alert-danger" role="alert">
+          @foreach ($errors->all() as $error)
+            <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ $error }} <br>           
+          @endforeach
+        </div>
+      @endif
+      @if (session()->has('error'))
+        <div class="alert alert-danger" role="alert">
+            <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ session('error') }} <br>           
+        </div>
+      @endif
+      @if (session()->has('success'))
+        <div class="alert alert-success" role="alert">
+            <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
+        </div>
+      @endif
         <div class="row my-4">
           <!-- Small table -->
           <div class="col-md-12">
@@ -31,13 +48,13 @@
                 <table class="table datatables" id="savings">
                   <thead>
                     <tr>
-                      <th>No.</th>
-                      <th>Kode</th>
-                      <th>Anggota</th>
-                      <th>Tanggal</th>
-                      <th>Jenis</th>
-                      <th>Nominal</th>
-                      <th>Action</th>
+                      <th width="5%">No.</th>
+                      <th width="15%">Kode</th>
+                      <th width="">Anggota</th>
+                      <th width="15%">Tanggal</th>
+                      <th width="15%">Jenis</th>
+                      <th width="20%">Nominal</th>
+                      <th width="5%">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -45,22 +62,26 @@
                     @foreach ($savings as $saving)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $saving->saving_code }}</td>
-                            <td>{{ $saving->member_id }}</td>
-                            <td>{{ date('d M Y', strtotime($saving->saving_date)) }}</td>
-                            <td>{{ $saving->saving_type_id }}</td>
-                            <td>{{ number_format($saving->saving_value, 2) }}</td>
-                            <td>
-                                <a href="{{ route('savings.edit', $saving->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                <form action="{{ route('savings.destroy', $saving->id) }}" method="POST" style="display: inline;">
+                            <td>{{ $saving->sv_code }}</td>
+                            <td>{{ ucwords($saving->member->name) }}</td>
+                            <td>{{ date('d M Y', strtotime($saving->sv_date)) }}</td>
+                            <td>{{ $saving->svType->name }}</td>
+                            <td>Rp {{ number_format($saving->sv_value, 2) }}</td>
+                            <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="text-muted sr-only">Action</span>
+                              </button>
+                              <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="{{ route('savings.show', $saving->id) }}">View</a>
+                                <a class="dropdown-item" href="{{ route('savings.edit', $saving->id) }}">Edit</a>
+                                <form action="{{ route('savings.destroy', $saving->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    <button type="submit" id="btnDelete" class="dropdown-item">Delete</button>
                                 </form>
-                            </td>
+                              </div>
+                            </td> 
                         </tr>
                     @endforeach
-                     
                   </tbody>
                 </table>
               </div>
@@ -76,6 +97,7 @@
 <script src="{{ asset('fedash/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('fedash/js/dataTables.bootstrap4.min.js') }}"></script>
 <script>
+  $(document).ready(function() {
     $('#savings').DataTable(
     {
       autoWidth: true,
@@ -84,5 +106,11 @@
         [10, 25, 50, "All"]
       ]
     });
+    $('#deleteForm').on('submit', function(e) {
+      if (!confirm('Are you sure you want to delete this member?')) {
+          e.preventDefault();
+      }
+    });
+  })
 </script>
 @endsection

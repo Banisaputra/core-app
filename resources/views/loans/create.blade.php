@@ -6,11 +6,11 @@
     <div class="col-12 col-xl-10">
       <div class="row align-items-center my-4">
         <div class="col">
-          <h2 class="h3 mb-0 page-title">Tambah Simpanan</h2>
+          <h2 class="h3 mb-0 page-title">Tambah Pinjaman</h2>
         </div>
         
       </div>
-      <form action="{{ route('savings.store')}}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('loans.store')}}" method="POST" enctype="multipart/form-data">
         @csrf
         <hr class="my-4">
         @if ($errors->any())
@@ -32,8 +32,8 @@
         @endif
         <div class="form-row">
           <div class="form-group col-md-4">
-            <label for="svDate">Kode</label>
-            <h5>{{ $sv_code }}</h5>
+            <label for="loan_code">Kode Pinjaman</label>
+            <h5>{{ $loan_code }}</h5>
           </div>
         </div>
         <div class="form-row">
@@ -42,35 +42,30 @@
             <select id="memberSelect" name="member_id" class="form-control"></select>
           </div>
           <div class="form-group col-md-3">
-            <label for="simple-select2">Jenis Simpanan</label>
-            <select id="svType" name="sv_type_id" class="form-control">
-              <option value="">-- Pilih jenis simpanan</option>
-              @foreach ($sv_types as $type)
-                  <option value="{{ $type->id }}">{{ ucwords($type->name) }}</option>
-              @endforeach
-            </select>
+            <label for="loan_date">Tanggal Pinjaman</label>
+            <input type="date" class="form-control" id="loan_date" name="loan_date" value="{{old('loan_date')}}">
           </div>
           <div class="form-group col-md-3">
-            <label for="sv_date">Tanggal Simpanan</label>
-            <input type="date" class="form-control" id="sv_date" name="sv_date" value="{{old('sv_date')}}">
+            <label for="loan_value">Jumlah Pinjaman</label>
+            <input type="number" class="form-control" id="loan_value" name="loan_value" value="{{old('loan_value')}}">
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-4">
-            <label for="sv_value">Jumlah</label>
-            <input type="number" class="form-control" id="sv_value" name="sv_value" value="{{old('sv_value')}}">
+          <div class="form-group col-md-3">
+            <label for="loan_tenor">Tenor Bulan</label>
+            <input type="number" class="form-control" id="loan_tenor" name="loan_tenor" value="{{old('loan_tenor')}}">
           </div>
-          <div class="form-group col-md-6">
-            <label for="proof_of_payment">Payment Photo</label>
-            <div class="custom-file">
-              <input type="file" class="custom-file-input" id="proof_of_payment" name="proof_of_payment">
-              <label class="custom-file-label" for="proof_of_payment" id="label_photo">Choose file</label>
-              <small>*Format file jpg/jpeg,png dengan ukuran max:2MB</small>
-            </div>
-            <!-- Preview container -->
-            <div class="mt-2">
-                <img id="preview-image" src="" alt="Preview" style="max-width: 300px;" hidden>
-            </div>
+          <div class="form-group col-md-3">
+            <label for="interest_percent">Bunga Cicilan</label>
+            <input type="number" class="form-control" id="interest_percent" name="interest_percent" value="{{old('interest_percent')}}">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="due_date">Jatuh Tempo</label>
+            <input type="date" class="form-control" id="due_date" name="due_date" value="{{old('due_date')}}" readonly>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="loan_state">Status Pinjaman</label>
+            <input type="text" class="form-control" id="loan_state" name="loan_state" value="Pengajuan Baru" readonly>
           </div>
         </div>
         <hr class="my-4">
@@ -118,24 +113,25 @@
         }
     });
 
-    $('#proof_of_payment').on('change', function(event) {
-      const file = event.target.files[0];
-      const preview = $('#preview-image');
-      const fileNameDisplay = $('#label_photo');
-      fileNameDisplay.html( file ? file.name.substr(1, 70) : 'Choose file');
-      if (file) {
-        const reader = new FileReader(); 
-        reader.onload = function(e) {
-            preview.prop('src', e.target.result);
-            preview.prop('hidden', false);
-        }
-        reader.readAsDataURL(file);
+    $('#loan_tenor').keyup(function() {
+      const loanDate = $('#loan_date').val();
+      const loanTenor = parseInt($(this).val()) || 0;
+      const dueDate = $('#due_date');
+      if (loanDate && loanTenor > 0) { 
+        const date = new Date(loanDate);
+        date.setMonth(date.getMonth() + loanTenor);
+        
+        // Format to YYYY-MM-DD (HTML date input format)
+        const formattedDate = date.toISOString().split('T')[0];
+        dueDate.val(formattedDate);
       } else {
-        preview.prop('src' , '');
-        preview.prop('hidden' , true);
+        dueDate.val(loanDate);
       }
     });
-
+    // Also trigger calculation when loan date changes
+    $('#loan_date').on('change', function() {
+        $('#loan_tenor').trigger('keyup');
+    });
 
   });
 </script>

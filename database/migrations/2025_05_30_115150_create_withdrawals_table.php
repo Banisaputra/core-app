@@ -11,17 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loans', function (Blueprint $table) {
+        Schema::create('withdrawals', function (Blueprint $table) {
             $table->id();
-            $table->string('loan_code', 50);
-            $table->foreignId('member_id')->references('id')->on('members')->onDelete('cascade');
-            $table->integer('loan_date')->length(8)->comment('Ymd');
-            $table->integer('loan_value');
-            $table->integer('loan_tenor')->length(8);
-            $table->integer('interest_percent');
-            $table->integer('due_date')->length(8)->comment('Ymd');
-            $table->tinyInteger('loan_state')->default(1);
-            $table->text('remark_approval')->nullable()->comment('for rejected only');
+            $table->string('wd_code', 100)->unique();
+            $table->integer('member_id')->references('id')->on('members')->onDelete('cascade');
+            $table->integer('wd_date')->length(8);
+            $table->integer('wd_value');
+            $table->text('remark');
+            $table->string('proof_of_withdrawal')->comment('bukti penarikan');
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
@@ -33,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loans');
+        Schema::dropIfExists('withdrawals');
     }
 };

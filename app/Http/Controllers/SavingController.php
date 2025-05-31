@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Member;
 use App\Models\Saving;
 use App\Models\SavingType;
 use Illuminate\Http\Request;

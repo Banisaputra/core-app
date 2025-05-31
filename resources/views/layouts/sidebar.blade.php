@@ -22,6 +22,9 @@
                 </a>
             </li>
         </ul>
+
+    @if (auth()->user()->hasPermission('master'))
+            
         <p class="text-muted nav-heading mt-4 mb-1">
             <span>Master & Pengaturan</span>
         </p>
@@ -45,7 +48,9 @@
                 </ul>
             </li>
         </ul>
-         
+    @endif
+    @if (auth()->user()->hasPermission('koperasi'))
+        
         <p class="text-muted nav-heading mt-4 mb-1">
             <span>Koperasi</span>
         </p>
@@ -57,18 +62,19 @@
                 </a>
             </li>
             <li class="nav-item w-100">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{ route('loans.index')}}">
                     <i class="fe fe-arrow-up-circle fe-16"></i>
                     <span class="ml-3 item-text">Pinjaman</span>
                 </a>
             </li>
             <li class="nav-item w-100">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{ route('withdrawals.index')}}">
                     <i class="fe fe-credit-card fe-16"></i>
                     <span class="ml-3 item-text">Penarikan</span>
                 </a>
             </li>
         </ul>
+    @endif
  
     </nav>
   </aside>

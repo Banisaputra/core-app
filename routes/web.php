@@ -4,12 +4,15 @@ use App\Http\Middleware\LoginAuth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LoanController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Middleware\PermissionMiddleware;
+use App\Http\Controllers\WithdrawalController;
+use App\Http\Controllers\LoanPaymentController;
 
 
 
@@ -22,15 +25,11 @@ Route::get('/logout', [AuthController::class, 'logout']);
 
 // admin access
 Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(function () {
-    Route::get('/', function() {
-        return view('dashboard');
-    })->middleware([PermissionMiddleware::class . ':dashboard']);
 
     // search
     Route::get('/api/users/search', [UserController::class, 'search']);
     Route::get('/api/roles/search', [RoleController::class, 'search']);
     Route::get('/api/members/search', [MemberController::class, 'search']);
-
 
     // member
     Route::get('/members', [MemberController::class, 'index'])->name('members.index');
@@ -59,5 +58,33 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::put('/savings/{id}', [SavingController::class, 'update'])->name('savings.update');
     Route::delete('/savings/{id}', [SavingController::class, 'destroy'])->name('savings.destroy');
 
+    
+    
+    // loan_payment
+    Route::get('/loanPayments/create', [LoanPaymentController::class, 'create'])->name('loanPayments.create');
+
+    // withdrawla
+    Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
+    Route::get('/withdrawals/create', [WithdrawalController::class, 'create'])->name('withdrawals.create');
+    Route::post('/withdrawals', [WithdrawalController::class, 'store'])->name('withdrawals.store');
+    Route::get('/withdrawals/{id}', [WithdrawalController::class, 'show'])->name('withdrawals.show');
+    Route::get('/withdrawals/{id}/edit', [WithdrawalController::class, 'edit'])->name('withdrawals.edit');
+    Route::put('/withdrawals/{id}', [WithdrawalController::class, 'update'])->name('withdrawals.update');
+    Route::delete('/withdrawals/{id}', [WithdrawalController::class, 'destroy'])->name('withdrawals.destroy');
 });
 
+Route::middleware([RoleMiddleware::class . ':admin,finance'])->group(function() {
+    Route::get('/', function() {
+        return view('dashboard');
+    })->middleware([PermissionMiddleware::class . ':dashboard']);
+
+    // loans
+    Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
+    Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
+    Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
+    Route::get('/loans/{id}', [LoanController::class, 'show'])->name('loans.show');
+    Route::get('/loans/{id}/edit', [LoanController::class, 'edit'])->name('loans.edit');
+    Route::put('/loans/{id}', [LoanController::class, 'update'])->name('loans.update');
+    Route::delete('/loans/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
+
+});

@@ -107,7 +107,7 @@
     });
 
     $('#deleteForm').on('submit', function(e) {
-      if (!confirm('Are you sure you want to delete this member?')) {
+      if (!confirm('Apakah anda yakin ingin menghapus anggota ini?')) {
           e.preventDefault();
       }
     });

@@ -9,12 +9,12 @@
     <div class="row justify-content-center">
       <div class="col-12">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">Daftar Simpanan</h2>
-            <p class="card-text">Daftar Simpanan Anggota.</p>
+            <h2 class="h3 mb-0 page-title">Daftar Penarikan</h2>
+            <p class="card-text">Daftar Penarikan Anggota.</p>
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-                <a href="{{ route('savings.create') }}" class="btn mb-2 btn-primary">
+                <a href="{{ route('withdrawals.create') }}" class="btn mb-2 btn-primary">
                     <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
                 </a>
             </div>
@@ -45,38 +45,36 @@
             <div class="card shadow">
               <div class="card-body">
                 <!-- table -->
-                <table class="table datatables" id="savings">
+                <table class="table datatables" id="withdrawals">
                   <thead>
                     <tr>
                       <th width="5%">No.</th>
                       <th width="15%">Kode</th>
                       <th width="">Anggota</th>
                       <th width="15%">Tanggal</th>
-                      <th width="15%">Jenis</th>
                       <th width="20%">Nominal</th>
                       <th width="5%">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     
-                    @foreach ($savings as $saving)
+                    @foreach ($withdrawals as $withdrawal)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $saving->sv_code }}</td>
-                            <td>{{ ucwords($saving->member->name) }}</td>
-                            <td>{{ date('d M Y', strtotime($saving->sv_date)) }}</td>
-                            <td>{{ $saving->svType->name }}</td>
-                            <td>Rp {{ number_format($saving->sv_value, 2) }}</td>
+                            <td>{{ $withdrawal->wd_code }}</td>
+                            <td>{{ ucwords($withdrawal->member->name) }}</td>
+                            <td>{{ date('d M Y', strtotime($withdrawal->wd_date)) }}</td>
+                            <td>Rp {{ number_format($withdrawal->wd_value, 2) }}</td>
                             <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="text-muted sr-only">Action</span>
                               </button>
                               <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{{ route('savings.show', $saving->id) }}">View</a>
-                                <a class="dropdown-item" href="{{ route('savings.edit', $saving->id) }}">Edit</a>
-                                <form action="{{ route('savings.destroy', $saving->id) }}" method="POST" style="display: inline;" id="deleteForm">
+                                <a class="dropdown-item" href="{{ route('withdrawals.show', $withdrawal->id) }}">View</a>
+                                <a class="dropdown-item" href="{{ route('withdrawals.edit', $withdrawal->id) }}">Edit</a>
+                                <form action="{{ route('withdrawals.destroy', $withdrawal->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" id="btnDelete" class="dropdown-item">Delete</button>
+                                    <button type="button" id="btnDelete" class="dropdown-item">Delete</button>
                                 </form>
                               </div>
                             </td> 
@@ -98,7 +96,7 @@
 <script src="{{ asset('fedash/js/dataTables.bootstrap4.min.js') }}"></script>
 <script>
   $(document).ready(function() {
-    $('#savings').DataTable(
+    $('#withdrawals').DataTable(
     {
       autoWidth: true,
       "lengthMenu": [
@@ -106,11 +104,15 @@
         [10, 25, 50, "All"]
       ]
     });
-    $('#deleteForm').on('submit', function(e) {
-      if (!confirm('Apakah anda yakin ingin menghapus simpanan ini?')) {
-          e.preventDefault();
+
+    $('#btnDelete').on('click', function(e) {
+      if (!confirm('Apakah anda yakin ingin menghapus pinjaman ini?')) {
+        e.preventDefault();
+      } else {
+        $('#deleteForm').submit();
       }
     });
+
   })
 </script>
 @endsection

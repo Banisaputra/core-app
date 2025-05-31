@@ -52,9 +52,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
-    public function hasRole($role)
+    public function hasRole($roles)
     {
-        return $this->roles()->where('name', $role)->exists();
+        return $this->roles()->whereIn('name', $roles)->exists();
     }
 
     // Cek apakah user punya permission melalui role

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('withdrawals', function (Blueprint $table) {
             $table->id();
             $table->string('wd_code', 100)->unique();
-            $table->integer('member_id')->references('id')->on('members')->onDelete('cascade');
+            $table->integer('member_id')->references('id')->on('members');
             $table->integer('wd_date')->length(8);
             $table->integer('wd_value');
             $table->text('remark');

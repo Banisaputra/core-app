@@ -45,6 +45,11 @@
                             <span class="ml-1 item-text">Anggota</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link pl-3" href="{{ route('items.index')}}">
+                            <span class="ml-1 item-text">Barang</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
         </ul>
@@ -75,6 +80,30 @@
             </li>
         </ul>
     @endif
+
+        <p class="text-muted nav-heading mt-4 mb-1">
+            <span>Usaha</span>
+        </p>
+        <ul class="navbar-nav flex-fill w-100 mb-2">
+            <li class="nav-item w-100">
+                <a class="nav-link" href="{{ route('pos.index') }}">
+                    <i class="fe fe-arrow-down-circle fe-16"></i>
+                    <span class="ml-3 item-text">POS</span>
+                </a>
+            </li>
+            <li class="nav-item w-100">
+                <a class="nav-link" href="#">
+                    <i class="fe fe-arrow-up-circle fe-16"></i>
+                    <span class="ml-3 item-text">Pembelian</span>
+                </a>
+            </li>
+            <li class="nav-item w-100">
+                <a class="nav-link" href="#">
+                    <i class="fe fe-credit-card fe-16"></i>
+                    <span class="ml-3 item-text">Inventory</span>
+                </a>
+            </li>
+        </ul>
  
     </nav>
   </aside>

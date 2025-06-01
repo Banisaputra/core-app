@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('member_status', 100)->nullable();
             $table->decimal('balance', 10, 2)->default(0);
             $table->date('date_joined');
+            $table->tinyInteger('is_transactional')->length(2)->default(1);
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();

@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\LoginAuth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PosController;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoanController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Middleware\PermissionMiddleware;
+use App\Http\Controllers\MasterItemController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\LoanPaymentController;
 
@@ -30,6 +32,7 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/api/users/search', [UserController::class, 'search']);
     Route::get('/api/roles/search', [RoleController::class, 'search']);
     Route::get('/api/members/search', [MemberController::class, 'search']);
+    Route::get('/api/items/search', [MasterItemController::class, 'search']);
 
     // member
     Route::get('/members', [MemberController::class, 'index'])->name('members.index');
@@ -71,6 +74,22 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/withdrawals/{id}/edit', [WithdrawalController::class, 'edit'])->name('withdrawals.edit');
     Route::put('/withdrawals/{id}', [WithdrawalController::class, 'update'])->name('withdrawals.update');
     Route::delete('/withdrawals/{id}', [WithdrawalController::class, 'destroy'])->name('withdrawals.destroy');
+
+    // pos
+    Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
+    Route::post('/submit-sale', [PosController::class, 'store']);
+
+
+
+    // items
+    Route::get('/items', [MasterItemController::class, 'index'])->name('items.index');
+    Route::get('/items/create', [MasterItemController::class, 'create'])->name('items.create');
+    Route::post('/items', [MasterItemController::class, 'store'])->name('items.store');
+    Route::get('/items/{id}', [MasterItemController::class, 'show'])->name('items.show');
+    Route::get('/items/{id}/edit', [MasterItemController::class, 'edit'])->name('items.edit');
+    Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
+    Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');
+
 });
 
 Route::middleware([RoleMiddleware::class . ':admin,finance'])->group(function() {

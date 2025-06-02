@@ -57,7 +57,7 @@
           </div>
           <div class="form-group col-md-3">
             <label for="interest_percent">Bunga Cicilan</label>
-            <input type="number" class="form-control" id="interest_percent" name="interest_percent" value="{{old('interest_percent')}}">
+            <input type="number" class="form-control" id="interest_percent" name="interest_percent" value="1.25" readonly>
           </div>
           <div class="form-group col-md-4">
             <label for="due_date">Jatuh Tempo</label>
@@ -69,9 +69,47 @@
           </div>
         </div>
         <hr class="my-4">
+        <div class="row mb-2">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="ln_agunan">Jaminan Pinjaman</label>
+                <input type="text" class="form-control" id="ln_agunan" name="ln_agunan">
+              </div>
+              <div class="form-group">
+                <label for="ln_docNumber">Nomor Dokumen</label>
+                <input type="text" class="form-control" id="ln_docNumber" name="ln_docNumber">
+              </div>
+              <div class="form-group">
+                <label for="ln_docDetail">Detail Dokumen</label>
+                <textarea class="form-control" id="ln_docDetail" name="ln_docDetail" rows="3"></textarea>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-2">Syarat Pinjaman</p>
+              <p class="small text-muted mb-2"> pengajuan pinjaman tanpa agunan:</p>
+              <ul class="small text-muted pl-4 mb-2">
+                <li>Kepesertaan Anggota < 1 tahun max. 2.000.000,-</li>
+                <li>Kepesertaan Anggota < 5 tahun max. 3.500.000,-</li>
+                <li>Kepesertaan Anggota > 5 tahun max. 5.500.000,-</li>
+                <li>Maksimum angsuran 12x</li>
+              </ul>
+              <p class="small text-muted mb-2"> pengajuan pinjaman dengan agunan:</p>
+              <ul class="small text-muted pl-4 mb-0">
+                <li>BPKB motor tahun 2010-1025 max. 8.000.000,-</li>
+                <li>BPKB motor tahun 2016-2020 max. 10.000.000,-</li>
+                <li>BPKB motor tahun 2020-2022 max. 12.000.000,-</li>
+                <li>BPKB motor tahun 2023-2025 max. 15.000.000,-</li>
+                <li>Khusus BPKB mobil max. 15.000.000,-</li>
+                <li>Maksimum angsuran 36x</li>
+              </ul>
+            </div>
+          </div>
+         
+
+        <hr class="my-4">
         <div class="form-row">
           <div class="col-md-6">
-            <small>*Kode dibuat otomatis oleh sistem</small>
+            <small>*informasi lainnya, <a href="#">Syarat dan ketentuan lebih lanjut</a></small>
           </div>
           <div class="col-md-6 text-right">
             <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Simpan</button>

@@ -74,18 +74,45 @@
         </div>
     </div>
 </div>
-{{-- credit modal --}}
+{{-- credit modal --}} 
 <div class="modal fade" id="creditModal" tabindex="-1" role="dialog" aria-labelledby="creditModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="creditModalTitle">Credit Payment</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
+                <span aria-hidden="true">x</span>
             </button>
         </div>
-        <div class="modal-body">Mauris lobortis efficitur ligula, et consectetur lectus maximus sed. 
-
+        <div class="modal-body">
+            <form>
+                <div class="form-group row">
+                    <label for="crMember" class="col-sm-3 col-form-label">Nama</label>
+                    <div class="col-sm-9">
+                        <h3><span id="crMember"></span></h3>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="crTotal" class="col-sm-3 col-form-label">Total</label>
+                    <div class="col-sm-9">
+                        <h3 id="crTotal"></h3>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="crTenor" class="col-sm-3 col-form-label">Tenor</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" id="crTenor">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="crTotal" class="col-sm-3 col-form-label">Angsuran</label>
+                    <div class="col-sm-9">
+                        <h3 id="crInterest"></h3>
+                    </div>
+                </div>
+                <hr class="my-2">
+                <small>*Kredit akan tercatat sebagain pinjaman anggota</small>
+            </form>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Close</button>
@@ -141,7 +168,10 @@
 @endsection
 
 @section('page_script')
+<script src="{{ asset('fedash/js/pos.js')}}"></script>
+
 <script>
+    loadProducts();
     $(document).ready(function () {
         $('#memberSelect').select2({
             placeholder: 'Search anggota...',
@@ -170,227 +200,14 @@
             }
         }).on('change', function(e) {
             // Get the full selected data
-            const selectedData = $(this).select2('data')[0];
-            cust_name = selectedData.text;
+            const selectedData = $(this).select2('data');
+            if (selectedData.length > 0) {
+                cust_name = selectedData[0].text
+            }
         });
 
 
     });
 </script>
-<script>
-  const productList = document.getElementById("productList");
-  const cartBody = document.getElementById("cartBody");
-  const totalEl = document.getElementById("total");
-  const searchBox = document.getElementById("item_search");
-  const cashBtn = document.getElementById('cashBtn');
-  const cashPayment = document.getElementById('cashPayment');
-  const cashReceive = document.getElementById('cashReceived');
-  const cart = {};
-  var cust_name = "";
-
-  function formatIDR(value, decimal) {
-    return value.toLocaleString('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: decimal
-    });
-  }
-
-
-
-cashBtn.addEventListener('click', function () {
-    // Set total in modal
-    const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
-    document.getElementById('memberName').textContent = cust_name;
-    document.getElementById('totalAmount').textContent = formatIDR(total,0);
-    cashReceive.value = '';
-    document.getElementById('cashChange').textContent = '0';
-    const memberId = document.getElementById('memberSelect').value *1;
-    // return, modal hide
-
-});
-
-cashReceive.addEventListener('input', function () {
-    const total = parseFloat(document.getElementById('totalAmount').textContent.replace(/[^\d]/g, ''));
-    const received = parseFloat(this.value) || 0;
-    const change = received - total;
-    document.getElementById('cashChange').textContent = formatIDR(change,0);
-});
-
-// save sales
-cashPayment.addEventListener('click', function () {
-  const total = parseFloat(document.getElementById('totalAmount').textContent.replace(/[^\d]/g, ''));
-  const received = parseFloat(cashReceive.value);
-  const memberId = document.getElementById('memberSelect').value *1;
-    if (isNaN(received) || received < total) {
-        alert('Nominal Tidak Sesui!');
-        return;
-    }
-    if(memberId == 0){
-        alert('Pelanggan Harus Dipilih!');
-        return;
-    }
   
-    // Collect cart data
-    var cartItems = [];
-    cartItems = Object.entries(cart).map((item) => {
-        const price = parseFloat(item[1].price ?? 0);
-        const qty = parseInt(item[1].qty ?? 1);
-
-        return {
-            id: item[0],
-            name: item[1].name,
-            price: !isNaN(price) ? Math.max(0, price) : 0,
-            qty: !isNaN(qty) ? Math.max(1, qty) : 1,
-            subtotal: function() { return this.price * this.qty }
-        };
-    });
-
-  // Send to backend
-  fetch('/submit-sale', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content // if Laravel
-    },
-    body: JSON.stringify({
-        member_id: memberId,
-        items: cartItems,
-        total: total,
-        received: received,
-        change: received - total,
-        payment_type: 'CASH'
-    })
-  })
-  .then(res => res.json())
-  .then(response => {
-    if (response.success) {
-        $('#cashModal').modal('hide');
-      alert('Payment successful!\nChange:' + formatIDR(received - total, 0));
-      
-      // Clear cart
-      document.getElementById('cartBody').innerHTML = '';
-      document.getElementById('total').textContent = '0';
-
-      // Optional: print receipt, show invoice, etc.
-    } else {
-      alert('Failed to submit sale.');
-    }
-  })
-  .catch(error => {
-    console.error(error);
-    alert('Error submitting sale.w');
-  });
-});
-
-
-// Load products from backend with optional search
-async function loadProducts(query = '') {
-    // Show loading
-    document.getElementById('productLoading').style.display = 'block';
-    try {
-        const res = await fetch(`/api/items/search?q=${encodeURIComponent(query)}`);
-        const data = await res.json();
-        // Hide loading
-        document.getElementById('productLoading').style.display = 'none';
-        renderProducts(data);
-    } catch (err) {
-        console.error("Failed to load products", err);
-    }
-}
-
-// Render products to the productList
-function renderProducts(products) {
-    productList.innerHTML = '';
-    if (products.length === 0) {
-        productList.innerHTML = '<p class="text-muted">No products found.</p>';
-        return;
-    }
-
-    products.forEach(product => {
-        const col = document.createElement("div");
-        col.className = "col-md-3 mb-3";
-        col.innerHTML = `
-        <div class="p-3 text-center product-card" data-id="${product.id}" data-name="${product.item_name}" data-price="${product.sales_price}">
-            <img src="/storage/${product.item_image}" alt="item_picture" width="150px">
-            <h6>${product.item_name}</h6>
-            <p>${formatIDR(parseFloat(product.sales_price), 0)}</p>
-            <button class="btn btn-sm btn-primary btn-block add-to-cart">Add</button>
-        </div>
-        `;
-        productList.appendChild(col);
-    });
-}
-
-// Update cart UI
-function updateCart() {
-cartBody.innerHTML = "";
-let total = 0;
-
-for (const [id, item] of Object.entries(cart)) {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-    <td>${item.name}</td>
-    <td width="20%"><input type="number" value="${item.qty}" min="1" class="form-control form-control-sm qty-input" data-name="${name}"></td>
-    <td width="25%">${formatIDR(item.qty * item.price ,0)}</td>
-    <td width="10%"><button class="btn btn-sm btn-danger remove-item" data-name="${name}">&times;</button></td>
-    `;
-    cartBody.appendChild(row);
-    total += item.qty * item.price;
-}
-
-totalEl.textContent = formatIDR(total, 0);
-}
-
-// Handle clicks
-document.addEventListener("click", e => {
-    if (e.target.classList.contains("add-to-cart")) {
-        const card = e.target.closest(".product-card");
-        const id = card.dataset.id; 
-        const name = card.dataset.name;
-        const price = parseFloat(card.dataset.price);
-
-        if (!cart[id]) {
-        cart[id] = { name: name, qty: 1, price: price };
-        } else {
-        cart[id].qty++;
-        }
-        updateCart();
-    }
-
-    if (e.target.classList.contains("remove-item")) {
-        const name = e.target.dataset.name;
-        delete cart[id];
-        updateCart();
-    }
-});
-
-// Quantity change
-cartBody.addEventListener("input", e => {
-    if (e.target.classList.contains("qty-input")) {
-        const id = e.target.dataset.id;
-        const name = e.target.dataset.name;
-        const qty = parseInt(e.target.value);
-        if (qty > 0) {
-        cart[id].qty = qty;
-        } else {
-        delete cart[id];
-        }
-        updateCart();
-    }
-});
-
-// Search input with debounce
-let searchTimer;
-searchBox.addEventListener("input", () => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => {
-        const query = searchBox.value.trim();
-        loadProducts(query);
-    }, 300);
-});
-
-// Load products on page load
-loadProducts();
-</script>
 @endsection

@@ -180,14 +180,14 @@ class MemberController extends Controller
         $user = User::findOrFail($member->user_id);
         if($member && $user) {
             // delete picture
-            if ($member->profile_photo && Storage::disk('public')->exists($member->profile_photo)) {
-                Storage::disk('public')->delete($member->profile_photo);
-            }
-            $member->delete();
-            $user->delete();
+            // if ($member->profile_photo && Storage::disk('public')->exists($member->profile_photo)) {
+            //     Storage::disk('public')->delete($member->profile_photo);
+            // }
+            $member->update(["is_transactional" => 0]);
+            $user->update(["is_transactional" => 0]);
         }
 
-        return redirect()->back()->with('success', "Data dan akun anggota berhasil dihapus");
+        return redirect()->back()->with('success', "Data dan akun anggota berhasil diperbaharui");
         
     }
 

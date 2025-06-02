@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string('employment', 100)->nullable();
             $table->text('address')->nullable();
             $table->string('image', 255)->nullable();
-            $table->string('member_status', 100)->nullable();
             $table->decimal('balance', 10, 2)->default(0);
             $table->date('date_joined');
             $table->tinyInteger('is_transactional')->length(2)->default(1);

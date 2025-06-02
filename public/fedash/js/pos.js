@@ -1,61 +1,295 @@
 "use strict"
-const formatter = new Intl.NumberFormat('id-ID')
-let cart = [];
-let invoice = 0;
+const productList = document.getElementById("productList");
+const cartBody = document.getElementById("cartBody");
+const totalEl = document.getElementById("total");
+const searchBox = document.getElementById("item_search");
+const cashBtn = document.getElementById('cashBtn');
+const cashPayment = document.getElementById('cashPayment');
+const creditBtn = document.getElementById('creditBtn');
+const creditPayment = document.getElementById('creditPayment');
+const cashReceive = document.getElementById('cashReceived');
+const tenorReceive = document.getElementById('crTenor');
+var cart = {};
+var cust_name = "";
 
-$('#add_cart').click(function () {
-   $(this).prop('disabled', true)
-   let item_id = $('.search-item #item').val();
-   let item_qty = $('.search-item #qty_item').val();
-   $.ajax({
-      url: urlSearch,
-      dataType: 'json',
-      data: {
-         'item_id': item_id,
-      },
-      success: function (result) {
-         // add cart
-         cart.push(result['item_id']);
-         invoice += (item_qty * 45000);
-         $('.cart-container #cart-list tbody').append("<tr>\
-         <td width='40%'>" + result['item_name'] + "</td>\
-         <td width='10%'>" + result['item_brand_id'] + "</td>\
-         <td width='10%'>" + item_qty + "</td>\
-         <td width='15%'>" + formatter.format(45000) + "</td>\
-         <td width='15%'>" + formatter.format(item_qty * 45000) + "</td>\
-         <td width='10%'><button class='btn btn-outline-danger' onClick='itemDelete(this)' data-subtotal='"+ (item_qty * 45000) + "' data-id='" + result['item_id'] + "'><i class='fe fe-trash'></i></button></td>\
-         </tr>");
-
-         $('#add_cart').prop('disabled', false)
-         $('select#item').val('').trigger('change')
-         $('input#qty_item').val('')
-         $('.invoice-item #total-invoice').text(formatter.format(invoice) + ',-')
-         $('.invoice-item strong').text(cart.length)
-      }
-   })
-})
-
-$('#payment').click(function () {
-   alert('saving transaction and view invoice')
-})
-
-$('#reset').click(function () {
-   alert('delete all item on cart')
-   location.reload();
-})
-
-function itemDelete(btn) {
-   let item_id = $(btn).data('id')
-   let subtotal = $(btn).data('subtotal')
-   var row = btn.parentNode.parentNode;
-   row.parentNode.removeChild(row);
-   cart.splice(cart.indexOf(item_id), 1);
-   invoice -= subtotal;
-   $('.invoice-item #total-invoice').text(formatter.format(invoice) + ',-')
-   $('.invoice-item strong').text(cart.length)
+function formatIDR(value, decimal) {
+   return value.toLocaleString('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: decimal
+   });
 }
 
-$('.js-data-item').change(function () {
-   var data = $(this).val();
-   alert('item selected with id = ' + data);
+ 
+cashBtn.addEventListener('click', function () {
+   const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
+   document.getElementById('memberName').textContent = cust_name;
+   document.getElementById('totalAmount').textContent = formatIDR(total,0);
+   cashReceive.value = '';
+   document.getElementById('cashChange').textContent = '0';
+});
+
+creditBtn.addEventListener('click', function () {
+   const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
+   document.getElementById('crMember').textContent = cust_name;
+   document.getElementById('crTotal').textContent = formatIDR(total,0);
+   document.getElementById('crTenor').value = '';
+   document.getElementById('crInterest').textContent = '0';
+});
+
+tenorReceive.addEventListener('input', function () {
+   const total = parseFloat(document.getElementById('crTotal').textContent.replace(/[^\d]/g, ''));
+   const tenor = parseFloat(this.value) || 1;
+   const estInterest = total/tenor;
+   document.getElementById('crInterest').textContent = formatIDR(estInterest,0);
+});
+
+cashReceive.addEventListener('input', function () {
+   const total = parseFloat(document.getElementById('totalAmount').textContent.replace(/[^\d]/g, ''));
+   const received = parseFloat(this.value) || 0;
+   const change = received - total;
+   document.getElementById('cashChange').textContent = formatIDR(change,0);
+});
+
+// save sales
+creditPayment.addEventListener('click', function () {
+  const total = parseFloat(document.getElementById('crTotal').textContent.replace(/[^\d]/g, ''));
+  const tenor = parseFloat(tenorReceive.value);
+  const memberId = document.getElementById('memberSelect').value *1;
+  const crType = "BARANG";
+    if (isNaN(tenor)) {
+        alert('Tenor Tidak Sesuai!');
+        return;
+    }
+    if(memberId == 0){
+        alert('Pelanggan Harus Dipilih!');
+        return;
+    }
+  
+    // Collect cart data
+    var cartItems = [];
+    cartItems = Object.entries(cart).map((item) => {
+        const price = parseFloat(item[1].price ?? 0);
+        const qty = parseInt(item[1].qty ?? 1);
+
+        return {
+            id: item[0],
+            name: item[1].name,
+            price: !isNaN(price) ? Math.max(0, price) : 0,
+            qty: !isNaN(qty) ? Math.max(1, qty) : 1,
+            subtotal: function() { return this.price * this.qty }
+        };
+    });
+
+  // Send to backend
+  fetch('/submit-sale', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content // if Laravel
+    },
+    body: JSON.stringify({
+        member_id: memberId,
+        items: cartItems,
+        total: total,
+        tenor: tenor,
+        crInterest: total/tenor,
+        crType: crType,
+        payment_type: 'CREDIT'
+    })
+  })
+  .then(res => res.json())
+  .then(response => {
+    if (response.success) {
+        $('#creditModal .close').trigger('click');
+        alert('Payment successful!\nAngsuran:' + formatIDR(total/tenor, 0) + 'selama '+ tenor +' bulan');
+      
+      // Clear cart
+      document.getElementById('cartBody').innerHTML = '';
+      document.getElementById('total').textContent = '0';
+      $('#memberSelect').val(null).trigger('change');
+      cart = {};
+
+      // Optional: print receipt, show invoice, etc.
+    } else {
+      alert('Failed to submit sale.');
+    }
+  })
+  .catch(error => {
+    console.error(error);
+    alert('Error submitting sale.');
+  });
+});
+
+cashPayment.addEventListener('click', function () {
+  const total = parseFloat(document.getElementById('totalAmount').textContent.replace(/[^\d]/g, ''));
+  const received = parseFloat(cashReceive.value);
+  const memberId = document.getElementById('memberSelect').value *1;
+    if (isNaN(received) || received < total) {
+        alert('Nominal Tidak Sesuai!');
+        return;
+    }
+    if(memberId == 0){
+        alert('Pelanggan Harus Dipilih!');
+        return;
+    }
+  
+    // Collect cart data
+    var cartItems = [];
+    cartItems = Object.entries(cart).map((item) => {
+        const price = parseFloat(item[1].price ?? 0);
+        const qty = parseInt(item[1].qty ?? 1);
+
+        return {
+            id: item[0],
+            name: item[1].name,
+            price: !isNaN(price) ? Math.max(0, price) : 0,
+            qty: !isNaN(qty) ? Math.max(1, qty) : 1,
+            subtotal: function() { return this.price * this.qty }
+        };
+    });
+
+  // Send to backend
+  fetch('/submit-sale', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content // if Laravel
+    },
+    body: JSON.stringify({
+        member_id: memberId,
+        items: cartItems,
+        total: total,
+        received: received,
+        change: received - total,
+        payment_type: 'CASH'
+    })
+  })
+  .then(res => res.json())
+  .then(response => {
+    if (response.success) {
+        $('#cashModal .close').trigger('click');
+        alert('Payment successful!\nChange:' + formatIDR(received - total, 0));
+      
+      // Clear cart
+      document.getElementById('cartBody').innerHTML = '';
+      document.getElementById('total').textContent = '0';
+      $('#memberSelect').val(null).trigger('change');
+      cart = {};
+
+      // Optional: print receipt, show invoice, etc.
+    } else {
+      alert('Failed to submit sale.');
+    }
+  })
+  .catch(error => {
+    console.error(error);
+    alert('Error submitting sale.');
+  });
+});
+
+
+// Load products from backend with optional search
+async function loadProducts(query = '') {
+   // Show loading
+   document.getElementById('productLoading').style.display = 'block';
+   try {
+      const res = await fetch(`/api/items/search?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      // Hide loading
+      document.getElementById('productLoading').style.display = 'none';
+      renderProducts(data);
+   } catch (err) {
+      console.error("Failed to load products", err);
+   }
+}
+
+// Render products to the productList
+function renderProducts(products) {
+   productList.innerHTML = '';
+   if (products.length === 0) {
+      productList.innerHTML = '<p class="text-muted">No products found.</p>';
+      return;
+   }
+
+   products.forEach(product => {
+      const col = document.createElement("div");
+      col.className = "col-md-3 mb-3";
+      col.innerHTML = `
+      <div class="p-3 text-center product-card" data-id="${product.id}" data-name="${product.item_name}" data-price="${product.sales_price}">
+         <img src="/storage/${product.item_image}" alt="item_picture" width="150px">
+         <h6>${product.item_name}</h6>
+         <p>${formatIDR(parseFloat(product.sales_price), 0)}</p>
+         <button class="btn btn-sm btn-primary btn-block add-to-cart">Add</button>
+      </div>
+      `;
+      productList.appendChild(col);
+   });
+}
+
+// Update cart UI
+function updateCart() {
+   cartBody.innerHTML = "";
+   let total = 0;
+
+   for (const [id, item] of Object.entries(cart)) {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+      <td>${item.name}</td>
+      <td width="20%"><input type="number" value="${item.qty}" min="1" class="form-control form-control-sm qty-input" data-name="${name}"></td>
+      <td width="25%">${formatIDR(item.qty * item.price ,0)}</td>
+      <td width="10%"><button class="btn btn-sm btn-danger remove-item" data-name="${name}">&times;</button></td>
+      `;
+      cartBody.appendChild(row);
+      total += item.qty * item.price;
+   }
+   totalEl.textContent = formatIDR(total, 0);
+}
+
+// Handle clicks
+document.addEventListener("click", e => {
+   if (e.target.classList.contains("add-to-cart")) {
+      const card = e.target.closest(".product-card");
+      const id = card.dataset.id; 
+      const name = card.dataset.name;
+      const price = parseFloat(card.dataset.price);
+
+      if (!cart[id]) {
+         cart[id] = { name: name, qty: 1, price: price };
+      } else {
+         cart[id].qty++;
+      }
+      updateCart();
+   }
+
+   if (e.target.classList.contains("remove-item")) {
+      const name = e.target.dataset.name;
+      delete cart[id];
+      updateCart();
+   }
+});
+
+// Quantity change
+cartBody.addEventListener("input", e => {
+   if (e.target.classList.contains("qty-input")) {
+      const id = e.target.dataset.id;
+      const name = e.target.dataset.name;
+      const qty = parseInt(e.target.value);
+      if (qty > 0) {
+      cart[id].qty = qty;
+      } else {
+      delete cart[id];
+      }
+      updateCart();
+   }
+});
+
+// Search input with debounce
+let searchTimer;
+searchBox.addEventListener("input", () => {
+   clearTimeout(searchTimer);
+   searchTimer = setTimeout(() => {
+      const query = searchBox.value.trim();
+      loadProducts(query);
+   }, 300);
 });

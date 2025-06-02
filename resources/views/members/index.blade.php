@@ -50,10 +50,10 @@
                     <tr>
                       <th width="5%">No.</th>
                       <th width="15%">NIP</th>
-                      <th width="20%">Nama</th>
+                      <th>Nama</th>
                       <th width="15%">No.Telp</th>
-                      <th>Alamat</th>
-                      <th>Saldo</th>
+                      <th width="15%">Saldo</th>
+                      <th width="10%">Status</th>
                       <th width="5%">Action</th>
                     </tr>
                   </thead>
@@ -65,8 +65,9 @@
                         <td>{{ $member->nip }}</td>
                         <td>{{ $member->name }}</td>
                         <td>{{ $member->telphone }}</td>
-                        <td>{{ $member->address }}</td>
-                        <td>{{ number_format($member->balance, 2) }}</td>
+                        <td>Rp {{ number_format($member->balance,0) }}</td>
+                        <td>{!! $member->is_transactional == 1 ? "<span class='dot dot-lg bg-success mr-1'></span>Aktif" : "<span class='dot dot-lg bg-secondary mr-1'></span>Tidak Aktif" !!}</td>
+
                         <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="text-muted sr-only">Action</span>
                           </button>
@@ -76,7 +77,7 @@
                             <form action="{{ route('members.destroy', $member->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" id="btnDelete" class="dropdown-item">Delete</button>
+                                <button type="submit" id="btnDelete" class="dropdown-item">{{ $member->is_transactional==1 ? "Nonaktifkan" : "Aktifkan"}}</button>
                             </form>
                           </div>
                         </td> 
@@ -106,9 +107,11 @@
       ]
     });
 
-    $('#deleteForm').on('submit', function(e) {
-      if (!confirm('Apakah anda yakin ingin menghapus anggota ini?')) {
-          e.preventDefault();
+    $('#btnDelete').on('click', function(e) {
+      if (!confirm('Anda yakin ingin mengubah Aktivasi anggota ini?')) {
+        e.preventDefault();
+      } else {
+        $('#deleteForm').submit()
       }
     });
 </script>

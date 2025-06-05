@@ -35,7 +35,8 @@
             <label for="inputPassword" class="sr-only">Password</label>
             <input type="password" id="inputPassword" name="password" class="form-control form-control-lg" placeholder="Password" required="">
             </div>
-            <div class="form-row">
+            <hr class="my-4">
+            {{-- <div class="form-row">
                 <div class="col-md-6 mb-3">
                     <div class="custom-control custom-checkbox text-left mb-3">
                         <input type="checkbox" class="custom-control-input" id="customControlValidation1" value="remember-me">
@@ -45,7 +46,7 @@
                 <div class="col-md-6 mb-3">
                     <p class="text-right"><a class="mb-3" href="#}"> Forgot password?</a></p>
                 </div>
-            </div>
+            </div> --}}
            
             <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Login</button>
             <p>Don't have an account? - <a class="mb-3" href="{{ route('register') }}"> Sign Up</a></p>

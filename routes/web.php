@@ -9,8 +9,10 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\RepaymentController;
 use App\Http\Middleware\PermissionMiddleware;
 use App\Http\Controllers\MasterItemController;
 use App\Http\Controllers\WithdrawalController;
@@ -79,8 +81,6 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
     Route::post('/submit-sale', [PosController::class, 'store']);
 
-
-
     // items
     Route::get('/items', [MasterItemController::class, 'index'])->name('items.index');
     Route::get('/items/create', [MasterItemController::class, 'create'])->name('items.create');
@@ -90,8 +90,17 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
     Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');
 
+
+    //reports
+    Route::get('/report/deduction', [ReportController::class, 'deduction'])->name('reports.deductionSalary');
+
+    // repayments
+    Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index');
+
 });
 
+
+// more role
 Route::middleware([RoleMiddleware::class . ':admin,finance'])->group(function() {
     Route::get('/', function() {
         return view('dashboard');

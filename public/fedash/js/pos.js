@@ -236,9 +236,15 @@ function updateCart() {
       const row = document.createElement("tr");
       row.innerHTML = `
       <td>${item.name}</td>
-      <td width="20%"><input type="number" value="${item.qty}" min="1" class="form-control form-control-sm qty-input" data-name="${name}"></td>
+      <td width="30%">
+      <div class="form-row" style="justify-content:center;">
+         <button class="btn btn-outline-primary btn-sm py-1 px-2 btnQty" type="button" id="plus-${id}">+</button>
+         <span class="text-center qty-input px-1 mx-2" data-name="${item.name}" data-id="${id}">${item.qty}</span>
+         <button class="btn btn-outline-secondary btn-sm py-1 px-2 btnQty" type="button" id="minus-${id}">-</button>
+      </div>
+      </td>
       <td width="25%">${formatIDR(item.qty * item.price ,0)}</td>
-      <td width="10%"><button class="btn btn-sm btn-danger remove-item" data-name="${name}">&times;</button></td>
+      <td width="10%"><button class="btn btn-sm btn-danger remove-item" data-name="${item.name}">&times;</button></td>
       `;
       cartBody.appendChild(row);
       total += item.qty * item.price;
@@ -263,25 +269,36 @@ document.addEventListener("click", e => {
    }
 
    if (e.target.classList.contains("remove-item")) {
-      const name = e.target.dataset.name;
+      const id = e.target.dataset.id;
       delete cart[id];
       updateCart();
    }
+
+  
+   
 });
 
 // Quantity change
-cartBody.addEventListener("input", e => {
-   if (e.target.classList.contains("qty-input")) {
-      const id = e.target.dataset.id;
-      const name = e.target.dataset.name;
-      const qty = parseInt(e.target.value);
-      if (qty > 0) {
-      cart[id].qty = qty;
-      } else {
-      delete cart[id];
+cartBody.addEventListener("click", e => {
+   if (e.target.classList.contains("btnQty")) {
+      const type = e.target.id.split('-')[0];
+      const id = e.target.id.split('-')[1];
+      console.log(type);
+      if (type == "plus") {
+         cart[id].qty++
+         console.log("plus1");
+      } else if (type == "minus") {
+         cart[id].qty--;
+         console.log("minus1");
+         if (cart[id].qty == 0) {
+            console.log("hapus");
+            delete cart[id];
+         }
       }
       updateCart();
+      
    }
+   
 });
 
 // Search input with debounce

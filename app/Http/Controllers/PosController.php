@@ -7,6 +7,7 @@ use DateInterval;
 use App\Models\POS;
 use App\Models\Loan;
 use App\Models\MasterItem;
+use App\Models\LoanPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -95,8 +96,9 @@ class PosController extends Controller
                 $date->add(new DateInterval('P' . $request->tenor . 'M'));
                 $dueDate = $date->format('Ymd');
 
-                Loan::create([
+                $loan = Loan::create([
                     'member_id' => $request->member_id,
+                    'loan_type' => 'BARANG',
                     'loan_code' => $loan_code,
                     'loan_date' => now()->format('Ymd'),
                     'loan_tenor' => $request->tenor,
@@ -107,6 +109,37 @@ class PosController extends Controller
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
+
+                // insert loan payment
+                $loan_total = $loan->loan_value;
+                $ln_date = $loan->loan_date;
+                for ($i=1; $i <= $request->tenor ; $i++) { 
+                    $lp_val = round($loan->loan_value / $loan->loan_tenor, 0);
+                    $lp_intr = round(($lp_val*$loan->interest_percent)/100, 0);
+                    $ln_remain = round($loan_total - $lp_val);
+                    $pay_date = new DateTime($ln_date);
+                    $lp_date = $pay_date->add(new DateInterval('P1M'))->format('Ymd');
+                    LoanPayment::create([
+                        'lp_code' => LoanPayment::generateCode($lp_date),
+                        'loan_id' => $loan->id,
+                        'lp_date' => $lp_date,
+                        'lp_value' => $lp_val,
+                        'loan_interest' => $lp_intr,
+                        'loan_remaining' => $ln_remain,
+                        'lp_total' => ($lp_val+$lp_intr),
+                        'tenor_month' => $i,
+                        'lp_state' => 1,
+                        'remark' => '',
+                        'proof_of_payment' => '',
+                        'lp_forfeit' => 0,
+                        'created_by' => auth()->id(),
+                        'updated_by' => auth()->id(),
+            
+                    ]);
+                    $loan_total -= $lp_val;
+                    $ln_date = $lp_date;
+                    
+                }
             }
 
             DB::commit();

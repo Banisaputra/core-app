@@ -1,36 +1,36 @@
 @extends('layouts.main')
 
 @section('page_css')
-
+    <link rel="stylesheet" href="{{ asset('fedash/css/dataTables.bootstrap4.css') }}">
 @endsection
 
 @section('content')
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-12 col-xl-10">
-        <div class="row align-items-center my-4">
-            <div class="col">
-                <h2 class="h3 mb-0 page-title">Detail Simpanan</h2>
+            <div class="row align-items-center my-4">
+                <div class="col">
+                    <h2 class="h3 mb-0 page-title">Detail Pinjaman</h2>
+                </div>
             </div>
-        </div>
-        <hr class="my-4"> 
-        @if ($errors->any())
-        <div class="alert alert-danger" role="alert">
-          @foreach ($errors->all() as $error)
-            <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ $error }} <br>           
-          @endforeach
-        </div>
-        @endif
-        @if (session()->has('error'))
-          <div class="alert alert-danger" role="alert">
-            <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ session('error') }} <br>           
-          </div>
-        @endif
-        @if (session()->has('success'))
-          <div class="alert alert-success" role="alert">
-            <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
-          </div>
-        @endif
+            <hr class="my-4"> 
+            @if ($errors->any())
+            <div class="alert alert-danger" role="alert">
+            @foreach ($errors->all() as $error)
+                <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ $error }} <br>           
+            @endforeach
+            </div>
+            @endif
+            @if (session()->has('error'))
+            <div class="alert alert-danger" role="alert">
+                <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ session('error') }} <br>           
+            </div>
+            @endif
+            @if (session()->has('success'))
+            <div class="alert alert-success" role="alert">
+                <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
+            </div>
+            @endif
             <div class="row">
                 <div class="col-4">
                     <div class="card shadow mb-4">
@@ -65,6 +65,12 @@
                         </div>
                     </div>
                     <hr class="my-4">
+                    <div class="row">
+                        <p class="col-sm-3 text-right">Jenis Pinjaman</p>
+                        <div class="col-sm-9">
+                            <h5>{{ ucwords(strtolower($loan->loan_type)) }}</h5>
+                        </div>
+                    </div>
                     <div class="row">
                         <p class="col-sm-3 text-right">Tgl. Pinjaman</p>
                         <div class="col-sm-9">
@@ -114,32 +120,58 @@
                         <span class="fe fe-plus fe-16 mr-1"></span> Tambah Angsuran
                     </a>
                 </div>
-                <div class="row my-4">
-          <!-- Small table -->
-          <div class="col-md-12">
-            <div class="card shadow">
-              <div class="card-body">
-                <!-- table -->
-                <table class="table datatables" id="loans">
-                  <thead>
-                    <tr>
-                      <th width="5%">No.</th>
-                      <th width="10%">Kode</th>
-                      <th width="15%">Tgl. Angsuran</th>
-                      <th width="15%">Jumlah</th>
-                      <th width="15%">Sisa Pinjaman</th>
-                      <th width="15%">Status</th>
-                      <th width="5%">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    
-                  </tbody>
-                </table>
-              </div>
             </div>
-          </div>
-        </div>
+            <div class="row my-4">
+                <div class="col-md-12">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <table class="table datatables" id="loanPayment">
+                            <thead>
+                                <tr>
+                                    <th width="5%">No.</th>
+                                    <th width="10%">Kode</th>
+                                    <th width="15%">Tgl. Angsuran</th>
+                                    <th width="15%">Jumlah</th>
+                                    <th width="15%">Sisa Pinjaman</th>
+                                    <th width="15%">Status</th>
+                                    <th width="5%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($loan->payments as $pay)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $pay->lp_code }}</td>
+                                    <td>{{ date('d M Y', strtotime($pay->lp_date)) }}</td>
+                                    <td>Rp {{ number_format($pay->lp_total, 2) }}</td>
+                                    <td>Rp {{ number_format($pay->loan_remaining, 2) }}</td>
+                                    <td>
+                                    @switch($loan->loan_state)
+                                        @case(99)
+                                            Ditutup
+                                            @break
+                                        @case(2)
+                                            Dibayarkan
+                                            @break
+                                        @default
+                                            Belum dibayar
+                                    @endswitch
+                                    </td>
+                                    <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="text-muted sr-only">Action</span>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="{{ route('loans.show', $loan->id) }}">View</a>
+                                        <a class="dropdown-item" href="{{ route('loans.edit', $loan->id) }}">Edit</a>
+                                    </div>
+                                    </td> 
+                                </tr>
+                            @endforeach
+                            </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -147,5 +179,17 @@
 @endsection
 
 @section('page_script')
- 
+<script src="{{ asset('fedash/js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('fedash/js/dataTables.bootstrap4.min.js') }}"></script>
+<script>
+$(document).ready(function () {
+    $('#loanPayment').DataTable({
+        autoWidth: true,
+        "lengthMenu": [
+            [10, 25, 50, -1],
+            [10, 25, 50, "All"]
+        ]
+    });
+})
+</script>
 @endsection

@@ -19,10 +19,11 @@ return new class extends Migration
             $table->integer('lp_value');
             $table->integer('loan_interest')->comment('bunga dari angsuran');
             $table->integer('loan_remaining');
+            $table->integer('lp_total');
             $table->integer('tenor_month')->length(8);
             $table->tinyInteger('lp_state')->length(2);
             $table->text('remark')->nullable();
-            $table->string('proof_of_payment')->comment('url payment');
+            $table->string('proof_of_payment')->nullable()->comment('url payment');
             $table->integer('lp_forfeit')->comment('denda keterlambatan');
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');

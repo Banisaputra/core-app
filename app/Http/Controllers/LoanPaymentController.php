@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class LoanPaymentController extends Controller
 {
-    public function create(string $id) 
+    public function create() 
     {
         return view('loan_payments.create');
     }

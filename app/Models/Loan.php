@@ -21,6 +21,11 @@ class Loan extends Model
         return $this->hasMany(LoanPayment::class);
     }
 
+    public function loanAgunan()
+    {
+        return $this->hasOne(LoanAgunan::class);
+    }
+
     public static function generateCode()
     {
         $prefix = 'LN-';

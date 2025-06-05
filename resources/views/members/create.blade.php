@@ -88,10 +88,6 @@
             <input type="number" class="form-control" id="balance" name="balance" value="{{old('balance')}}">
           </div>
           <div class="form-group col-md-4">
-            <label for="member_status">Status</label>
-            <input type="text" class="form-control" id="member_status" name="member_status" value="{{old('member_status')}}">
-          </div>
-          <div class="form-group col-md-4">
             <label for="date_joined">Tanggal Bergabung</label>
             <input type="date" class="form-control" id="date_joined" name="date_joined" value="{{old('date_joined')}}">
           </div>

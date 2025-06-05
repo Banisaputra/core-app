@@ -45,7 +45,6 @@ class MemberController extends Controller
             'gender' => 'required|in:female,male',
             'religion' => 'required|in:Islam,Kristen,Katholik,Hindu,Budha',
             'balance' => 'integer',
-            'member_status' => 'string|max:50',
             'date_joined' => 'required|date',
             'address' => 'required',
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -81,7 +80,6 @@ class MemberController extends Controller
             'employment' => $request->employment,
             'address' => $request->address,
             'image' => $photoPath,
-            'member_status' => $request->member_status,
             'balance' => $request->balance,
             'date_joined' => $request->date_joined,
             'created_by' => auth()->id(),
@@ -130,7 +128,6 @@ class MemberController extends Controller
             'gender' => 'required|in:female,male',
             'religion' => 'required|in:Islam,Kristen,Katholik,Hindu,Budha',
             'balance' => 'integer',
-            'member_status' => 'string|max:50',
             'date_joined' => 'required|date',
             'address' => 'required',
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -161,7 +158,6 @@ class MemberController extends Controller
         $member->date_of_birth = $request->date_of_birth;
         $member->employment = $request->employment;
         $member->address = $request->address;
-        $member->member_status = $request->member_status;
         $member->balance = $request->balance;
         $member->date_joined = $request->date_joined;
         $member->updated_by = auth()->id();
@@ -178,16 +174,28 @@ class MemberController extends Controller
     {
         $member = Member::findOrFail($id);
         $user = User::findOrFail($member->user_id);
+        $message = "";
         if($member && $user) {
             // delete picture
             // if ($member->profile_photo && Storage::disk('public')->exists($member->profile_photo)) {
             //     Storage::disk('public')->delete($member->profile_photo);
             // }
-            $member->update(["is_transactional" => 0]);
-            $user->update(["is_transactional" => 0]);
+
+            if ($member->is_transactional == 0 && $user->is_transactional == 0 ) {
+                $member->is_transactional = 1;
+                $user->is_transactional = 1;
+                $message .= "diaktifkan";
+            } else {
+                $member->is_transactional = 0;
+                $user->is_transactional = 0;
+                $message .= "dinonaktifkan";
+            }
+        
+            $member->update();
+            $user->update();
         }
 
-        return redirect()->back()->with('success', "Data dan akun anggota berhasil diperbaharui");
+        return redirect()->back()->with('success', "Data dan akun anggota berhasil ".$message);
         
     }
 

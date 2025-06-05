@@ -68,6 +68,14 @@
                     <h5>Rp{{ number_format($member->balance, 0) }}</h5>
                 </div>
             </div>
+            <div class="row">
+                <p class="col-sm-3 text-right">Status</p>
+                <div class="col-sm-9">
+                    <h5>{!! $member->is_transactional == 1 
+                    ? "<span class='dot dot-lg bg-success mr-1'></span>Aktif" 
+                    : "<span class='dot dot-lg bg-secondary mr-1'></span>Tidak Aktif" !!}</h5>
+                </div>
+            </div>
         </div>
        
     </div>

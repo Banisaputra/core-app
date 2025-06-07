@@ -12,6 +12,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\RepaymentController;
 use App\Http\Middleware\PermissionMiddleware;
 use App\Http\Controllers\MasterItemController;
@@ -64,7 +65,6 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::delete('/savings/{id}', [SavingController::class, 'destroy'])->name('savings.destroy');
 
     
-    
     // loan_payment
     Route::get('/loanPayments/create', [LoanPaymentController::class, 'create'])->name('loanPayments.create');
 
@@ -96,6 +96,9 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
 
     // repayments
     Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index');
+
+    // inventories
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inv.index');
 
 });
 

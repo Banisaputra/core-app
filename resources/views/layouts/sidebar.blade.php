@@ -106,7 +106,7 @@
                 </a>
             </li>
             <li class="nav-item w-100">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{ route('inv.index') }}">
                     <i class="fe fe-credit-card fe-16"></i>
                     <span class="ml-3 item-text">Inventory</span>
                 </a>

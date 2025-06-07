@@ -58,6 +58,8 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     // savings
     Route::get('/savings', [SavingController::class, 'index'])->name('savings.index');
     Route::get('/savings/create', [SavingController::class, 'create'])->name('savings.create');
+    Route::get('/savings/generate', [SavingController::class, 'generate'])->name('savings.generate');
+    Route::post('/savings/generate', [SavingController::class, 'generated'])->name('savings.generated');
     Route::post('/savings', [SavingController::class, 'store'])->name('savings.store');
     Route::get('/savings/{id}', [SavingController::class, 'show'])->name('savings.show');
     Route::get('/savings/{id}/edit', [SavingController::class, 'edit'])->name('savings.edit');

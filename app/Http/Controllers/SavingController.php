@@ -24,6 +24,11 @@ class SavingController extends Controller
         return view('savings.create', $data);
     }
 
+    public function generate() 
+    {
+        return view('savings.generate');
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -54,6 +59,18 @@ class SavingController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Data simpanan berhasil ditambahkan.');
+    }
+
+    public function generated(Request $request) 
+    {
+        $request->validate([
+            'periode' => 'required',
+            'member_id' => 'nullable|array',
+            'member_id.*' => 'exists:members,id',
+        ]);
+
+        // loop member
+
     }
 
     public function show(string $id)

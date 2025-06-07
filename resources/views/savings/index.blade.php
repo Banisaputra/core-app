@@ -14,8 +14,11 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-                <a href="{{ route('savings.create') }}" class="btn mb-2 btn-primary">
+                <a href="{{ route('savings.create') }}" class="btn mb-2 btn-primary mr-3">
                     <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
+                </a>
+                <a href="{{ route('savings.generate') }}" class="btn mb-2 btn-warning">
+                    <span class="fe fe-plus fe-16 mr-1"></span> Generate
                 </a>
             </div>
             <div class="col-auto">

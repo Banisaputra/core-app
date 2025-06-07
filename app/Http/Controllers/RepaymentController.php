@@ -9,7 +9,7 @@ class RepaymentController extends Controller
 {
     public function index() 
     {
-        $lp_date = 2507; //date('ym'); 
+        $lp_date = 2508; //date('ym'); 
         $loanDetails = Loan::with(['member', 'payments' => function($query) use ($lp_date) {
             $query->whereRaw("DATE_FORMAT(lp_date, '%y%m') = ?", [$lp_date]);
         }])

@@ -10,11 +10,7 @@ use Barryvdh\DomPDF\Facade\pdf as PDF;
 class ReportController extends Controller
 {
     public function deduction(Request $request) {
-        $periode = $request->get('periode') ?? date('Ym');//2505
-        $month = 06;
-        $year = 25;
-
-        $lp_date = 2507;
+        $lp_date = 2508;
         $members = Member::with('user')->get();
 
         $data = [];
@@ -31,26 +27,27 @@ class ReportController extends Controller
             ->orderBy('id')
             ->get();
 
-            if($member->id == 8) {
-                dd($loanDetails);
-
-            }
-
-            for ($i=0; $i < count($loanDetails) ; $i++) { 
-                $loan = $loanDetails[$i];
-                
-            }
-
-
+            // if($member->id == 8) {
+            //     dd($loanDetails);
+            // }
 
             $simpananWajib = 50000;
+            $angsuranPinjaman = 0;
+            $cicilanBarang = 0;
+            for ($i=0; $i < count($loanDetails) ; $i++) { 
+                $loan = $loanDetails[$i];
+                if(strtoupper($loan->type) == "BARANG") {
+                    $cicilanBarang += $loan->payments[0]['lp_total']*1;
+                } else {
+                    $angsuranPinjaman += $loan->payments[0]['lp_total']*1;
+                }
+            }
 
-            $angsuranPinjaman = 125000;
 
-            $cicilanBarang = 35000;
+
 
             $data[] = [
-                'name' => $member->user->name ?? '-',
+                'name' => $member->name ?? '-',
                 'potongan_wajib' => $simpananWajib,
                 'potongan_pinjaman' => $angsuranPinjaman + $cicilanBarang,
                 'total' => $simpananWajib + $angsuranPinjaman + $cicilanBarang,
@@ -59,9 +56,9 @@ class ReportController extends Controller
 
         $pdf = PDF::loadView('reports.deduction-salary', [
             'data' => $data,
-            'periode' => $periode
+            'periode' => $lp_date
         ]);
 
-        return $pdf->stream('Laporan-Potongan-Gaji-' . $periode . '.pdf');
+        return $pdf->stream('Laporan-Potongan-Gaji-' . $lp_date . '.pdf');
     }
 }

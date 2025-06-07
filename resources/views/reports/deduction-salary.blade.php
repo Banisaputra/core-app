@@ -10,7 +10,7 @@
 </head>
 <body>
     <h3>Laporan Potongan Gaji Anggota</h3>
-    <p>Periode: {{ \Carbon\Carbon::createFromFormat('Y-m', $periode)->translatedFormat('F Y') }}</p>
+    <p>Periode: {{ \Carbon\Carbon::createFromFormat('ym', $periode)->translatedFormat('F Y') }}</p>
 
     <table>
         <thead>

@@ -6,10 +6,20 @@ use App\Models\Loan;
 use App\Models\Member;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\pdf as PDF;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
 {
-    public function deduction(Request $request) {
+    public function index() 
+    {
+        return view('reports.index');
+    }
+
+    // for PDF report type
+    public function deduction(Request $request) 
+    {
         $lp_date = 2508;
         $members = Member::with('user')->get();
 
@@ -61,4 +71,73 @@ class ReportController extends Controller
 
         return $pdf->stream('Laporan-Potongan-Gaji-' . $lp_date . '.pdf');
     }
+    // -----------
+    // for excel report type
+    public function deductionXlsx(Request $request)
+    {
+        $periode = $request->get('periode') ?? date('Y-m');
+        $month = substr($periode, 5, 2);
+        $year = substr($periode, 0, 4);
+
+        $members = Member::with('user')->get();
+        $data = [];
+
+        foreach ($members as $member) {
+            $simpananWajib = $member->savings()
+                ->where('type', 'wajib')
+                ->whereMonth('date', $month)
+                ->whereYear('date', $year)
+                ->sum('amount');
+
+            $angsuranPinjaman = $member->loanInstallments()
+                ->whereMonth('date', $month)
+                ->whereYear('date', $year)
+                ->sum('amount');
+
+            $cicilanBarang = $member->installments()
+                ->whereMonth('date', $month)
+                ->whereYear('date', $year)
+                ->sum('amount');
+
+            $data[] = [
+                'Nama' => $member->user->name ?? '-',
+                'Potongan Wajib' => $simpananWajib,
+                'Potongan Pinjaman' => $angsuranPinjaman + $cicilanBarang,
+                'Total Potongan' => $simpananWajib + $angsuranPinjaman + $cicilanBarang,
+            ];
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header
+        $sheet->setCellValue('A1', 'Nama Anggota');
+        $sheet->setCellValue('B1', 'Potongan Wajib');
+        $sheet->setCellValue('C1', 'Potongan Pinjaman');
+        $sheet->setCellValue('D1', 'Total Potongan');
+
+        // Data
+        $row = 2;
+        foreach ($data as $item) {
+            $sheet->setCellValue("A$row", $item['Nama']);
+            $sheet->setCellValue("B$row", $item['Potongan Wajib']);
+            $sheet->setCellValue("C$row", $item['Potongan Pinjaman']);
+            $sheet->setCellValue("D$row", $item['Total Potongan']);
+            $row++;
+        }
+
+        // Response
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Laporan-Potongan-Gaji-' . $periode . '.xlsx';
+
+        return new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output');
+        }, 200, [
+            "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Content-Disposition" => "attachment; filename=\"$fileName\"",
+            "Cache-Control" => "max-age=0",
+        ]);
+    }
+
+
 }

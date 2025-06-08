@@ -124,8 +124,13 @@
                 </a>
                 <ul class="collapse list-unstyled pl-4 w-100" id="ui-elements">
                     <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('reports.deductionSalary')}}" target="_blank">
+                        <a class="nav-link pl-3" target="_blank" href="{{ route('reports.deductionPdf')}}">
                             <span class="ml-1 item-text">Potong Gaji Anggota</span>
+                        </a>
+                    </li> 
+                    <li class="nav-item">
+                        <a class="nav-link pl-3" href="{{ route('reports.index')}}">
+                            <span class="ml-1 item-text">Laporan</span>
                         </a>
                     </li> 
                 </ul>

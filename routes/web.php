@@ -40,6 +40,8 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     // member
     Route::get('/members', [MemberController::class, 'index'])->name('members.index');
     Route::get('/members/create', [MemberController::class, 'create'])->name('members.create');
+    Route::get('/members/import', [MemberController::class, 'templateXlsx'])->name('members.template');
+    Route::post('/members/import', [MemberController::class, 'import'])->name('members.import');
     Route::post('/members', [MemberController::class, 'store'])->name('members.store');
     Route::get('/members/{id}', [MemberController::class, 'show'])->name('members.show');
     Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit');
@@ -94,7 +96,11 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
 
 
     //reports
-    Route::get('/report/deduction', [ReportController::class, 'deduction'])->name('reports.deductionSalary');
+    Route::get('/report', [ReportController::class, 'index'])->name('reports.index');
+    Route::post('/report/get', [ReportController::class, 'getReport'])->name('reports.getReport');
+    Route::get('/report/pdf-deduction', [ReportController::class, 'deduction'])->name('reports.deductionPdf');
+    Route::get('/report/xlsx-deduction', [ReportController::class, 'exportPotonganGajiExcel'])->name('reports.deductionXlsx');
+
 
     // repayments
     Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index');

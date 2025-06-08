@@ -10,6 +10,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\Validator;
 
 class MemberController extends Controller
 {
@@ -211,4 +213,81 @@ class MemberController extends Controller
 
         return response()->json($members);
     }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        $file = $request->file('file');
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+
+        $success = 0;
+        $failed = [];
+
+        foreach ($rows as $index => $row) {
+            if ($index <= 2) continue; // skip header and info 
+            $data = [
+                'nip' => $row[0] ?? null,
+                'name' => $row[1] ?? null,
+                'email' => $row[2] ?? null,
+                'telphone' => $row[3] ?? null,
+                'date_of_birth' => $row[4] ?? null,
+                'gender' => $row[5] ?? null,
+                'religion' => $row[6] ?? null,
+                'date_joined' => $row[7] ?? null,
+                'address' => $row[8] ?? null,
+            ];
+
+            $validator = Validator::make($data, [
+                'nip' => 'nullable',
+                'name' => 'required|string|max:100',
+                'email' => 'required|email|unique:users,email',
+                'date_of_birth' => 'required',
+                'telphone' => 'required',
+                'gender' => 'required',
+                'religion' => 'required',
+                'date_joined' => 'required',
+                'address' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                $failed[] = ['row' => $index + 1, 'errors' => $validator->errors()->all()];
+                continue;
+            }
+
+            $password = Hash::make($request->email);
+            $email_verify = now();
+            
+
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $password,
+                'email_verified_at' => $email_verify
+            ]);
+
+            $member = Member::create([
+                'user_id' => $user->id,
+                'nip' => $data['nip'],
+                'name' => $data['name'],
+                'telphone' => $data['telphone'],
+                'religion' => $data['religion'],
+                'gender' => $data['gender'],
+                'date_of_birth' => $data['date_of_birth'],
+                'address' => $data['address'],
+                'date_joined' => $data['date_joined'],
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
+            ]);
+
+            $success++;
+        }
+
+        return back()->with('success', "$success data berhasil diimport")->with('failed', $failed);
+    }
+
 }

@@ -40,7 +40,7 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     // member
     Route::get('/members', [MemberController::class, 'index'])->name('members.index');
     Route::get('/members/create', [MemberController::class, 'create'])->name('members.create');
-    Route::get('/members/import', [MemberController::class, 'templateXlsx'])->name('members.template');
+    Route::get('/members/import', [MemberController::class, 'downloadTemplate'])->name('members.template');
     Route::post('/members/import', [MemberController::class, 'import'])->name('members.import');
     Route::post('/members', [MemberController::class, 'store'])->name('members.store');
     Route::get('/members/{id}', [MemberController::class, 'show'])->name('members.show');

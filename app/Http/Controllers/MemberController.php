@@ -10,8 +10,15 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Font;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MemberController extends Controller
 {
@@ -289,5 +296,76 @@ class MemberController extends Controller
 
         return back()->with('success', "$success data berhasil diimport")->with('failed', $failed);
     }
+
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Master Anggota');
+
+        // Judul besar
+        $sheet->mergeCells('A1:I1');
+        $sheet->setCellValue('A1', 'Template Master Anggota');
+        $sheet->getStyle('A1')->applyFromArray([
+            'font' => ['bold' => true, 'size' => 14],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['argb' => 'FFB0D5F6'],
+            ],
+            'alignment' => ['horizontal' => 'center'],
+        ]);
+
+        // Header
+        $headers = ['NIP', 'Nama Lengkap', 'Email', 'No.Telp', 'Tgl. Lahir', 'Jenis Kelamin', 'Agama', 'Tgl. Bergabung', 'Alamat'];
+        $sheet->fromArray($headers, null, 'A2');
+
+        // Style header
+        $sheet->getStyle('A2:I2')->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => 'center'],
+            'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
+        ]);
+
+        // Keterangan wajib isi
+        $notes = [
+            '', 'Harus diisi', 'Harus diisi', 'Harus diisi',
+            "Format penulisan\nYYYY.MM.DD\nExp :\n - 2025.12.31\n - 2002.05.07",
+            "PRIA / WANITA\nHarus diisi",
+            '',
+            "Format penulisan\nYYYY.MM.DD\nExp :\n - 2025.12.31\n - 2002.05.07",
+            'Harus diisi',
+        ];
+
+        foreach (range('A', 'I') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        foreach ($notes as $index => $note) {
+            $cell = chr(65 + $index) . '3'; // A3, B3, ...
+            $sheet->setCellValue($cell, $note);
+            $sheet->getStyle($cell)->getFont()->getColor()->setARGB(Color::COLOR_RED);
+            $sheet->getStyle($cell)->getAlignment()->setWrapText(true);
+        }
+
+        // Contoh data
+        // $sheet->fromArray([
+        //     ['5563463', 'Gunawan Putra', 'gunawan@gmail.com', '987689', '1999.04.15', 'PRIA', 'ISLAM', '2025.06.08', 'alamat gunawan sekarang sesuai ktp saja'],
+        //     ['3453476', 'Dani Saputra', 'dani@gmail.com', '678799', '2002.05.14', 'PRIA', 'KRISTEN', '2025.06.08', 'alamat dani sekarang']
+        // ], null, 'A4');
+
+        // Generate response
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'template-master-anggota.xlsx';
+
+        return new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output');
+        }, 200, [
+            "Content-Type" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Content-Disposition" => "attachment; filename=\"$fileName\"",
+            "Cache-Control" => "max-age=0",
+        ]);
+    }
+
+
 
 }

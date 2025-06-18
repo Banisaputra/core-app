@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Middleware\LoginAuth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PosController;
+use App\Http\Middleware\LoginAuth;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\PermissionMiddleware;
+use App\Http\Controllers\PosController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\RoleController;
@@ -14,12 +15,9 @@ use App\Http\Controllers\SavingController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\RepaymentController;
-use App\Http\Middleware\PermissionMiddleware;
 use App\Http\Controllers\MasterItemController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\LoanPaymentController;
-
-
 
 // auth
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -68,7 +66,6 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::put('/savings/{id}', [SavingController::class, 'update'])->name('savings.update');
     Route::delete('/savings/{id}', [SavingController::class, 'destroy'])->name('savings.destroy');
 
-    
     // loan_payment
     Route::get('/loanPayments/create', [LoanPaymentController::class, 'create'])->name('loanPayments.create');
 
@@ -94,13 +91,11 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
     Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');
 
-
     //reports
     Route::get('/report', [ReportController::class, 'index'])->name('reports.index');
     Route::post('/report/get', [ReportController::class, 'getReport'])->name('reports.getReport');
     Route::get('/report/pdf-deduction', [ReportController::class, 'deduction'])->name('reports.deductionPdf');
     Route::get('/report/xlsx-deduction', [ReportController::class, 'exportPotonganGajiExcel'])->name('reports.deductionXlsx');
-
 
     // repayments
     Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index');
@@ -109,7 +104,6 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inv.index');
 
 });
-
 
 // more role
 Route::middleware([RoleMiddleware::class . ':admin,finance'])->group(function() {

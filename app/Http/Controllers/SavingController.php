@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Member;
 use App\Models\Saving;
 use App\Models\SavingType;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ class SavingController extends Controller
 {
     public function index() 
     {
-        $savings = Saving::with('member', 'svType')->latest()->paginate(10);
+        $savings = Saving::with('member', 'svType')->latest()->get();
         return view('savings.index', compact('savings'));
     }
 
@@ -26,7 +27,10 @@ class SavingController extends Controller
 
     public function generate() 
     {
-        return view('savings.generate');
+        $data = [
+            "sv_types" => SavingType::all(),
+        ];
+        return view('savings.generate', $data);
     }
 
     public function store(Request $request)
@@ -36,7 +40,7 @@ class SavingController extends Controller
             'sv_type_id' => 'required|exists:saving_types,id',
             'sv_value' => 'required|integer',
             'sv_date' => 'required|date',
-            'proof_of_payment' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'proof_of_payment' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $svn_code = Saving::generateCode();
@@ -46,17 +50,23 @@ class SavingController extends Controller
         if ($request->hasFile('proof_of_payment')) {
             $photoPath = $request->file('proof_of_payment')->store('proof_of_payment', 'public');
         }
-        
-        Saving::create([
-            "sv_code" => $svn_code,
-            "sv_date" => date('Ymd', strtotime($request->sv_date)),
-            "member_id" => $request->member_id,
-            "sv_type_id" => $request->sv_type_id,
-            "sv_value" => $request->sv_value,
-            "proof_of_payment" => $photoPath,
-            "created_by" => auth()->id(),
-            "updated_by" => auth()->id(),
-        ]);
+        try {
+            Saving::create([
+                "sv_code" => $svn_code,
+                "sv_date" => date('Ymd', strtotime($request->sv_date)),
+                "member_id" => $request->member_id,
+                "sv_type_id" => $request->sv_type_id,
+                "sv_value" => $request->sv_value,
+                "proof_of_payment" => $photoPath,
+                "created_by" => auth()->id(),
+                "updated_by" => auth()->id(),
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd($th->message);
+            return redirect()->back()->with('error', json_encode($th->message));
+            // return redirect()->back()->with('error', 'Anggota sudah melakukan jenis simpanan bulan ini.');
+        }    
 
         return redirect()->back()->with('success', 'Data simpanan berhasil ditambahkan.');
     }
@@ -65,11 +75,37 @@ class SavingController extends Controller
     {
         $request->validate([
             'periode' => 'required',
+            'sv_type_id' => 'required',
             'member_id' => 'nullable|array',
             'member_id.*' => 'exists:members,id',
         ]);
 
         // loop member
+        $members = Member::pluck('id');
+
+        foreach ($members as $key => $id) {
+            if (!in_array($id, $request->member_id ?? [])) {
+                try {
+                    Saving::create([
+                        "sv_code" => Saving::generateCode(date('ym', strtotime($request->periode))),
+                        "sv_date" => date('Ymd', strtotime($request->periode)),
+                        "member_id" => $id,
+                        "sv_type_id" => $request->sv_type_id,
+                        "sv_value" => 50000, // sesuikan settingan
+                        "created_by" => auth()->id(),
+                        "updated_by" => auth()->id(),
+                    ]);
+                } catch (\Throwable $th) {
+                    // Log the full error for debugging
+                    \Log::error('Error fetching record: ' . $th->getMessage(), [
+                        'exception' => $th,
+                    ]);
+                    return redirect()->back()->with('error', 'Anggota sudah melakukan jenis simpanan bulan ini.');
+                }    
+            }
+
+        }
+        return redirect()->back()->with('success', 'Data simpanan berhasil digenerate.');
 
     }
 

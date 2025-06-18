@@ -21,10 +21,10 @@ class Saving extends Model
         return $this->belongsTo(SavingType::class);
     }
 
-    public static function generateCode()
+    public static function generateCode($periode)
     {
         $prefix = 'SVN-';
-        $dateCode = date('ym'); // ex: 2505
+        $dateCode = $periode ?? date('ym'); // ex: 2505
 
         // Ambil entri terakhir di bulan ini
         $last = self::whereRaw("DATE_FORMAT(sv_date, '%y%m') = ?", [$dateCode])

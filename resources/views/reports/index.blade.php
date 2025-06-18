@@ -60,7 +60,7 @@
             <small>Note:laporan berdasarkan tanggal dibuatnya dokumen.</small>
            </div>
            <div class="col-md-6 text-right">
-             <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button>
+             <button type="button" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button>
            </div>
          </div>
       </form>

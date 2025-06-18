@@ -41,7 +41,16 @@
                <label for="periode">Periode</label>
                <input class="form-control" id="periode" type="month" name="periode">
             </div>
-            <div class="form-group col-md-9">
+            <div class="form-group col-md-3">
+              <label for="simple-select2">Jenis Simpanan</label>
+              <select id="svType" name="sv_type_id" class="form-control">
+                <option value="">-- Pilih jenis simpanan</option>
+                @foreach ($sv_types as $type)
+                    <option value="{{ $type->id }}">{{ ucwords($type->name) }}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-group col-md-6">
                 <label for="simple-select2">Anggota</label>
                 <select id="memberSelect" name="member_id[]" class="form-control"></select>
             </div>

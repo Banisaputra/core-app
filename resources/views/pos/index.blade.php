@@ -9,10 +9,30 @@
       vertical-align: middle;
     }
     /* Scrollable product list */
+    
     #productList {
       max-height: 80vh;
       overflow-y: auto;
     }
+    /* Custom scrollbar styling */
+    #productList::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+    }
+
+    #productList::-webkit-scrollbar-track {
+    background: #5c5c5ce1; /* Color of the track */
+    border-radius: 10px;
+    }
+
+    #productList::-webkit-scrollbar-thumb {
+    background: #979797; /* Color of the scroll thumb */
+    border-radius: 10px;
+    }
+
+    #productList::-webkit-scrollbar-thumb:hover {
+    background: #d4d4d4; /* Color on hover */
+    }
+       
     .cart-table {
         display: block;
     }

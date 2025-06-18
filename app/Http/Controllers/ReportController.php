@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Loan;
 use App\Models\Member;
+use App\Models\Saving;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\pdf as PDF;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -20,30 +21,37 @@ class ReportController extends Controller
     // for PDF report type
     public function deduction(Request $request) 
     {
-        $lp_date = 2508;
+        $periode = 2507; // date('ym');
         $members = Member::with('user')->get();
 
         $data = [];
 
         foreach ($members as $member) {
             $m_id = $member->id;
-            $loanDetails = Loan::with(['member', 'payments' => function($query) use ($lp_date) {
-                $query->whereRaw("DATE_FORMAT(lp_date, '%y%m') = ?", [$lp_date]);
-            }])
-            ->where('member_id', $m_id)
-            ->whereHas('payments', function($query) use ($lp_date) {
-                $query->whereRaw("DATE_FORMAT(lp_date, '%y%m') = ?", [$lp_date]);
-            })
-            ->orderBy('id')
-            ->get();
+            $loanDetails = Loan::with(['member', 'payments' => function($query) use ($periode) {
+                $query->whereRaw("DATE_FORMAT(lp_date, '%y%m') = ?", [$periode]);
+                }])
+                ->where('member_id', $m_id)
+                ->whereHas('payments', function($query) use ($periode) {
+                    $query->whereRaw("DATE_FORMAT(lp_date, '%y%m') = ?", [$periode]);
+                })
+                ->orderBy('id')
+                ->get();
 
-            // if($member->id == 8) {
-            //     dd($loanDetails);
-            // }
+            $savingDetails = Saving::with(['member', 'svType'])
+                ->whereRaw("DATE_FORMAT(sv_date, '%y%m') = ?", [$periode])
+                ->where('member_id', $m_id)
+                ->orderBy('id')
+                ->get();
 
-            $simpananWajib = 50000;
+            $simpananWajib = 0;
             $angsuranPinjaman = 0;
             $cicilanBarang = 0;
+
+            for ($i=0; $i < count($savingDetails); $i++) { 
+                $saving = $savingDetails[$i];
+                $simpananWajib += $saving->sv_value;
+            }
             for ($i=0; $i < count($loanDetails) ; $i++) { 
                 $loan = $loanDetails[$i];
                 if(strtoupper($loan->type) == "BARANG") {
@@ -52,6 +60,7 @@ class ReportController extends Controller
                     $angsuranPinjaman += $loan->payments[0]['lp_total']*1;
                 }
             }
+            
 
 
 
@@ -66,10 +75,10 @@ class ReportController extends Controller
 
         $pdf = PDF::loadView('reports.deduction-salary', [
             'data' => $data,
-            'periode' => $lp_date
+            'periode' => $periode
         ]);
 
-        return $pdf->stream('Laporan-Potongan-Gaji-' . $lp_date . '.pdf');
+        return $pdf->stream('Laporan-Potongan-Gaji-' . $periode . '.pdf');
     }
     // -----------
     // for excel report type

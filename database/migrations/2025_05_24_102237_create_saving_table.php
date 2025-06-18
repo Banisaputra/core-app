@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('savings', function (Blueprint $table) {
             $table->id();
-            $table->string('sv_code', 50);
+            $table->string('sv_code', 50)->unique();
             $table->integer('sv_date')->length(8);
-            $table->foreignId('member_id')->references('id')->on('members')->onDelete('cascade');
-            $table->foreignId('sv_type_id')->references('id')->on('saving_types')->onDelete('cascade');
+            $table->foreignId('member_id')->references('id')->on('members')->onDelete('cascade')->unique();
+            $table->foreignId('sv_type_id')->references('id')->on('saving_types')->onDelete('cascade')->unique();
             $table->string('sv_value', 100);
-            $table->string('proof_of_payment', 255)->comment('url bukti bayar');
+            $table->tinyInteger('sv_state')->length(2)->default(1);
+            $table->string('proof_of_payment', 255)->nullable()->comment('url bukti bayar');
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();

@@ -1,10 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\LoginAuth;
-use App\Http\Middleware\RoleMiddleware;
-use App\Http\Middleware\PermissionMiddleware;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PosController;
+use App\Http\Middleware\RoleMiddleware;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\RoleController;
@@ -13,8 +12,10 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\RepaymentController;
+use App\Http\Middleware\PermissionMiddleware;
 use App\Http\Controllers\MasterItemController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\LoanPaymentController;
@@ -102,6 +103,9 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
 
     // inventories
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inv.index');
+
+    // purchase
+    Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index');
 
 });
 

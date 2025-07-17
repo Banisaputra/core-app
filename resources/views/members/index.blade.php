@@ -80,9 +80,11 @@
         </div>
       @endif
       {{-- handle error import --}}
-      @if (session()->has('failed'))
+      @if (session()->has('failed') && count(session('failed')) > 0)
         <div class="alert alert-danger" role="alert">Kesalahan Row <br>
-          <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ "[".session('failed')[0]['row']."] ".session('failed')[0]['errors'][0] }} <br>           
+          @foreach (session('failed') as $error)
+            <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ "[".$error['row']."] ".$error['errors'][0] }} <br>           
+          @endforeach
         </div>
       @endif
         <div class="row my-4">
@@ -159,6 +161,16 @@
       } else {
         $('#deleteForm').submit()
       }
+    });
+
+    $('#memberFile').on('change', function() {
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+
+    $('#importModal').on('hidden.bs.modal', function () {
+      $(this).find('form')[0].reset();
+      $('#importModal .custom-file-label').html('Choose file');
     });
 </script>
 @endsection

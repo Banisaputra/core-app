@@ -293,8 +293,10 @@ class MemberController extends Controller
 
             $success++;
         }
+                // dd($failed);
 
-        return back()->with('success', "$success data berhasil diimport")->with('failed', $failed);
+
+        return redirect()->back()->with('success', "$success data berhasil diimport")->with('failed', $failed);
     }
 
     public function downloadTemplate()

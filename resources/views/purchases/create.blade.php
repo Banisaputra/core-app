@@ -6,10 +6,11 @@
     <div class="col-12 col-xl-10">
       <div class="row align-items-center my-4">
         <div class="col">
-          <h2 class="h3 mb-0 page-title">Tambah Barang</h2>
+          <h2 class="h3 mb-0 page-title">Tambah Simpanan</h2>
         </div>
+        
       </div>
-      <form action="{{ route('items.store')}}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('savings.store')}}" method="POST" enctype="multipart/form-data">
         @csrf
         <hr class="my-4">
         @if ($errors->any())
@@ -30,29 +31,40 @@
           </div>
         @endif
         <div class="form-row">
-          <div class="form-group col-md-5">
-            <label for="item_code">Kode Barang</label>
-            <input type="text" class="form-control" id="item_code" name="item_code" value="{{old('item_code')}}">
-          </div>
-          <div class="form-group col-md-7">
-            <label for="item_name">Nama Barang</label>
-            <input type="text" class="form-control" id="item_name" name="item_name" value="{{old('item_name')}}">
+          <div class="form-group col-md-4">
+            <label for="svDate">Kode</label>
+            <h5>{{ $sv_code }}</h5>
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-3">
-            <label for="sales_price">Harga Jual</label>
-            <input type="number" class="form-control" id="sales_price" name="sales_price" value="{{old('sales_price')}}">
+          <div class="form-group col-md-6">
+            <label for="simple-select2">Anggota</label>
+            <select id="memberSelect" name="member_id" class="form-control"></select>
           </div>
           <div class="form-group col-md-3">
-            <label for="stock">Stok</label>
-            <input type="number" class="form-control" id="stock" name="stock" value="{{old('stock')}}">
+            <label for="simple-select2">Jenis Simpanan</label>
+            <select id="svType" name="sv_type_id" class="form-control">
+              <option value="">-- Pilih jenis simpanan</option>
+              @foreach ($sv_types as $type)
+                  <option value="{{ $type->id }}">{{ ucwords($type->name) }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="sv_date">Tanggal Simpanan</label>
+            <input type="date" class="form-control" id="sv_date" name="sv_date" value="{{old('sv_date')}}">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="sv_value">Jumlah</label>
+            <input type="number" class="form-control" id="sv_value" name="sv_value" value="{{old('sv_value')}}">
           </div>
           <div class="form-group col-md-6">
-            <label for="item_image">Gambar</label>
+            <label for="proof_of_payment">Payment Photo</label>
             <div class="custom-file">
-              <input type="file" class="custom-file-input" id="item_image" name="item_image">
-              <label class="custom-file-label" for="item_image" id="label_photo">Choose file</label>
+              <input type="file" class="custom-file-input" id="proof_of_payment" name="proof_of_payment">
+              <label class="custom-file-label" for="proof_of_payment" id="label_photo">Choose file</label>
               <small>*Format file jpg/jpeg,png dengan ukuran max:2MB</small>
             </div>
             <!-- Preview container -->
@@ -64,7 +76,7 @@
         <hr class="my-4">
         <div class="form-row">
           <div class="col-md-6">
-            <small></small>
+            <small>*Kode dibuat otomatis oleh sistem</small>
           </div>
           <div class="col-md-6 text-right">
             <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Simpan</button>
@@ -78,9 +90,35 @@
 
 @section('page_script')
 <script>
-  $(document).ready(function () { 
+  $(document).ready(function () {
+    $('#memberSelect').select2({
+        placeholder: 'Search anggota...',
+        theme: 'bootstrap4',
+        minimumInputLength: 2,
+        ajax: {
+            url: '/api/members/search', // Your route
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term // search term
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.name
+                        };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
 
-    $('#item_image').on('change', function(event) {
+    $('#proof_of_payment').on('change', function(event) {
       const file = event.target.files[0];
       const preview = $('#preview-image');
       const fileNameDisplay = $('#label_photo');

@@ -140,6 +140,7 @@ class MasterItemController extends Controller
         $items = MasterItem::where('item_name', 'like', "%$search%")
             ->orwhere('item_code', 'like', "%$search%")
             ->limit(50)
+            ->orderBy('id', 'DESC')
             ->get();
 
         return response()->json($items);

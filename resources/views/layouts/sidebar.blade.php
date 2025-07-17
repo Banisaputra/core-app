@@ -4,7 +4,7 @@
     </a>
     <nav class="vertnav navbar navbar-light">
         <div class="w-100 mb-4 d-flex">
-            <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="./index.html">
+            <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="{{ url('/') }}">
                 <svg version="1.1" id="logo" class="navbar-brand-img brand-sm" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 120 120" xml:space="preserve">
                     <g>
                         <polygon class="st0" points="78,105 15,105 24,87 87,87"/>
@@ -30,23 +30,29 @@
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
             <li class="nav-item dropdown">
-                <a href="#ui-elements" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    <i class="fe fe-user fe-16"></i>
-                    <span class="ml-3 item-text">Grup Pengguna</span>
+                <a href="#access-asign" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                    <i class="fe fe-shield fe-16"></i>
+                    <span class="ml-3 item-text">Akses Pengguna</span>
                 </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="ui-elements">
+                <ul class="collapse list-unstyled pl-4 w-100" id="access-asign">
                     <li class="nav-item">
                         <a class="nav-link pl-3" href="{{ route('roles.index')}}">
                             <span class="ml-1 item-text">Role</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('members.index')}}">
-                            <span class="ml-1 item-text">Anggota</span>
+                        <a class="nav-link pl-3" href="{{ route('roles.index')}}">
+                            <span class="ml-1 item-text">Permission</span>
                         </a>
                     </li>
                     
                 </ul>
+                <li class="nav-item w-100">
+                    <a class="nav-link" href="{{ route('members.index')}}">
+                        <i class="fe fe-user fe-16"></i>
+                        <span class="ml-3 item-text">Anggota</span>
+                    </a>
+                </li>
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('items.index')}}">
                         <i class="fe fe-credit-card fe-16"></i>
@@ -100,7 +106,7 @@
                 </a>
             </li>
             <li class="nav-item w-100">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="{{ route('purchases.index')}}">
                     <i class="fe fe-arrow-up-circle fe-16"></i>
                     <span class="ml-3 item-text">Pembelian</span>
                 </a>

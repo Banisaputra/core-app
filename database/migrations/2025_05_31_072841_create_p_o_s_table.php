@@ -28,30 +28,7 @@ return new class extends Migration
             $table->integer('price');
             $table->integer('total');
             $table->timestamps();
-        });
-
-        Schema::create('purchases', function (Blueprint $table) {
-            $table->id();
-            $table->string('pr_code', 50);
-            $table->integer('pr_date')->length(8);
-            $table->string('supplier', 100);
-            $table->integer('sub_total');
-            $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
-            $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
-            $table->timestamps();
-        });
-
-        Schema::create('purchase_detail', function (Blueprint $table) {
-            $table->foreignId('pr_id');
-            $table->foreignId('item_id');
-            $table->integer('amount');
-            $table->integer('price');
-            $table->integer('total');
-            $table->string('batch', 15)->comment('YmdHis');
-            $table->integer('margin');
-
-            $table->timestamps();
-        });
+        }); 
 
         // Schema::create('inventories', function (Blueprint $table) {
         //     $table->id();
@@ -73,8 +50,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('sales');
         Schema::dropIfExists('sales_detail');
-        Schema::dropIfExists('purchases');
-        Schema::dropIfExists('purchase_detail');
-        // Schema::dropIfExists('inventories');
     }
 };

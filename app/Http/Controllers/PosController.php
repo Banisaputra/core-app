@@ -15,7 +15,7 @@ class PosController extends Controller
 {
     public function index() 
     {
-        $items = MasterItem::all();
+        $items = MasterItem::latest()->get();
         return view('pos.index', compact('items'));
     }
 

@@ -106,4 +106,8 @@ class RoleController extends Controller
         
     }
 
+    public function info() {
+        return view('roles.info');
+    }
+
 }

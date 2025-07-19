@@ -6,12 +6,13 @@
     <div class="col-12 col-xl-10">
       <div class="row align-items-center my-4">
         <div class="col">
-          <h2 class="h3 mb-0 page-title">Tambah Pembelian</h2>
+          <h2 class="h3 mb-0 page-title">Edit Pembelian</h2>
         </div>
         
       </div>
-      <form action="{{ route('purchases.store')}}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('purchases.update', $purchase->id)}}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
         <hr class="my-4">
         @if ($errors->any())
         <div class="alert alert-danger" role="alert">
@@ -33,27 +34,27 @@
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="svDate">Kode</label>
-            <h5>{{ $pr_code }}</h5>
+            <h5>{{ $purchase->pr_code }}</h5>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="simple-select2">Supplier</label>
-            <input type="text" class="form-control" id="supplier" name="supplier" value="{{old('supplier')}}">
+            <input type="text" class="form-control" id="supplier" name="supplier" value="{{old('supplier', ($purchase->supplier) ?? '')}}">
           </div>
           <div class="form-group col-md-3">
             <label for="simple-select2">Nomor Faktur</label>
-            <input type="text" class="form-control" id="ref_doc" name="ref_doc" value="{{old('ref_doc')}}">
+            <input type="text" class="form-control" id="ref_doc" name="ref_doc" value="{{old('ref_doc', ($purchase->ref_doc) ?? '')}}">
           </div>
           <div class="form-group col-md-3">
             <label for="pr_date">Tanggal Pembelian</label>
-            <input type="date" class="form-control" id="pr_date" name="pr_date" value="{{old('pr_date')}}">
+            <input type="date" class="form-control" id="pr_date" name="pr_date" value="{{old('pr_date', date('Y-m-d', strtotime($purchase->pr_date)) ?? '')}}">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="pr_value">Total</label>
-            <input type="number" class="form-control" id="pr_value" name="pr_value" value="{{old('pr_value')}}">
+            <input type="number" class="form-control" id="pr_value" name="pr_value" value="{{old('pr_value', ($purchase->total) ?? '')}}">
           </div>
           <div class="form-group col-md-6">
             <label for="proof_of_payment">Invoice Photo</label>
@@ -85,13 +86,18 @@
                     </tr>
                 </thead>
                 <tbody id="itemsBody">
+                    @foreach ($purchase['prDetails'] as $prd)
                     <tr>
-                        <td><select name="items[0][item_id]" class="form-control itemSelect" required></select></td>
-                        <td><input type="number" name="items[0][qty]" class="form-control qty" required></td>
-                        <td><input type="number" name="items[0][price]" class="form-control price" required></td>
+                        <td><select name="items[0][item_id]" class="form-control itemSelect" required>
+                             <option value="{{ $prd->item->id }}" selected>
+                                {{ $prd->item->item_name ?? 'Search anggota...' }}
+                            </option></select></td>
+                        <td><input type="number" name="items[0][qty]" class="form-control qty" value="{{ $prd->amount }}" required></td>
+                        <td><input type="number" name="items[0][price]" class="form-control price" value="{{ $prd->price }}" required></td>
                         <td><span name="items[0][subtotal]" class="form-control subtotal" data-value=""></span></td>
                         <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">x</button></td>
                     </tr>
+                    @endforeach
                 </tbody>
                 <tfoot>
                     <tr>
@@ -120,6 +126,7 @@
 <script>
   $(document).ready(function () {
     initSelectItem();
+    $('#itemsBody .price').trigger('input');
     $('#proof_of_payment').on('change', function(event) {
       const file = event.target.files[0];
       const preview = $('#preview-image');

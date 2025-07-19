@@ -36,6 +36,9 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/api/members/search', [MemberController::class, 'search']);
     Route::get('/api/items/search', [MasterItemController::class, 'search']);
 
+    // info
+    Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
+
     // member
     Route::get('/members', [MemberController::class, 'index'])->name('members.index');
     Route::get('/members/create', [MemberController::class, 'create'])->name('members.create');
@@ -106,6 +109,13 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
 
     // purchase
     Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index');
+    Route::get('/purchase/create', [PurchaseController::class, 'create'])->name('purchases.create');
+    Route::post('/purchase', [PurchaseController::class, 'store'])->name('purchases.store');
+    Route::get('/purchase/{id}', [PurchaseController::class, 'show'])->name('purchases.show');
+    Route::get('/purchase/{id}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit');
+    Route::put('/purchase/{id}', [PurchaseController::class, 'update'])->name('purchases.update');
+    Route::delete('/purchase/{id}', [PurchaseController::class, 'destroy'])->name('purchases.destroy');
+
 
 });
 

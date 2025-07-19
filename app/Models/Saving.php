@@ -21,7 +21,7 @@ class Saving extends Model
         return $this->belongsTo(SavingType::class);
     }
 
-    public static function generateCode($periode)
+    public static function generateCode($periode = null)
     {
         $prefix = 'SVN-';
         $dateCode = $periode ?? date('ym'); // ex: 2505

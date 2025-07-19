@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="{{asset('favicon.ico')}}">
     <title>Tiny Dashboard - A Bootstrap Dashboard Template</title>
     <!-- Simple bar CSS -->
     <link rel="stylesheet" href="{{ asset('fedash/css/simplebar.css') }}">

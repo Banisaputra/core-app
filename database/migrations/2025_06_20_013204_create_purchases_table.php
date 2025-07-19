@@ -30,8 +30,8 @@ return new class extends Migration
             $table->integer('amount');
             $table->integer('price');
             $table->integer('total');
-            $table->string('batch', 15)->comment('YmdHis');
-            $table->integer('margin');
+            $table->string('batch', 15)->comment('YmdHis')->nullable();
+            $table->integer('margin')->nullable();
 
             $table->timestamps();
         });

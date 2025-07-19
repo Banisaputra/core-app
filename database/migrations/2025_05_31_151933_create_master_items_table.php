@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('item_name', 255);
             $table->integer('stock');
             $table->integer('sales_price');
-            $table->string('item_image', 255);
+            $table->string('item_image', 255)->nullable();
             $table->tinyInteger('is_transactional')->length(2)->default(1);
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade');

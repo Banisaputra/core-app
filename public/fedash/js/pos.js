@@ -102,7 +102,7 @@ creditPayment.addEventListener('click', function () {
   .then(response => {
     if (response.success) {
         $('#creditModal .close').trigger('click');
-        alert('Payment successful!\nAngsuran:' + formatIDR(total/tenor, 0) + 'selama '+ tenor +' bulan');
+        alert('Payment successful!\nAngsuran: ' + formatIDR(total/tenor, 0) + ' selama '+ tenor +' bulan');
       
       // Clear cart
       document.getElementById('cartBody').innerHTML = '';
@@ -122,32 +122,36 @@ creditPayment.addEventListener('click', function () {
 });
 
 cashPayment.addEventListener('click', function () {
-  const total = parseFloat(document.getElementById('totalAmount').textContent.replace(/[^\d]/g, ''));
-  const received = parseFloat(cashReceive.value);
-  const memberId = document.getElementById('memberSelect').value *1;
-    if (isNaN(received) || received < total) {
-        alert('Nominal Tidak Sesuai!');
-        return;
-    }
-    if(memberId == 0){
-        alert('Pelanggan Harus Dipilih!');
-        return;
-    }
+   cashPayment.disabled = true;
+ 
+   const total = parseFloat(document.getElementById('totalAmount').textContent.replace(/[^\d]/g, ''));
+   const received = parseFloat(cashReceive.value);
+   const memberId = document.getElementById('memberSelect').value *1;
+   if (isNaN(received) || received < total) {
+      alert('Nominal Tidak Sesuai!');
+      cashPayment.disabled = false;
+      return;
+   }
+   if(memberId == 0){
+      alert('Pelanggan Harus Dipilih!');
+      cashPayment.disabled = false;
+      return;
+   }
   
     // Collect cart data
-    var cartItems = [];
-    cartItems = Object.entries(cart).map((item) => {
-        const price = parseFloat(item[1].price ?? 0);
-        const qty = parseInt(item[1].qty ?? 1);
+   var cartItems = [];
+   cartItems = Object.entries(cart).map((item) => {
+      const price = parseFloat(item[1].price ?? 0);
+      const qty = parseInt(item[1].qty ?? 1);
 
-        return {
-            id: item[0],
-            name: item[1].name,
-            price: !isNaN(price) ? Math.max(0, price) : 0,
-            qty: !isNaN(qty) ? Math.max(1, qty) : 1,
-            subtotal: function() { return this.price * this.qty }
-        };
-    });
+      return {
+         id: item[0],
+         name: item[1].name,
+         price: !isNaN(price) ? Math.max(0, price) : 0,
+         qty: !isNaN(qty) ? Math.max(1, qty) : 1,
+         subtotal: function() { return this.price * this.qty }
+      };
+   });
 
   // Send to backend
   fetch('/submit-sale', {
@@ -176,6 +180,7 @@ cashPayment.addEventListener('click', function () {
       document.getElementById('total').textContent = '0';
       $('#memberSelect').val(null).trigger('change');
       cart = {};
+      cashPayment.disabled = false;
 
       // Optional: print receipt, show invoice, etc.
     } else {
@@ -244,7 +249,7 @@ function updateCart() {
       </div>
       </td>
       <td width="25%">${formatIDR(item.qty * item.price ,0)}</td>
-      <td width="10%"><button class="btn btn-sm btn-danger remove-item" data-name="${item.name}">&times;</button></td>
+      <td width="10%"><button class="btn btn-sm btn-danger remove-item" data-id="${id}">&times;</button></td>
       `;
       cartBody.appendChild(row);
       total += item.qty * item.price;
@@ -273,9 +278,7 @@ document.addEventListener("click", e => {
       delete cart[id];
       updateCart();
    }
-
-  
-   
+ 
 });
 
 // Quantity change

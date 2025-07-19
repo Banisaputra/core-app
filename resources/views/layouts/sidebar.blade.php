@@ -30,7 +30,7 @@
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
             <li class="nav-item dropdown">
-                <a href="#access-asign" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                {{-- <a href="#access-asign" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
                     <i class="fe fe-shield fe-16"></i>
                     <span class="ml-3 item-text">Akses Pengguna</span>
                 </a>
@@ -41,12 +41,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('roles.index')}}">
+                        <a class="nav-link pl-3" href="#">
                             <span class="ml-1 item-text">Permission</span>
                         </a>
                     </li>
                     
-                </ul>
+                </ul> --}}
+                <li class="nav-item w-100">
+                    <a class="nav-link" href="{{ route('access.info')}}">
+                        <i class="fe fe-shield fe-16"></i>
+                        <span class="ml-3 item-text">Role Info</span>
+                    </a>
+                </li>
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('members.index')}}">
                         <i class="fe fe-user fe-16"></i>
@@ -55,13 +61,38 @@
                 </li>
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('items.index')}}">
-                        <i class="fe fe-credit-card fe-16"></i>
+                        <i class="fe fe-box fe-16"></i>
                         <span class="ml-3 item-text">Barang</span>
                     </a>
                 </li>
             </li>
         </ul>
     @endif
+
+        <p class="text-muted nav-heading mt-4 mb-1">
+            <span>Usaha</span>
+        </p>
+        <ul class="navbar-nav flex-fill w-100 mb-2">
+            <li class="nav-item w-100">
+                <a class="nav-link" href="{{ route('pos.index') }}">
+                    <i class="fe fe-arrow-down-circle fe-16"></i>
+                    <span class="ml-3 item-text">POS</span>
+                </a>
+            </li>
+            <li class="nav-item w-100">
+                <a class="nav-link" href="{{ route('purchases.index')}}">
+                    <i class="fe fe-arrow-up-circle fe-16"></i>
+                    <span class="ml-3 item-text">Pembelian</span>
+                </a>
+            </li>
+            <li class="nav-item w-100">
+                <a class="nav-link" href="{{ route('inv.index') }}">
+                    <i class="fe fe-credit-card fe-16"></i>
+                    <span class="ml-3 item-text">Inventory</span>
+                </a>
+            </li>
+        </ul>
+
     @if (auth()->user()->hasPermission('koperasi'))
         
         <p class="text-muted nav-heading mt-4 mb-1">
@@ -94,30 +125,6 @@
             </li>
         </ul>
     @endif
-
-        <p class="text-muted nav-heading mt-4 mb-1">
-            <span>Usaha</span>
-        </p>
-        <ul class="navbar-nav flex-fill w-100 mb-2">
-            <li class="nav-item w-100">
-                <a class="nav-link" href="{{ route('pos.index') }}">
-                    <i class="fe fe-arrow-down-circle fe-16"></i>
-                    <span class="ml-3 item-text">POS</span>
-                </a>
-            </li>
-            <li class="nav-item w-100">
-                <a class="nav-link" href="{{ route('purchases.index')}}">
-                    <i class="fe fe-arrow-up-circle fe-16"></i>
-                    <span class="ml-3 item-text">Pembelian</span>
-                </a>
-            </li>
-            <li class="nav-item w-100">
-                <a class="nav-link" href="{{ route('inv.index') }}">
-                    <i class="fe fe-credit-card fe-16"></i>
-                    <span class="ml-3 item-text">Inventory</span>
-                </a>
-            </li>
-        </ul>
 
         <p class="text-muted nav-heading mt-4 mb-1">
             <span>Laporan</span>

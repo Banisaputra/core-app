@@ -9,12 +9,11 @@
     <div class="row justify-content-center">
       <div class="col-12">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">Daftar Barang</h2>
-            <p class="card-text">Daftar Barang.</p>
+            <h2 class="h3 mb-0 page-title">Daftar Pembelian</h2>
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-                <a href="{{ route('items.create') }}" class="btn mb-2 btn-primary">
+                <a href="{{ route('purchases.create') }}" class="btn mb-2 btn-primary">
                     <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
                 </a>
             </div>
@@ -51,8 +50,7 @@
                       <th width="5%">No.</th>
                       <th width="15%">Kode</th>
                       <th width="">Supplier</th>
-                      <th width="15%">Total</th>
-                      <th width="15%">Status</th>
+                      <th width="25%">Total</th>
                       <th width="5%">Action</th>
                     </tr>
                   </thead>
@@ -63,19 +61,13 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $purchase->pr_code }}</td>
                             <td>{{ $purchase->supplier }}</td>
-                            <td>Rp {{ number_format($purchase->sub_total, 0) }}</td>
-                            <td>{!! $purchase->is_transactional == 1 ? "<span class='dot dot-lg bg-success mr-1'></span>Aktif" : "<span class='dot dot-lg bg-secondary mr-1'></span>Tidak Aktif" !!}</td>
+                            <td>Rp {{ number_format($purchase->sub_total, 0) }}</td> 
                             <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="text-muted sr-only">Action</span>
                               </button>
                               <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{{ route('items.show', $item->id) }}">View</a>
-                                <a class="dropdown-item" href="{{ route('items.edit', $item->id) }}">Edit</a>
-                                <form action="{{ route('items.destroy', $item->id) }}" method="POST" style="display: inline;" id="deleteForm">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" id="btnDelete" class="dropdown-item">{{ $item->is_transactional==1 ? "Nonaktifkan" : "Aktifkan"}}</button>
-                                </form>
+                                <a class="dropdown-item" href="{{ route('purchases.show', $purchase->id) }}">View</a>
+                                <a class="dropdown-item" href="{{ route('purchases.edit', $purchase->id) }}">Edit</a>
                               </div>
                             </td> 
                         </tr>

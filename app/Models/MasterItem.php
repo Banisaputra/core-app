@@ -10,4 +10,9 @@ class MasterItem extends Model
     use HasFactory;
     protected $table = 'master_items';
     protected $guarded = ['id'];
+
+    public function purchaseDetails()
+    {
+        return $this->hasMany(PurchaseDetail::class);
+    }
 }

@@ -6,7 +6,7 @@
     <div class="col-12 col-xl-10">
       <div class="row align-items-center my-4">
         <div class="col">
-          <h2 class="h3 mb-0 page-title">Tambah Anggota</h2>
+          <h2 class="h3 mb-0 page-title">Perubahan Anggota</h2>
         </div>
       </div>
       <hr class="my-4">

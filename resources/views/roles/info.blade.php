@@ -14,7 +14,7 @@
                   <div class="card shadow">
                     <div class="card-body">
                       <h5 class="card-title">Role access</h5>
-                      <p class="card-text">Menu yang akan didapat dan dapat diakses oleh role terdaftar</p>
+                      <p class="card-text">Menu yang dapat diakses oleh role terdaftar</p>
                       <table class="table table-hover">
                         <thead>
                           <tr>

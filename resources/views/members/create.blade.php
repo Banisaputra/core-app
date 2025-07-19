@@ -113,7 +113,7 @@
          <div class="form-row">
            <div class="col-md-6">
              <div class="custom-control custom-switch mb-2">
-               <input type="checkbox" class="custom-control-input" id="accountGenerate" name="accountGenerate" checked>
+               <input type="checkbox" class="custom-control-input" id="accountGenerate" name="accountGenerate">
                <label class="custom-control-label" for="accountGenerate">Generate Account</label>
             </div>
             <small>*Buat akun untuk pengguna dan generate password dari email terdaftar.</small>

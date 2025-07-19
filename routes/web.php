@@ -11,8 +11,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SavingController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\RepaymentController;
 use App\Http\Middleware\PermissionMiddleware;
@@ -35,10 +37,33 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/api/roles/search', [RoleController::class, 'search']);
     Route::get('/api/members/search', [MemberController::class, 'search']);
     Route::get('/api/items/search', [MasterItemController::class, 'search']);
+    Route::get('/api/category/search', [CategoryController::class, 'search']);
+    Route::get('/api/supplier/search', [SupplierController::class, 'search']);
 
     // info
     Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
 
+    // supplier
+    Route::get('/supplier', [SupplierController::class, 'index'])->name('supplier.index');
+    Route::get('/supplier/create', [SupplierController::class, 'create'])->name('supplier.create');
+    Route::get('/supplier/import', [SupplierController::class, 'downloadTemplate'])->name('supplier.template');
+    Route::post('/supplier/import', [SupplierController::class, 'import'])->name('supplier.import');
+    Route::post('/supplier', [SupplierController::class, 'store'])->name('supplier.store');
+    Route::get('/supplier/{id}', [SupplierController::class, 'show'])->name('supplier.show');
+    Route::get('/supplier/{id}/edit', [SupplierController::class, 'edit'])->name('supplier.edit');
+    Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
+    Route::delete('/supplier/{id}', [SupplierController::class, 'destroy'])->name('supplier.destroy');
+    
+    // categories
+    Route::get('/category', [CategoryController::class, 'index'])->name('category.index');
+    Route::get('/category/create', [CategoryController::class, 'create'])->name('category.create');
+    Route::get('/category/import', [CategoryController::class, 'downloadTemplate'])->name('category.template');
+    Route::post('/category/import', [CategoryController::class, 'import'])->name('category.import');
+    Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
+    Route::get('/category/{id}/edit', [CategoryController::class, 'edit'])->name('category.edit');
+    Route::put('/category/{id}', [CategoryController::class, 'update'])->name('category.update');
+    Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('category.destroy');
+    
     // member
     Route::get('/members', [MemberController::class, 'index'])->name('members.index');
     Route::get('/members/create', [MemberController::class, 'create'])->name('members.create');

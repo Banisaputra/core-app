@@ -19,9 +19,14 @@ function formatIDR(value, decimal) {
       minimumFractionDigits: decimal
    });
 }
-
  
 cashBtn.addEventListener('click', function () {
+   if (cust_name == '') {
+      alert('Silakan pilih pelanggan terlebih dahulu!')
+      document.getElementById('memberSelect').focus();
+      return;
+   }
+   new bootstrap.Modal(document.getElementById('cashModal')).show();
    const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
    document.getElementById('memberName').textContent = cust_name;
    document.getElementById('totalAmount').textContent = formatIDR(total,0);
@@ -30,6 +35,12 @@ cashBtn.addEventListener('click', function () {
 });
 
 creditBtn.addEventListener('click', function () {
+   if (cust_name == '') {
+      alert('Silakan pilih pelanggan terlebih dahulu!')
+      document.getElementById('memberSelect').focus();
+      return;
+   }
+   new bootstrap.Modal(document.getElementById('creditModal')).show();
    const total = parseFloat(document.getElementById('total').textContent.replace(/[^\d]/g, '')) || 0;
    document.getElementById('crMember').textContent = cust_name;
    document.getElementById('crTotal').textContent = formatIDR(total,0);
@@ -86,7 +97,7 @@ creditPayment.addEventListener('click', function () {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content // if Laravel
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
     },
     body: JSON.stringify({
         member_id: memberId,
@@ -158,7 +169,7 @@ cashPayment.addEventListener('click', function () {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content // if Laravel
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
     },
     body: JSON.stringify({
         member_id: memberId,

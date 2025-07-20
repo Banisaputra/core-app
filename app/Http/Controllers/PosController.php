@@ -84,6 +84,8 @@ class PosController extends Controller
                     'price' => $item['price'],
                     'total' => $item['price'] * $item['qty'],
                 ];
+
+                MasterItem::where('id', $item['id'])->decrement('stock', $item['qty']);
             }
 
             // Batch insert for better performance

@@ -141,8 +141,11 @@ class SupplierController extends Controller
                 'is_active' => $row[3] ?? null,
             ];
 
+            $sExists = Supplier::where('code', $data['code'])->first();
+            $rules = $sExists ? 'exists' : 'unique';
+
             $validator = Validator::make($data, [
-                'code' => 'required|string|max:50',
+                'code' => 'required|string|max:50|'.$rules.':suppliers,code',
                 'name' => 'required|string|max:100',
                 'address' => 'required|max:255',
             ]);
@@ -152,16 +155,23 @@ class SupplierController extends Controller
                 continue;
             }
 
-             
-
-            $supplier = Supplier::create([
-                'code' => $data['code'],
-                'name' => $data['name'],
-                'address' => $data['address'],
-                'is_active' => $data['is_active'],
-                'created_by' => auth()->id(),
-                'updated_by' => auth()->id(),
-            ]);
+            if($sExists) {
+                $sExists->update([
+                    'name' => $data['name'],
+                    'address' => $data['address'],
+                    'is_active' => $data['is_active'],
+                    'updated_by' => auth()->id(),
+                ]);
+            } else {
+                $supplier = Supplier::create([
+                    'code' => $data['code'],
+                    'name' => $data['name'],
+                    'address' => $data['address'],
+                    'is_active' => $data['is_active'],
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+            }
 
             $success++;
         }

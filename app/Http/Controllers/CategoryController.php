@@ -135,25 +135,35 @@ class CategoryController extends Controller
                 'is_active' => $row[2] ?? null,
             ];
 
+            $cExists = Category::where('code', $data['code'])->first();
+            $rules = $cExists ? 'exists' : 'unique';
+
             $validator = Validator::make($data, [
-                'code' => 'required|string|max:50|unique:categories, code',
+                'code' => 'required|string|max:50|'.$rules.':categories, code',
                 'name' => 'required|string|max:100',
             ]);
 
             if ($validator->fails()) {
                 $failed[] = ['row' => $index + 1, 'errors' => $validator->errors()->all()];
                 continue;
+            }             
+
+            if ($cExists) {
+                $cExists->update([
+                    'name' => $data['name'],
+                    'is_active' => $data['is_active'],
+                    'updated_by' => auth()->id(),
+                ]);
+
+            } else {
+                $category = Category::create([
+                    'code' => $data['code'],
+                    'name' => $data['name'],
+                    'is_active' => $data['is_active'],
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
             }
-
-             
-
-            $category = Category::create([
-                'code' => $data['code'],
-                'name' => $data['name'],
-                'is_active' => $data['is_active'],
-                'created_by' => auth()->id(),
-                'updated_by' => auth()->id(),
-            ]);
 
             $success++;
         }

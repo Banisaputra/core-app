@@ -115,6 +115,8 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/items', [MasterItemController::class, 'index'])->name('items.index');
     Route::get('/items/create', [MasterItemController::class, 'create'])->name('items.create');
     Route::post('/items', [MasterItemController::class, 'store'])->name('items.store');
+    Route::get('/items/import', [MasterItemController::class, 'downloadTemplate'])->name('items.template');
+    Route::post('/items/import', [MasterItemController::class, 'import'])->name('items.import');
     Route::get('/items/{id}', [MasterItemController::class, 'show'])->name('items.show');
     Route::get('/items/{id}/edit', [MasterItemController::class, 'edit'])->name('items.edit');
     Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');

@@ -247,10 +247,13 @@ class MemberController extends Controller
                 'religion' => $row[6] ?? null,
                 'date_joined' => $row[7] ?? null,
                 'address' => $row[8] ?? null,
+                'accountGenerate' => $row[9] ?? null,
             ];
 
+            $mExists = Member::where('nip', $data['nip'])->first();
+            $rules = $mExists ? 'exists' : 'unique';
             $validator = Validator::make($data, [
-                'nip' => 'nullable',
+                'nip' => 'requires|'.$rules.':members,nip',
                 'name' => 'required|string|max:100',
                 'email' => 'required|email|unique:users,email',
                 'date_of_birth' => 'required',
@@ -266,35 +269,58 @@ class MemberController extends Controller
                 continue;
             }
 
-            $password = Hash::make($request->email);
-            $email_verify = now();
-            
+            // check generate account
+            $password = Hash::make(Str::random(8));
+            $email_verify = null;
+            if($data['accountGenerate'] == "YA") {
+                $password = Hash::make($request->email);
+                $email_verify = now();
+            }
 
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => $password,
-                'email_verified_at' => $email_verify
-            ]);
+            if ($mExists) {
+                $user = User::findOrFails($mExists->user_id);
+                $user->update([
+                    'name' => $data['name'],
+                    'email' => $data['email'],
+                    'password' => $password,
+                    'email_verified_at' => $email_verify
+                ]);
 
-            $member = Member::create([
-                'user_id' => $user->id,
-                'nip' => $data['nip'],
-                'name' => $data['name'],
-                'telphone' => $data['telphone'],
-                'religion' => $data['religion'],
-                'gender' => $data['gender'],
-                'date_of_birth' => $data['date_of_birth'],
-                'address' => $data['address'],
-                'date_joined' => $data['date_joined'],
-                'created_by' => auth()->id(),
-                'updated_by' => auth()->id(),
-            ]);
+                $mExists->update([
+                    'name' => $data['name'],
+                    'telphone' => $data['telphone'],
+                    'religion' => $data['religion'],
+                    'gender' => $data['gender'],
+                    'date_of_birth' => $data['date_of_birth'],
+                    'address' => $data['address'],
+                    'date_joined' => $data['date_joined'],
+                    'updated_by' => auth()->id(),
+                ]);
+            } else {
+                $user = User::create([
+                    'name' => $data['name'],
+                    'email' => $data['email'],
+                    'password' => $password,
+                    'email_verified_at' => $email_verify
+                ]);
+    
+                $member = Member::create([
+                    'user_id' => $user->id,
+                    'nip' => $data['nip'],
+                    'name' => $data['name'],
+                    'telphone' => $data['telphone'],
+                    'religion' => $data['religion'],
+                    'gender' => $data['gender'],
+                    'date_of_birth' => $data['date_of_birth'],
+                    'address' => $data['address'],
+                    'date_joined' => $data['date_joined'],
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+            }
 
             $success++;
         }
-                // dd($failed);
-
 
         return redirect()->back()->with('success', "$success data berhasil diimport")->with('failed', $failed);
     }
@@ -306,7 +332,7 @@ class MemberController extends Controller
         $sheet->setTitle('Template Master Anggota');
 
         // Judul besar
-        $sheet->mergeCells('A1:I1');
+        $sheet->mergeCells('A1:J1');
         $sheet->setCellValue('A1', 'Template Master Anggota');
         $sheet->getStyle('A1')->applyFromArray([
             'font' => ['bold' => true, 'size' => 14],
@@ -318,27 +344,27 @@ class MemberController extends Controller
         ]);
 
         // Header
-        $headers = ['NIP', 'Nama Lengkap', 'Email', 'No.Telp', 'Tgl. Lahir', 'Jenis Kelamin', 'Agama', 'Tgl. Bergabung', 'Alamat'];
+        $headers = ['NIP', 'Nama Lengkap', 'Email', 'No.Telp', 'Tgl. Lahir', 'Jenis Kelamin', 'Agama', 'Tgl. Bergabung', 'Alamat', 'Akun Anggota'];
         $sheet->fromArray($headers, null, 'A2');
 
         // Style header
-        $sheet->getStyle('A2:I2')->applyFromArray([
+        $sheet->getStyle('A2:J2')->applyFromArray([
             'font' => ['bold' => true],
             'alignment' => ['horizontal' => 'center'],
             'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
         ]);
 
-        // Keterangan wajib isi
+        // Keterangan
         $notes = [
             '', 'Harus diisi', 'Harus diisi', 'Harus diisi',
             "Format penulisan\nYYYY.MM.DD\nExp :\n - 2025.12.31\n - 2002.05.07",
             "PRIA / WANITA\nHarus diisi",
             '',
             "Format penulisan\nYYYY.MM.DD\nExp :\n - 2025.12.31\n - 2002.05.07",
-            'Harus diisi',
+            'Harus diisi', 'YA / TIDAK'
         ];
 
-        foreach (range('A', 'I') as $col) {
+        foreach (range('A', 'J') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

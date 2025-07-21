@@ -5,6 +5,36 @@
 @endsection
 
 @section('content')
+{{-- modal import --}}
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalTitle" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form action="{{ route('items.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title" id="importModalTitle">Upload file</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body"> 
+          <div class="form-group mb-3">
+            <label for="memberFile"> Format file harus sesuai template</label>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="memberFile" name="file" accept=".xlsx,.xls" required>
+              <label class="custom-file-label" for="memberFile">Choose file</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn mb-2 btn-primary">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <div class="container-fluid">
     <div class="row justify-content-center">
       <div class="col-12">
@@ -19,7 +49,15 @@
                 </a>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-success"><span class="fe fe-16 mr-2 fe-download"></span>Import Data <small>(soon)</small></button>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-success more-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+                  <span class="fe fe-24 fe-download"></span>Import file
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style="">
+                  <a class="dropdown-item" href="{{ route('items.template')}}"><small>Download Template</small></a>
+                  <button class="dropdown-item" data-toggle="modal" data-target="#importModal"><small>Upload data</small></button>
+                </div>
+              </div>
             </div>
         </div>
          @if ($errors->any())
@@ -113,6 +151,16 @@
         $('#deleteForm').submit();
       }
 
+    });
+
+    $('#memberFile').on('change', function() {
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+
+    $('#importModal').on('hidden.bs.modal', function () {
+      $(this).find('form')[0].reset();
+      $('#importModal .custom-file-label').html('Choose file');
     });
     
   })

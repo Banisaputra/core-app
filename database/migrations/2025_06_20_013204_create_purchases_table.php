@@ -20,6 +20,8 @@ return new class extends Migration
             $table->integer('total');
             $table->tinyInteger('pr_state')->default(1);
             $table->string('file_path', 255)->nullable();
+            $table->tinyInteger('is_finished')->default(0);
+            $table->integer('over_due');
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
             $table->timestamps();
@@ -32,8 +34,6 @@ return new class extends Migration
             $table->integer('price');
             $table->integer('total');
             $table->string('batch', 15)->comment('YmdHis')->nullable();
-            $table->integer('margin')->nullable();
-
             $table->timestamps();
         });
     }

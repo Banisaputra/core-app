@@ -115,7 +115,7 @@ class SupplierController extends Controller
             ->limit(10)
             ->get();
 
-        return response()->json($categories);
+        return response()->json($suppliers);
     }
 
     public function import(Request $request)

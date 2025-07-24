@@ -72,9 +72,42 @@
                             <h5>Rp {{ number_format($purchase->total, 0) }},-</h5>
                         </div>
                     </div>
+                    <div class="row">
+                        <p class="col-sm-3 text-right">Status</p>
+                        <div class="col-sm-9">
+                            <h5>
+                                @switch($purchase->pr_state)
+                                    @case(99)
+                                        Dibatalkan
+                                        @break
+                                    @case(2)
+                                        Sudah Dikonfirmasi
+                                        @break
+                                    @default
+                                        Belum Dikonfirmasi
+                                @endswitch
+                            </h5>
+                        </div>
+                    </div>
                      
                     <hr class="my-4">
-                   
+                    <div class="form-inline">
+                        <div class="col-md-4 text-center">
+                            <form action="{{ route('purchases.confirm')}}" method="POST">
+                                @csrf
+                                <input type="hidden" value="{{ $purchase->id }}" name="pr_id">
+                                <button type="submit" class="btn btn-primary" {{ $purchase->pr_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-check-circle"></span>Konfirmasi Pembelian</button>
+                            </form>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <form action="{{ route('purchases.destroy', $purchase->id)}}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" value="{{ $purchase->id }}" name="pr_id">
+                                <button type="submit" class="btn btn-danger" {{ $purchase->pr_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-slash"></span>Batalkan Pembelian</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
             <hr class="my-4">

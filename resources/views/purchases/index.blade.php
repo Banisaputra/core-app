@@ -52,6 +52,7 @@
                       <th width="">Supplier</th>
                       <th width="15%">Invoice</th>
                       <th width="15%">Total</th>
+                      <th width="15%">Status</th>
                       <th width="5%">Action</th>
                     </tr>
                   </thead>
@@ -64,6 +65,16 @@
                             <td>{{ $purchase->supplier }}</td>
                             <td>{{ $purchase->ref_doc }}</td>
                             <td>Rp {{ number_format($purchase->total, 0) }}</td> 
+                            <td>@switch($purchase->pr_state)
+                                  @case(99)
+                                    <span class="text-danger">Dibatalkan</span>
+                                    @break
+                                  @case(2)
+                                    <span class="text-success">Dikonfirmasi</span>
+                                    @break
+                                  @default
+                                    <span class="text-info">Pengajuan</span>
+                                @endswitch</td> 
                             <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="text-muted sr-only">Action</span>
                               </button>

@@ -39,7 +39,7 @@
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="simple-select2">Supplier</label>
-            <input type="text" class="form-control" id="supplier" name="supplier" value="{{old('supplier')}}">
+            <select id="supplierSelect" name="supplier_id" class="form-control"></select>
           </div>
           <div class="form-group col-md-3">
             <label for="simple-select2">Nomor Faktur</label>
@@ -51,10 +51,6 @@
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-4">
-            <label for="pr_value">Total</label>
-            <input type="number" class="form-control" id="pr_value" name="pr_value" value="{{old('pr_value')}}">
-          </div>
           <div class="form-group col-md-6">
             <label for="proof_of_payment">Invoice Photo</label>
             <div class="custom-file">
@@ -66,6 +62,10 @@
             <div class="mt-2">
                 <img id="preview-image" src="" alt="Preview" style="max-width: 300px;" hidden>
             </div>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="pr_date">Jatuh Tempo</label>
+            <input type="date" class="form-control" id="over_due" name="over_due" value="{{old('over_due')}}">
           </div>
         </div>
         <hr class="my-4">
@@ -120,6 +120,33 @@
 <script>
   $(document).ready(function () {
     initSelectItem();
+     $('#supplierSelect').select2({
+        placeholder: 'Search supplier...',
+        theme: 'bootstrap4',
+        minimumInputLength: 2,
+        ajax: {
+            url: '/api/supplier/search', // Your route
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term // search term
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.name
+                        };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+
     $('#proof_of_payment').on('change', function(event) {
       const file = event.target.files[0];
       const preview = $('#preview-image');

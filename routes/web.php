@@ -138,6 +138,7 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index');
     Route::get('/purchase/create', [PurchaseController::class, 'create'])->name('purchases.create');
     Route::post('/purchase', [PurchaseController::class, 'store'])->name('purchases.store');
+    Route::post('/purchase/confirm', [PurchaseController::class, 'confirmation'])->name('purchases.confirm');
     Route::get('/purchase/{id}', [PurchaseController::class, 'show'])->name('purchases.show');
     Route::get('/purchase/{id}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit');
     Route::put('/purchase/{id}', [PurchaseController::class, 'update'])->name('purchases.update');

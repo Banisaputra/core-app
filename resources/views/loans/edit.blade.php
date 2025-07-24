@@ -52,7 +52,7 @@
           </div>
           <div class="form-group col-md-3">
             <label for="loan_value">Jumlah Pinjaman</label>
-            <input type="number" class="form-control" id="loan_value" name="loan_value" value="{{old('loan_value', $loan->loan_value*1 ?? '')}}" {{ $loan->loan_state>1 ? "readonly" : ''}}>
+            <input type="text" class="form-control" id="loan_value" name="loan_value" value="{{old('loan_value', $loan->loan_value*1 ?? '')}}" {{ $loan->loan_state>1 ? "readonly" : ''}}>
           </div>
         </div>
         <div class="form-row">
@@ -62,24 +62,19 @@
           </div>
           <div class="form-group col-md-3">
             <label for="interest_percent">Bunga Cicilan(%)</label>
-            <input type="number" class="form-control" id="interest_percent" name="interest_percent" value="{{old('interest_percent', $loan->interest_percent ?? '')}}">
+            <input type="number" class="form-control" id="interest_percent" name="interest_percent" value="{{old('interest_percent', $loan->interest_percent ?? '')}}" {{ $loan->loan_state>1 ? "readonly" : ''}}>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-3">
             <label for="due_date">Jatuh Tempo</label>
             <input type="date" class="form-control" id="due_date" name="due_date" value="{{old('due_date', date('Y-m-d', strtotime($loan->due_date)) ?? '')}}" readonly>
           </div>
-          <div class="form-group col-md-2">
+          <div class="form-group col-md-3">
             <label for="loan_state">Status Pinjaman</label>
-            @switch($loan->loan_state)
-              @case(99)
-                <input type="text" class="form-control" id="loan_state" name="loan_state" value="Ditolak" readonly>
-                @break
-              @case(2)
-                <input type="text" class="form-control" id="loan_state" name="loan_state" value="Disetujui" readonly>
-                @break
-              @default
-                <input type="text" class="form-control" id="loan_state" name="loan_state" value="Pengajuan" readonly>
-            @endswitch
+            <select class="custom-select" name="loan_status" id="loan_status" {{ $loan->loan_state>1 ? "disabled" : ''}}>
+              <option value="1" selected>Diajukan</option>
+              <option value="2">Disetujui</option>
+              <option value="99">Ditolak</option>
+            </select>
           </div>
         </div>
         <hr class="my-4">
@@ -145,6 +140,31 @@
     // Also trigger calculation when loan date changes
     $('#loan_date').on('change', function() {
         $('#loan_tenor').trigger('keyup');
+    });
+
+    $('#loan_value').on('input', function() {
+      let value = $(this).val().replace(/[^\d.]/g, '');
+      
+      if ((value.match(/\./g) || []).length > 1) {
+          value = value.substring(0, value.lastIndexOf('.'));
+      }
+      
+      if (value) {
+          let parts = value.split('.');
+          let wholePart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+          let formattedValue = wholePart;
+          
+          if (parts.length > 1) {
+              formattedValue += ',' + parts[1].substring(0, 2);
+          }
+          
+          $(this).val(formattedValue);
+      }
+    });
+      
+    $('#loan_value').on('blur', function() {
+      let numericValue = $(this).val().replace(/\./g, '').replace(',', '.');
+      console.log('Numeric value:', numericValue);
     });
 
   });

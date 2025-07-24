@@ -226,6 +226,12 @@
             }
         });
 
+        $("body").bind('paste', function(e) {
+            console.log("PASTE");
+            $("#item_search").focus();
+            console.log("PASTE. Sending input. Value before clearing input : " + $('#item_search').val());
+        });
+
     });
 </script>
   

@@ -233,17 +233,19 @@ function renderProducts(products) {
       col.className = "col-md-3 mb-3";
       col.innerHTML = `
       <div class="p-3 text-center product-card" data-id="${product.id}" data-name="${product.item_name}" data-price="${product.sales_price}">
-         <img src="/storage/${product.item_image}" alt="item_picture" width="150px">
+         <img src="/storage/${product.item_image}" class="mb-3"
+            onerror="this.onerror=null; this.src='/images/default.jpg'" 
+            alt="item_picture" width="150px" height="150px">
          <h6>${product.item_name}</h6>
          <p>${formatIDR(parseFloat(product.sales_price), 0)}</p>
          <button class="btn btn-sm btn-primary btn-block add-to-cart">Add</button>
       </div>
       `;
       productList.appendChild(col);
+      searchBox.value = "";
    });
 }
 
-// Update cart UI
 function updateCart() {
    cartBody.innerHTML = "";
    let total = 0;
@@ -268,7 +270,6 @@ function updateCart() {
    totalEl.textContent = formatIDR(total, 0);
 }
 
-// Handle clicks
 document.addEventListener("click", e => {
    if (e.target.classList.contains("add-to-cart")) {
       const card = e.target.closest(".product-card");
@@ -292,7 +293,6 @@ document.addEventListener("click", e => {
  
 });
 
-// Quantity change
 cartBody.addEventListener("click", e => {
    if (e.target.classList.contains("btnQty")) {
       const type = e.target.id.split('-')[0];
@@ -315,7 +315,6 @@ cartBody.addEventListener("click", e => {
    
 });
 
-// Search input with debounce
 let searchTimer;
 searchBox.addEventListener("input", () => {
    clearTimeout(searchTimer);

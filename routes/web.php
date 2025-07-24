@@ -143,8 +143,10 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::put('/purchase/{id}', [PurchaseController::class, 'update'])->name('purchases.update');
     Route::delete('/purchase/{id}', [PurchaseController::class, 'destroy'])->name('purchases.destroy');
 
+    // policy
+    Route::get('/policy', [PurchaseController::class, 'index'])->name('policy.index');
 
-});
+}); 
 
 // more role
 Route::middleware([RoleMiddleware::class . ':admin,finance'])->group(function() {

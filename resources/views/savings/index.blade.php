@@ -22,7 +22,7 @@
                 </a>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-success"><span class="fe fe-16 mr-2 fe-download"></span>Import Data <small>(soon)</small></button>
+              {{-- other button --}}
             </div>
         </div>
          @if ($errors->any())

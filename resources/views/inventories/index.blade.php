@@ -1,1 +1,1 @@
-<h1>Halaman Inventory</h1>
+@extends('layouts.error404')

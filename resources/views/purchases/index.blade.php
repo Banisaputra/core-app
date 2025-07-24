@@ -50,7 +50,8 @@
                       <th width="5%">No.</th>
                       <th width="15%">Kode</th>
                       <th width="">Supplier</th>
-                      <th width="25%">Total</th>
+                      <th width="15%">Invoice</th>
+                      <th width="15%">Total</th>
                       <th width="5%">Action</th>
                     </tr>
                   </thead>
@@ -61,7 +62,8 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $purchase->pr_code }}</td>
                             <td>{{ $purchase->supplier }}</td>
-                            <td>Rp {{ number_format($purchase->sub_total, 0) }}</td> 
+                            <td>{{ $purchase->ref_doc }}</td>
+                            <td>Rp {{ number_format($purchase->total, 0) }}</td> 
                             <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="text-muted sr-only">Action</span>
                               </button>

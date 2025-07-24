@@ -57,10 +57,10 @@
             <input type="number" class="form-control" id="pr_value" name="pr_value" value="{{old('pr_value', ($purchase->total) ?? '')}}">
           </div>
           <div class="form-group col-md-6">
-            <label for="proof_of_payment">Invoice Photo</label>
+            <label for="invoice_file">Invoice Photo</label>
             <div class="custom-file">
-              <input type="file" class="custom-file-input" id="proof_of_payment" name="proof_of_payment">
-              <label class="custom-file-label" for="proof_of_payment" id="label_photo">Choose file</label>
+              <input type="file" class="custom-file-input" id="invoice_file" name="invoice_file">
+              <label class="custom-file-label" for="invoice_file" id="label_photo">Choose file</label>
               <small>*Format file jpg/jpeg,png dengan ukuran max:2MB</small>
             </div>
             <!-- Preview container -->
@@ -127,7 +127,7 @@
   $(document).ready(function () {
     initSelectItem();
     $('#itemsBody .price').trigger('input');
-    $('#proof_of_payment').on('change', function(event) {
+    $('#invoice_file').on('change', function(event) {
       const file = event.target.files[0];
       const preview = $('#preview-image');
       const fileNameDisplay = $('#label_photo');

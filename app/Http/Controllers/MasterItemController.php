@@ -52,7 +52,7 @@ class MasterItemController extends Controller
         // image path
         $photoPath = null;
         if ($request->hasFile('item_image')) {
-            $photoPath = $request->file('item_image')->store('item_image', 'public');
+            $photoPath = $request->file('item_image')->store('item_images', 'public');
         }
         
         MasterItem::create([

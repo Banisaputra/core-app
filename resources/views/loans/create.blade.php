@@ -65,25 +65,27 @@
           </div>
           <div class="form-group col-md-3">
             <label for="loan_value">Jumlah Pinjaman</label>
-            <input type="number" class="form-control" id="loan_value" name="loan_value" value="{{old('loan_value')}}">
+            <input type="text" class="form-control" id="loan_value" name="loan_value" data-value="" value="{{old('loan_value')}}">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-3">
             <label for="loan_tenor">Tenor Bulan</label>
-            <input type="number" class="form-control" id="loan_tenor" name="loan_tenor" value="{{old('loan_tenor')}}">
+            <input type="number" class="form-control" id="loan_tenor" name="loan_tenor">
           </div>
           <div class="form-group col-md-3">
             <label for="interest_percent">Bunga Cicilan</label>
             <input type="number" class="form-control" id="interest_percent" name="interest_percent" value="1.25" readonly>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-3">
             <label for="due_date">Jatuh Tempo</label>
             <input type="date" class="form-control" id="due_date" name="due_date" value="{{old('due_date')}}" readonly>
           </div>
-          <div class="form-group col-md-2">
-            <label for="loan_state">Status Pinjaman</label>
-            <input type="text" class="form-control" id="loan_state" name="loan_state" value="Pengajuan Baru" readonly>
+          <div class="form-group col-md-3">
+            <label for="religion">Status</label>
+            <select class="custom-select" name="loan_status" id="loan_status">
+              <option value="1" selected>Diajukan</option>
+            </select>
           </div>
         </div>
         <hr class="my-4">
@@ -91,18 +93,22 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="ln_agunan">Jaminan Pinjaman</label>
-                <input type="text" class="form-control" id="ln_agunan" name="ln_agunan" value="{{ old('ln_docDetail')}}">
+                <input type="text" class="form-control" id="ln_agunan" name="ln_agunan" value="{{ old('ln_docDetail')}}" disabled>
               </div>
               <div class="form-group">
                 <label for="ln_docNumber">Nomor Dokumen</label>
-                <input type="text" class="form-control" id="ln_docNumber" name="ln_docNumber" value="{{ old('ln_docNumber')}}">
+                <input type="text" class="form-control" id="ln_docNumber" name="ln_docNumber" value="{{ old('ln_docNumber')}}" disabled>
               </div>
               <div class="form-group">
                 <label for="ln_docDetail">Detail Dokumen</label>
-                <textarea class="form-control" id="ln_docDetail" name="ln_docDetail" rows="3">{{ old('ln_docDetail')}}</textarea>
+                <textarea class="form-control" id="ln_docDetail" name="ln_docDetail" rows="3" disabled>{{ old('ln_docDetail')}}</textarea>
               </div>
             </div>
             <div class="col-md-6">
+              <div class="custom-control custom-switch mb-3">
+                <input type="checkbox" class="custom-control-input" id="cbAgunan" name="cbAgunan">
+                <label class="custom-control-label" for="cbAgunan">Aktifkan jika menggunakan agunan</label>
+              </div>
               <p class="mb-2">Syarat Pinjaman</p>
               <p class="small text-muted mb-2"> pengajuan pinjaman tanpa agunan:</p>
               <ul class="small text-muted pl-4 mb-2">
@@ -184,9 +190,58 @@
         dueDate.val(loanDate);
       }
     });
-    // Also trigger calculation when loan date changes
+
     $('#loan_date').on('change', function() {
         $('#loan_tenor').trigger('keyup');
+    });
+ 
+    $('#cbAgunan').on('click', function (e) {
+      console.log("agunan active");
+      if ($(this).is(':checked')) {
+        $('#ln_agunan').prop('disabled', false);
+        $('#ln_docNumber').prop('disabled', false);
+        $('#ln_docDetail').prop('disabled', false);
+      } else {
+        $('#ln_agunan').val('').prop('disabled', true);
+        $('#ln_docNumber').val('').prop('disabled', true);
+        $('#ln_docDetail').val('').prop('disabled', true);
+      }
+    })
+
+    $('#loan_value').on('input', function() {
+      // Save cursor position
+      const cursorPosition = this.selectionStart;
+      const originalLength = this.value.length;
+      
+      // Get raw value without formatting
+      let value = $(this).val().replace(/[^\d]/g, '');
+      
+      // Format to IDR
+      if (value.length > 0) {
+          let formattedValue = '';
+          for (let i = 0; i < value.length; i++) {
+              if (i > 0 && (value.length - i) % 3 === 0) {
+                  formattedValue += '.';
+              }
+              formattedValue += value[i];
+          }
+          
+          $(this).val(formattedValue);
+          
+          // Adjust cursor position based on added dots
+          const newLength = formattedValue.length;
+          const lengthDiff = newLength - originalLength;
+          const newCursorPosition = cursorPosition + lengthDiff;
+          this.setSelectionRange(newCursorPosition, newCursorPosition);
+      } else {
+          $(this).val('');
+      }
+    });
+
+    // For form submission
+    $('#loan_value').on('blur', function() {
+      const numericValue = $(this).val().replace(/\./g, '');
+      $(this).attr('data-value', numericValue)
     });
 
   });

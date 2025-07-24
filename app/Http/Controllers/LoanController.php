@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use DateTime;
 use DateInterval;
 use App\Models\Loan;
+use App\Models\Member;
 use App\Models\LoanAgunan;
 use App\Models\LoanPayment;
 use Illuminate\Http\Request;
@@ -42,19 +43,32 @@ class LoanController extends Controller
             'loan_date' => 'required|date',
             'due_date' => 'required|date',
             'loan_tenor' => 'required|integer',
-            'loan_value' => 'required|integer',
+            'loan_value' => ['required','regex:/^\s?(\d{1,3}(\.\d{3})*(,\d{1,2})?|\d+)$/'],
             'interest_percent' => 'required|decimal:2',
         ]);
 
         $loan_code = Loan::generateCode();
+        $loan_value = Loan::formatIdrToNumeric($request->loan_value);
 
         // check due date
         $date = new DateTime($request->loan_date);
         $date->add(new DateInterval('P' . $request->loan_tenor . 'M'));
         $dueDate = $date->format('Ymd');
 
-        // check total loan
-        if ($request->loan_value > 3000000) {
+        // get anggota
+        $member = Member::findOrFail($request->member_id);
+        $maxLoan = $member->maxLoanAmount();
+        $is_agunan = isset($request->cbAgunan) ? true : false;
+        // check policy max loan non agunan
+        if ($loan_value > $maxLoan || $is_agunan === true)
+            return redirect()->back()->with('error', 'Plafon pinjaman melebihi batas maksimal sebesar Rp ' . number_format($maxLoan, 0, ',', '.'));
+        if ($request->loan_tenor > 12 && $is_agunan === false)
+            return redirect()->back()->with('error', 'Tenor pinjaman melebihi batas maksimal 12 bulan');
+
+
+
+
+        if ($loan_value > 3000000) {
             $request->validate([
                 'ln_agunan' => 'required|string',
                 'ln_docNumber' => 'required|string',
@@ -76,10 +90,10 @@ class LoanController extends Controller
                 'loan_code' => $loan_code,
                 'loan_date' => date('Ymd', strtotime($request->loan_date)),
                 'loan_tenor' => $request->loan_tenor,
-                'loan_value' => $request->loan_value,
+                'loan_value' => $loan_value,
                 'interest_percent' => $request->interest_percent,
                 'due_date' => $dueDate,
-                'loan_state' => 1,
+                'loan_state' => $request->loan_status,
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]);
@@ -140,9 +154,6 @@ class LoanController extends Controller
 
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $data = [
@@ -152,18 +163,12 @@ class LoanController extends Controller
         return view('loans.view', $data);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $loan = Loan::with('member')->findOrFail($id);
         return view('loans.edit', compact('loan'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $loan = Loan::findOrFail($id);
@@ -172,11 +177,15 @@ class LoanController extends Controller
             'loan_date' => 'required|date',
             'due_date' => 'required|date',
             'loan_tenor' => 'required|integer',
-            'loan_value' => 'required|integer',
-            'interest_percent' => 'required|integer',
+            'loan_value' => ['required','regex:/^\s?(\d{1,3}(\.\d{3})*(,\d{1,2})?|\d+)$/'],
+            'interest_percent' => 'required|decimal:2',
+            'loan_status' => 'required'
+        ], [
+            'loan_value' => 'Jumlah pinjaman tidak sesuai format penulisan.'
         ]);
 
         $loan_code = Loan::generateCode();
+        $loan_value = Loan::formatIdrToNumeric($request->loan_value);
 
         // check due date
         $date = new DateTime($request->loan_date);
@@ -191,7 +200,7 @@ class LoanController extends Controller
             'loan_value' => $request->loan_value,
             'interest_percent' => $request->interest_percent,
             'due_date' => $dueDate,
-            'loan_state' => 1,
+            'loan_state' => $request->loan_status * 1,
             'updated_by' => auth()->id(),
         ]);
 

@@ -32,7 +32,14 @@ class PurchaseController extends Controller
             'items.*.item_id' => 'required|exists:master_items,id',
             'items.*.qty' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
+            'invoice_file' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
+
+        // image path
+        $photoPath = null;
+        if ($request->hasFile('invoice_file')) {
+            $photoPath = $request->file('invoice_file')->store('invoice_images', 'public');
+        }
 
         DB::beginTransaction();
         try {
@@ -50,6 +57,7 @@ class PurchaseController extends Controller
                 'pr_date' => date('Ymd', strtotime($validated['pr_date'])),
                 'supplier' => $validated['supplier'],
                 'total' => $total,
+                'file_path' => $photoPath,
                 "created_by" => auth()->id(),
                 "updated_by" => auth()->id(),
             ]);
@@ -77,14 +85,13 @@ class PurchaseController extends Controller
  
     public function show(string $id)
     {
-        $purchase = Purchase::findOrFail($id);
+        $purchase = Purchase::with(['prDetails.item'])->findOrFail($id);
         return view('purchases.view', compact('purchase'));
     }
  
     public function edit(string $id)
     {
         $purchase = Purchase::with(['prDetails.item'])->findOrFail($id);
-        
         return view('purchases.edit', compact('purchase'));
     }
  
@@ -98,7 +105,14 @@ class PurchaseController extends Controller
             'items.*.item_id' => 'required|exists:master_items,id',
             'items.*.qty' => 'required|numeric|min:1',
             'items.*.price' => 'required|numeric|min:0',
+            'invoice_file' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
         ]);
+        // image path
+        $photoPath = null;
+        if ($request->hasFile('invoice_file')) {
+            $photoPath = $request->file('invoice_file')->store('invoice_image', 'public');
+        }
 
         $total = collect($request['items'])->sum(function ($item) {
             return $item['qty'] * $item['price'];
@@ -107,6 +121,9 @@ class PurchaseController extends Controller
         $request['pr_date'] = date('Ymd', strtotime($request['pr_date']));
         $purchase = Purchase::findOrFail($id);
         $purchase->update($request->only('ref_doc', 'pr_date', 'supplier', 'total'));
+        if ($request->hasFile('invoice_file') && $photoPath !== null) {
+            $purchase->update(['filepath' => $photoPath]);
+        }
 
         $purchase->prDetails()->delete();
 

@@ -19,7 +19,9 @@
                 <div class="col-4">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
-                            <img src="{{ asset('storage/'.$saving->proof_of_payment) }}" alt="payment" width="300px">
+                            <img src="{{ file_exists(asset('storage/'.$saving->proof_of_payment)) 
+                            ? asset('storage/'.$saving->proof_of_payment) 
+                            : asset('images/default.png') }}" alt="profile" width="300px">
                         </div>
                     </div>
                 </div>

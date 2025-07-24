@@ -15,13 +15,14 @@
       </div>
       <hr class="my-4">
       <h5 class="mb-2 mt-4">Personal</h5>
-      <p class="mb-4">Data personal</p>
        
     <div class="row">
         <div class="col-4">
             <div class="card shadow mb-4">
                 <div class="card-body text-center">
-                    <img src="{{ asset('storage/'.$member->image) }}" alt="..." width="300px">
+                     <img src="{{ file_exists(asset('storage/'.$member->image)) 
+                        ? asset('storage/'.$member->image) 
+                        : asset('images/default.png') }}" alt="profile" width="300px">
                 </div>
             </div>
         </div>

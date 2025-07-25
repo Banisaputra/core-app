@@ -1,5 +1,12 @@
 @extends('layouts.main')
 
+@section('title')
+    <title>Dashboard - Monitoring</title>
+@endsection
+
+@section('page_css')
+    
+@endsection
 @section('content')
    <div class="container-fluid">
       <div class="row justify-content-center">
@@ -87,5 +94,9 @@
             </div>
          </div>
       </div>
-   </div> <!-- .container-fluid -->
+   </div>
+@endsection
+
+@section('page_script')
+    
 @endsection

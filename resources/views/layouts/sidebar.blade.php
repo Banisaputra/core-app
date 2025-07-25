@@ -137,11 +137,11 @@
                 </a>
             </li>
             <li class="nav-item dropdown">
-                <a href="#ui-elements" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                <a href="#kopSetting" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
                     <i class="fe fe-settings fe-16"></i>
                     <span class="ml-3 item-text">Pengaturan</span>
                 </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="ui-elements">
+                <ul class="collapse list-unstyled pl-4 w-100" id="kopSetting">
                     <li class="nav-item">
                         <a class="nav-link pl-3" href="{{ route('policy.index')}}">
                             <span class="ml-1 item-text">Syarat & Ketentuan</span>
@@ -158,30 +158,25 @@
         <ul class="navbar-nav flex-fill w-100 mb-2">
             {{-- koperasi --}}
             <li class="nav-item dropdown">
-                <a href="#ui-elements" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                <a href="#usahaReport" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
                     <i class="fe fe-shopping-cart fe-16"></i>
                     <span class="ml-3 item-text">Usaha</span>
                 </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="ui-elements">
+                <ul class="collapse list-unstyled pl-4 w-100" id="usahaReport">
                     <li class="nav-item">
                         <a class="nav-link pl-3" target="_blank" href="{{ route('reports.deductionPdf')}}">
                             <span class="ml-1 item-text">Laba Rugi</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('reports.index')}}">
-                            <span class="ml-1 item-text">Laporan</span>
-                        </a>
-                    </li> 
                 </ul>
             </li>
-            {{-- usaha --}}
+            {{-- koperasi --}}
             <li class="nav-item dropdown">
-                <a href="#ui-elements" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                <a href="#koperasiReport" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
                     <i class="fe fe-file-text fe-16"></i>
                     <span class="ml-3 item-text">Koperasi</span>
                 </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="ui-elements">
+                <ul class="collapse list-unstyled pl-4 w-100" id="koperasiReport">
                     <li class="nav-item">
                         <a class="nav-link pl-3" target="_blank" href="{{ route('reports.deductionPdf')}}">
                             <span class="ml-1 item-text">Potong Gaji Anggota</span>

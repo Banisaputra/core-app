@@ -6,7 +6,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="{{asset('favicon.ico')}}">
-    <title>Tiny Dashboard - A Bootstrap Dashboard Template</title>
+    @yield('title')
     <!-- Simple bar CSS -->
     <link rel="stylesheet" href="{{ asset('fedash/css/simplebar.css') }}">
     <!-- Fonts CSS -->

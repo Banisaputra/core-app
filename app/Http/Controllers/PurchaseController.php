@@ -184,12 +184,7 @@ class PurchaseController extends Controller
         ]);
 
         $purchase = Purchase::with(['prDetails.item'])->findOrFail($request->pr_id);
-
-        $is_exists = ItemStock::where('ref_doc_type', 'PURCHASE')
-        ->where('ref_doc_id', $purchase->id)
-        ->first();
-
-        if ($is_exists) return redirect()->back()->with('error', 'Pembelian sudah pernah dikonfirmasi');
+        if ($purchase->pr_state != 1) return redirect()->back()->with('error', 'Dokumen pembelian tidak valid, atau sudah pernah dikonfrimasi');
 
         DB::beginTransaction();
         try {

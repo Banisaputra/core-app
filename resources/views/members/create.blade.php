@@ -52,8 +52,8 @@
             <input type="text" class="form-control" id="nip" name="nip" value="{{ old('nip')}}">
           </div>
           <div class="form-group col-md-4">
-            <label for="employment">Pekerjaan</label>
-            <input type="text" class="form-control" id="employment" name="employment" value="{{ old('employment')}}">
+            <label for="departement">Departemen</label>
+            <input type="text" class="form-control" id="departement" name="departement" value="{{ old('departement')}}">
           </div>
         </div>
         <div class="form-row">

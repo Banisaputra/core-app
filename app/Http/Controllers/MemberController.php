@@ -42,7 +42,7 @@ class MemberController extends Controller
             'email' => 'required|email|unique:users,email',
             'date_of_birth' => 'required|date',
             'nip' => 'integer',
-            'employment' => 'string',
+            'departement' => 'string',
             'telphone' => 'required|integer',
             'gender' => 'required|in:female,male',
             'religion' => 'required|in:Islam,Kristen,Katholik,Hindu,Budha',
@@ -79,7 +79,7 @@ class MemberController extends Controller
             'religion' => $request->religion,
             'gender' => $request->gender,
             'date_of_birth' => $request->date_of_birth,
-            'employment' => $request->employment,
+            'departement' => $request->departement,
             'address' => $request->address,
             'image' => $photoPath,
             'balance' => $request->balance,
@@ -121,7 +121,7 @@ class MemberController extends Controller
             'email' => 'required|email|unique:users,email,'.$user->id,
             'date_of_birth' => 'required|date',
             'nip' => 'integer',
-            'employment' => 'string',
+            'departement' => 'string',
             'telphone' => 'required|integer',
             'gender' => 'required|in:female,male',
             'religion' => 'required|in:Islam,Kristen,Katholik,Hindu,Budha',
@@ -154,7 +154,7 @@ class MemberController extends Controller
         $member->religion = $request->religion;
         $member->gender = $request->gender;
         $member->date_of_birth = $request->date_of_birth;
-        $member->employment = $request->employment;
+        $member->departement = $request->departement;
         $member->address = $request->address;
         $member->balance = $request->balance;
         $member->date_joined = $request->date_joined;

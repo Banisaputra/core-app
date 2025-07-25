@@ -81,7 +81,7 @@
                 <div class="col-4">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
-                            <img src="{{ file_exists(asset('storage/'.$member->image)) 
+                            <img src="{{ file_exists(public_path('storage/'.$member->image)) 
                             ? asset('storage/'.$member->image) 
                             : asset('images/default.png') }}" alt="profile" width="300px">
                         </div>
@@ -141,7 +141,7 @@
                 </div> 
             </div>
             <hr class="my-4">
-            <h5 class="mb-2 mt-4">Account</h5>
+            <h5 class="mb-2 mt-4">Account Information</h5>
             <button type="button" class="btn mb-2 btn-outline-success" data-toggle="modal" data-target="#accountModal">Edit Account</button>
             <div class="card shadow mb-4">
                 <div class="card-header">
@@ -166,9 +166,13 @@
                         <dd class="col-sm-4 mb-3">{{ $member->user->updated_at}}</dd>
                         <dt class="col-sm-2 text-muted">Role</dt>
                         <dd class="col-sm-10">
-                            @foreach ($userRole as $role)
-                                <li>{{ $role->name }}</li>
-                            @endforeach
+                            @if (count($userRole) > 0)
+                                @foreach ($userRole as $role)
+                                    <li>{{ $role->name }}</li>
+                                @endforeach
+                            @else  
+                                <li>-</li>
+                            @endif
                         </dd>
                     </dl>
                 </div>

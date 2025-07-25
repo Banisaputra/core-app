@@ -4,44 +4,37 @@ namespace App\Http\Controllers;
 
 use Log;
 use Exception;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Member;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Font;
+use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MemberController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $members = Member::with('user')->latest()->paginate();
         return view('members.index', compact('members'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('members.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     { 
         $request->validate([
@@ -102,27 +95,23 @@ class MemberController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $member = Member::with('user')->findOrFail($id);
-        return view('members.view', compact('member'));
+        $data = [
+            "member" => $member,
+            "roles" => Role::all(),
+            "userRole" => Role::getUserRole($member->user_id)
+        ];
+        return view('members.view', $data);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $member = Member::with('user')->findOrFail($id);
         return view('members.edit', compact('member'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $member = Member::findOrFail($id);
@@ -176,9 +165,6 @@ class MemberController extends Controller
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $member = Member::findOrFail($id);
@@ -399,6 +385,34 @@ class MemberController extends Controller
         ]);
     }
 
+    public function account(Request $request) 
+    {
+        $request->validate([
+            'member_id' => 'required|exists:members,id',
+            'email' => 'required|exists:users,email',
+            'role' => 'required|exists:roles,id',
+            'password' => 'required|min:8'
+        ]);
+        
+        DB::beginTransaction();
+        try {
+            $member = Member::findOrFail($request->member_id);
+            $user = User::where('email', $request->email)
+            ->where('id', $member->user_id)
+            ->first();
+            $user->update(['password' => Hash::make($request->password)]);
+            $user->update(['is_transactional' => isset($request->accountActive) ? 1 : 0]);
+            $newRole = Role::findOrFail($request->role);
+            $newRole->asignRole($user->id);
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Data Account berhasil diperbarui');
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return back()->with('error', 'Gagal menyimpan pembelian: ' . $e->getMessage())->withInput();
+        }
+
+    }   
 
 
 }

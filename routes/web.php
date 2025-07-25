@@ -70,6 +70,7 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
     Route::get('/members/import', [MemberController::class, 'downloadTemplate'])->name('members.template');
     Route::post('/members/import', [MemberController::class, 'import'])->name('members.import');
     Route::post('/members', [MemberController::class, 'store'])->name('members.store');
+    Route::post('/members/account', [MemberController::class, 'account'])->name('members.account');
     Route::get('/members/{id}', [MemberController::class, 'show'])->name('members.show');
     Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit');
     Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');

@@ -195,6 +195,7 @@ class PurchaseController extends Controller
                     'batch' => $item['batch'],
                     'stock' => $item['amount'],
                     'price' => $item['price'],
+                    'remaining_stock' => $item['amount'],
                     'ref_doc_id' => $purchase->id,
                     'ref_doc_type' => 'PURCHASE'
                 ]);

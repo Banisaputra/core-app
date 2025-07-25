@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('batch', 100);
             $table->integer('stock');
             $table->integer('price');
+            $table->integer('remaining_stock');
             $table->integer('ref_doc_id');
             $table->string('ref_doc_type', 50);
             $table->timestamps();

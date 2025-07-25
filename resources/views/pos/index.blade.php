@@ -60,6 +60,10 @@
         width: 100%;
         table-layout: fixed;
     }
+    .quantity-control {
+        display: flex;
+        align-items: center;
+    }
 
   </style>
   <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -164,22 +168,22 @@
         <h4>Cart Pelanggan</h4>
         <select id="memberSelect" name="member_id" class="form-control"></select>
 
-      <table class="table cart-table table-bordered">
-        <thead>
-          <tr>
-            <th>Barang</th>
-            <th width="20%">Qty</th>
-            <th width="25%">Price</th>
-            <th width="10%"></th>
-          </tr>
-        </thead>
-        <tbody id="cartBody"></tbody>
-      </table>
-      <h2>Total: <span id="total">0</span>,-</h2>
-      <hr class="my-2">
-      <button type="button" id="cashBtn" class="btn mb-2 btn-success btn-block"> C A S H </button>
-      <hr class="my-2">
-      <button type="button" id="creditBtn" class="btn mb-2 btn-outline-warning btn-block"> KREDIT </button>
+        <table class="table cart-table table-bordered">
+            <thead>
+            <tr>
+                <th>Barang</th>
+                <th width="20%">Qty</th>
+                <th width="25%">Price</th>
+                <th width="10%"></th>
+            </tr>
+            </thead>
+            <tbody id="cartBody"></tbody>
+        </table>
+        <h2>Total: <span id="total">0</span>,-</h2>
+        <hr class="my-2">
+        <button type="button" id="cashBtn" class="btn mb-2 btn-success btn-block"> C A S H </button>
+        <hr class="my-2">
+        <button type="button" id="creditBtn" class="btn mb-2 btn-outline-warning btn-block"> KREDIT </button>
     </div>
   </div>
 </div>

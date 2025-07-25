@@ -232,12 +232,13 @@ function renderProducts(products) {
       const col = document.createElement("div");
       col.className = "col-md-3 mb-3";
       col.innerHTML = `
-      <div class="p-3 text-center product-card" data-id="${product.id}" data-name="${product.item_name}" data-price="${product.sales_price}">
+      <div class="p-3 text-center product-card" data-id="${product.id}" data-stock="${product.stock}" data-name="${product.item_name}" data-price="${product.sales_price}">
          <img src="/storage/${product.item_image}" class="mb-3"
             onerror="this.onerror=null; this.src='/images/default.jpg'" 
             alt="item_picture" width="150px" height="150px">
          <h6>${product.item_name}</h6>
-         <p>${formatIDR(parseFloat(product.sales_price), 0)}</p>
+         <span>${formatIDR(parseFloat(product.sales_price), 0)}</span><br>
+         <span class="text-muted">Stock: ${product.stock}</span>
          <button class="btn btn-sm btn-primary btn-block add-to-cart">Add</button>
       </div>
       `;
@@ -255,9 +256,9 @@ function updateCart() {
       row.innerHTML = `
       <td>${item.name}</td>
       <td width="30%">
-      <div class="form-row" style="justify-content:center;">
+      <div class="quantity-control" style="justify-content:center;">
          <button class="btn btn-outline-primary btn-sm py-1 px-2 btnQty" type="button" id="plus-${id}">+</button>
-         <span class="text-center qty-input px-1 mx-2" data-name="${item.name}" data-id="${id}">${item.qty}</span>
+         <input type="number" id="qty-input-${id}" class="form-control qty-input px-1 mx-2" data-name="${item.name}" data-id="${id}" min="1" value="${item.qty}">
          <button class="btn btn-outline-secondary btn-sm py-1 px-2 btnQty" type="button" id="minus-${id}">-</button>
       </div>
       </td>
@@ -276,10 +277,15 @@ document.addEventListener("click", e => {
       const id = card.dataset.id; 
       const name = card.dataset.name;
       const price = parseFloat(card.dataset.price);
+      const stock = card.dataset.stock;
 
+      if (stock == 0) return alert('stok barang kosong, restock barang diperlukan untuk transaksi!')
       if (!cart[id]) {
-         cart[id] = { name: name, qty: 1, price: price };
+         cart[id] = { name: name, qty: 1, price: price, stock: stock };
       } else {
+         if (cart[id].stock < (cart[id].qty + 1)) {
+            return alert("stock barang tidak cukup!")
+         }
          cart[id].qty++;
       }
       updateCart();
@@ -292,28 +298,64 @@ document.addEventListener("click", e => {
    }
  
 });
-
 cartBody.addEventListener("click", e => {
-   if (e.target.classList.contains("btnQty")) {
-      const type = e.target.id.split('-')[0];
-      const id = e.target.id.split('-')[1];
-      console.log(type);
-      if (type == "plus") {
-         cart[id].qty++
-         console.log("plus1");
-      } else if (type == "minus") {
-         cart[id].qty--;
-         console.log("minus1");
-         if (cart[id].qty == 0) {
-            console.log("hapus");
-            delete cart[id];
-         }
+    if (!e.target.classList.contains("btnQty")) return;
+    
+    const [type, id] = e.target.id.split('-');
+    const item = cart[id];
+    
+    if (type === "plus") {
+        if (item.stock <= item.qty) {
+            return alert("Stok barang tidak cukup!");
+        }
+        item.qty++;
+    } 
+    else if (type === "minus") {
+        if (--item.qty <= 0) {
+            if (confirm("Hapus item dari keranjang?")) {
+                delete cart[id];
+            } else {
+                item.qty = 1; // Reset to minimum
+            }
+        }
+    }
+    updateCart();
+});
+
+cartBody.addEventListener("input", debounce(e => {
+   if (!e.target.classList.contains("qty-input")) return;
+   
+   const [,, id] = e.target.id.split('-');
+   const item = cart[id];
+   let newQty = parseInt(e.target.value) || 0;
+   
+   if (newQty > item.stock) {
+      newQty = item.stock;
+      alert("Stok hanya tersedia " + item.stock);
+   }
+   else if (newQty < 1) {
+      if (confirm("Hapus item dari keranjang?")) {
+         delete cart[id];
+      } else {
+         newQty = 1;
       }
-      updateCart();
-      
    }
    
-});
+   item.qty = newQty;
+   e.target.value = newQty;
+   updateCart();
+}, 800));
+
+// Debounce helper function
+function debounce(func, delay) {
+   let timeout;
+   return function() {
+      const context = this;
+      const args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(context, args), delay);
+   };
+}
 
 let searchTimer;
 searchBox.addEventListener("input", () => {

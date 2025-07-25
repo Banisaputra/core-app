@@ -45,6 +45,7 @@ class MasterItemController extends Controller
             'item_code' => 'required|alpha_num|unique:master_items,item_code',
             'item_name' => 'required|string|max:255',
             'stock' => 'required|integer|min:0',
+            'category_id' => 'required|exists:categories,id',
             'sales_price' => 'required|integer|min:0',
             'item_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -58,6 +59,7 @@ class MasterItemController extends Controller
         MasterItem::create([
             "item_code" => $request->item_code,
             "item_name" => $request->item_name,
+            "ct_id" => $request->category_id,
             "stock" => $request->stock,
             "sales_price" => $request->sales_price,
             "item_image" => $photoPath,

@@ -30,13 +30,17 @@
           </div>
         @endif
         <div class="form-row">
-          <div class="form-group col-md-5">
+          <div class="form-group col-md-3">
             <label for="item_code">Kode Barang</label>
             <input type="text" class="form-control" id="item_code" name="item_code" value="{{old('item_code')}}">
           </div>
-          <div class="form-group col-md-7">
+          <div class="form-group col-md-6">
             <label for="item_name">Nama Barang</label>
             <input type="text" class="form-control" id="item_name" name="item_name" value="{{old('item_name')}}">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="simple-select2">Kategori</label>
+            <select id="categorySelect" name="category_id" class="form-control"></select>
           </div>
         </div>
         <div class="form-row">
@@ -79,6 +83,32 @@
 @section('page_script')
 <script>
   $(document).ready(function () { 
+    $('#categorySelect').select2({
+        placeholder: 'Search category...',
+        theme: 'bootstrap4',
+        minimumInputLength: 2,
+        ajax: {
+            url: '/api/category/search', // Your route
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term // search term
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.name
+                        };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
 
     $('#item_image').on('change', function(event) {
       const file = event.target.files[0];

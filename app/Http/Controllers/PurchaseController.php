@@ -38,7 +38,7 @@ class PurchaseController extends Controller
         ]);
 
         // image path
-        $photoPath = null;
+        $photoPath = '';
         if ($request->hasFile('invoice_file')) {
             $photoPath = $request->file('invoice_file')->store('invoice_images', 'public');
         }

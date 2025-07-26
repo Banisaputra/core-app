@@ -1,5 +1,8 @@
 @extends('layouts.main')
 
+@section('title')
+    <title>Laporan - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
 @section('page_css')
 
 @endsection

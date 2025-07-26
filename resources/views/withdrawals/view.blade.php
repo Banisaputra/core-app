@@ -1,5 +1,8 @@
 @extends('layouts.main')
 
+@section('name')
+    <title>View Penarikan - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
 @section('page_css')
 
 @endsection
@@ -19,7 +22,7 @@
                 <div class="col-4">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
-                            <img src="{{ file_exists(asset('storage/'.$withdrawal->proof_of_withdrawal)) 
+                            <img src="{{ $withdrawal->proof_of_withdrawal != '' && file_exists(asset('storage/'.$withdrawal->proof_of_withdrawal)) 
                             ? asset('storage/'.$withdrawal->proof_of_withdrawal) 
                             : asset('images/default.png') }}" alt="profile" width="300px">
                         </div>

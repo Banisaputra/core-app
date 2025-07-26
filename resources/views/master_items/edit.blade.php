@@ -1,5 +1,11 @@
 @extends('layouts.main')
 
+@section('title')
+    <title>Edit Barang - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
+@section('page_css')
+    
+@endsection
 @section('content')
 <div class="container-fluid">
   <div class="row justify-content-center">

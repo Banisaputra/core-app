@@ -1,4 +1,11 @@
 @extends('layouts.main')
+@section('title')
+    <title>Tambah Kategori - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
+
+@section('page_css')
+    
+@endsection
 
 @section('content')
 <div class="container-fluid">

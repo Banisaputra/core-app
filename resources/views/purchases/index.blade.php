@@ -1,5 +1,9 @@
 @extends('layouts.main')
 
+@section('title')
+    <title>Pembelian - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
+
 @section('page_css')
     <link rel="stylesheet" href="{{ asset('fedash/css/dataTables.bootstrap4.css') }}">
 @endsection
@@ -18,7 +22,7 @@
                 </a>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-success"><span class="fe fe-16 mr-2 fe-download"></span>Import Data <small>(soon)</small></button>
+              {{-- other button --}}
             </div>
         </div>
          @if ($errors->any())
@@ -80,7 +84,7 @@
                               </button>
                               <div class="dropdown-menu dropdown-menu-right">
                                 <a class="dropdown-item" href="{{ route('purchases.show', $purchase->id) }}">View</a>
-                                <a class="dropdown-item" href="{{ route('purchases.edit', $purchase->id) }}">Edit</a>
+                                <a class="dropdown-item" href="{{ $purchase->pr_state == 1 ? route('purchases.edit', $purchase->id) : "javascript:void(0)" }}">Edit</a>
                               </div>
                             </td> 
                         </tr>

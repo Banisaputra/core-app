@@ -9,7 +9,7 @@ class ItemStock extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['item_id', 'batch', 'stock', 'price', 'ref_doc_id', 'ref_doc_type'];
+    protected $fillable = ['item_id', 'batch', 'stock', 'price', 'ref_doc_id', 'ref_doc_type', 'remaining_stock'];
 
 
 }

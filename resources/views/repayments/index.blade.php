@@ -1,5 +1,8 @@
 @extends('layouts.main')
 
+@section('title')
+    <title>Pelunasan - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
 @section('page_css')
     <link rel="stylesheet" href="{{ asset('fedash/css/dataTables.bootstrap4.css') }}">
     <style>

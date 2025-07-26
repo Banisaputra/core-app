@@ -1,5 +1,9 @@
 @extends('layouts.main')
 
+@section('title')
+    <title>View Pembelian - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
+
 @section('page_css')
     <link rel="stylesheet" href="{{ asset('fedash/css/dataTables.bootstrap4.css') }}">
 @endsection
@@ -35,7 +39,7 @@
                 <div class="col-4">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
-                            <img src="{{ file_exists(asset('storage/'.$purchase->file_path)) 
+                            <img src="{{ $purchase->file_path != '' && file_exists(public_path('storage/'.$purchase->file_path)) 
                             ? asset('storage/'.$purchase->file_path) 
                             : asset('images/default.png') }}" alt="profile" width="300px">
                         </div>

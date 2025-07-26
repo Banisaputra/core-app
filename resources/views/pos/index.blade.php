@@ -1,5 +1,8 @@
 @extends('layouts.main')
 
+@section('title')
+    <title>POINT OF SALES - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
 @section('page_css')
     <style>
     .product-card {

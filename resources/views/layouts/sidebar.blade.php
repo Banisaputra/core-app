@@ -89,18 +89,18 @@
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('pos.index') }}">
                     <i class="fe fe-shopping-bag fe-16"></i>
-                    <span class="ml-3 item-text">POS</span>
+                    <span class="ml-3 item-text">Penjualan</span>
                 </a>
             </li>
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('purchases.index')}}">
-                    <i class="fe fe-arrow-up-circle fe-16"></i>
+                    <i class="fe fe-package fe-16"></i>
                     <span class="ml-3 item-text">Pembelian</span>
                 </a>
             </li>
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('inv.index') }}">
-                    <i class="fe fe-credit-card fe-16"></i>
+                    <i class="fe fe-box fe-16"></i>
                     <span class="ml-3 item-text">Inventory</span>
                 </a>
             </li>

@@ -1,5 +1,9 @@
 @extends('layouts.main')
 
+@section('title')
+    <title>View Pinjaman - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
+
 @section('page_css')
     <link rel="stylesheet" href="{{ asset('fedash/css/dataTables.bootstrap4.css') }}">
 @endsection
@@ -35,7 +39,7 @@
                 <div class="col-4">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
-                            <img src="{{ file_exists(asset('storage/'.$loan->member->image)) 
+                            <img src="{{ $loan->member->image != '' && file_exists(asset('storage/'.$loan->member->image)) 
                             ? asset('storage/'.$loan->member->image) 
                             : asset('images/default.png') }}" alt="profile" width="300px">
                         </div>
@@ -118,9 +122,6 @@
             <div class="row align-items-center my-4">
                 <div class="col">
                     <h2 class="h3 mb-2 page-title">Detail Angsuran</h2>
-                    <a href="{{ route('loanPayments.create') }}" class="btn mb-2 btn-primary">
-                        <span class="fe fe-plus fe-16 mr-1"></span> Tambah Angsuran
-                    </a>
                 </div>
             </div>
             <div class="row my-4">
@@ -163,8 +164,8 @@
                                         <span class="text-muted sr-only">Action</span>
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-right">
-                                        <a class="dropdown-item" href="{{ route('loans.show', $loan->id) }}">View</a>
-                                        <a class="dropdown-item" href="{{ route('loans.edit', $loan->id) }}">Edit</a>
+                                        <a class="dropdown-item" href="#">View</a>
+                                        <a class="dropdown-item" href="#">Edit</a>
                                     </div>
                                     </td> 
                                 </tr>

@@ -236,7 +236,7 @@ function renderProducts(products) {
          <img src="/storage/${product.item_image}" class="mb-3"
             onerror="this.onerror=null; this.src='/images/default.jpg'" 
             alt="item_picture" width="150px" height="150px">
-         <h6>${product.item_name}</h6>
+         <h6>${product.item_name.length > 20 ? product.item_name.substring(0, 20) + '...' : product.item_name}</h6>
          <span>${formatIDR(parseFloat(product.sales_price), 0)}</span><br>
          <span class="text-muted">Stock: ${product.stock}</span>
          <button class="btn btn-sm btn-primary btn-block add-to-cart">Add</button>

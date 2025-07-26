@@ -1,1 +1,1 @@
-<h1>Pembayaran Angsuran</h1>
+@extends('layouts.error404')

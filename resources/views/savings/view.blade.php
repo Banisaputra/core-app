@@ -1,5 +1,8 @@
 @extends('layouts.main')
 
+@section('title')
+    <title>View Simpanan - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
 @section('page_css')
 
 @endsection
@@ -19,7 +22,7 @@
                 <div class="col-4">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
-                            <img src="{{ file_exists(asset('storage/'.$saving->proof_of_payment)) 
+                            <img src="{{ $saving->proof_of_payment != '' && file_exists(asset('storage/'.$saving->proof_of_payment)) 
                             ? asset('storage/'.$saving->proof_of_payment) 
                             : asset('images/default.png') }}" alt="profile" width="300px">
                         </div>

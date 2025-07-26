@@ -1,5 +1,13 @@
 @extends('layouts.main')
 
+@section('title')
+    <title>Tambah Pinjaman - Sistem Informasi Koperasi dan Usaha</title>
+@endsection
+
+@section('page_css')
+    
+@endsection
+
 @section('content')
 {{-- syarat pinjaman --}}
 <div class="modal fade modal-right modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" style="display: none;" aria-hidden="true">

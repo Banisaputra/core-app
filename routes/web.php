@@ -134,6 +134,13 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
 
     // inventories
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inv.index');
+    Route::get('/inventory/create', [InventoryController::class, 'create'])->name('inv.create');
+    Route::post('/inventory', [InventoryController::class, 'store'])->name('inv.store');
+    Route::post('/inventory/confirm', [InventoryController::class, 'confirmation'])->name('inv.confirm');
+    Route::get('/inventory/{id}', [InventoryController::class, 'show'])->name('inv.show');
+    Route::get('/inventory/{id}/edit', [InventoryController::class, 'edit'])->name('inv.edit');
+    Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inv.update');
+    Route::delete('/inventory/{id}', [InventoryController::class, 'destroy'])->name('inv.destroy');
 
     // purchase
     Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index');

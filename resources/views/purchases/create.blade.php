@@ -177,11 +177,4 @@
 
   });
 </script>
-<script>
-  
-
-  
-
- 
-</script>
 @endsection

@@ -28,8 +28,8 @@ return new class extends Migration
         });
 
         Schema::create('purchase_detail', function (Blueprint $table) {
-            $table->foreignId('pr_id');
-            $table->foreignId('item_id');
+            $table->foreignId('pr_id')->references('id')->on('purchases')->onUpdate('cascade');
+            $table->foreignId('item_id')->references('id')->on('master_items')->onUpdate('cascade');
             $table->integer('amount');
             $table->integer('price');
             $table->integer('total');

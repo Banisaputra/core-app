@@ -15,6 +15,7 @@
             </svg>
             </a>
             <h1 class="h6 mb-3">Sign in</h1>
+            <a style="display:none;" href="#" id="modeSwitcher" data-mode="dark"></a>
             @if ($errors->any())
             <div class="alert alert-danger" role="alert">
                 @foreach ($errors->all() as $error)
@@ -28,12 +29,16 @@
             </div>
             @endif
             <div class="form-group">
-            <label for="inputEmail" class="sr-only">Email address</label>
-            <input type="email" id="inputEmail" name="email" class="form-control form-control-lg" placeholder="Email address" required="" autofocus="">
+                <label for="inputEmail" class="sr-only">Email address</label>
+                <input type="email" id="inputEmail" name="email" class="form-control form-control-lg" tabindex='1' placeholder="Email address" required="" autofocus="">
+            </div>
+             <div class="custom-control custom-checkbox text-left mb-3">
+                <input type="checkbox" class="custom-control-input" id="showPassword">
+                <label class="custom-control-label" for="showPassword">Show Password </label>
             </div>
             <div class="form-group">
-            <label for="inputPassword" class="sr-only">Password</label>
-            <input type="password" id="inputPassword" name="password" class="form-control form-control-lg" placeholder="Password" required="">
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input type="password" id="inputPassword" name="password" class="form-control form-control-lg" tabindex='2' placeholder="Password" required="">
             </div>
             <hr class="my-4">
             {{-- <div class="form-row">
@@ -48,10 +53,26 @@
                 </div>
             </div> --}}
            
-            <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Login</button>
+            <button class="btn btn-lg btn-primary btn-block mb-3" tabindex="3" type="submit">Login</button>
             <p>Don't have an account? - <a class="mb-3" href="{{ route('register') }}"> Sign Up</a></p>
             <p class="mt-5 mb-3 text-muted">&copy; <script>document.write(new Date().getFullYear('Y'))</script></p>
         </form>
         </div>
     </div>
+@endsection
+
+@section('page_script')
+    <script>
+        $(document).ready(function() {
+            $('#showPassword').on('click', function () {
+                console.log('ready bosskuhh');
+                if ($(this).is(':checked')) {
+                    $('#inputPassword').attr('type', "text")
+                } else {
+                    $('#inputPassword').attr('type', "password")
+                }
+            });
+        })
+    </script>
+    
 @endsection

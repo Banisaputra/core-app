@@ -36,6 +36,7 @@
     <script src="{{ asset('fedash/js/config.js') }}"></script>
     <script src="{{ asset('fedash/js/apps.js') }}"></script>
 
+    @yield('page_script')
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
     <script>

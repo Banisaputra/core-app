@@ -167,6 +167,8 @@ class InventoryController extends Controller
             $inventory = Inventory::findOrFail($id);
             $inventory->inv_date = $validated['inv_date'];
 
+            InventoryDetail::where('inv_id', $inventory->id)
+            ->delete();
             
             foreach ($validated['items'] as $item) {
                 $itemId = $item['item_id'];

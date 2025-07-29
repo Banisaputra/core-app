@@ -1,8 +1,9 @@
 @extends('layouts.main')
 
 @section('title')
-    <title>Edit Barang - Sistem Informasi Koperasi dan Usaha</title>
+    <title>Edit Inventory - Sistem Informasi Koperasi dan Usaha</title>
 @endsection
+
 @section('page_css')
     
 @endsection
@@ -12,10 +13,10 @@
     <div class="col-12 col-xl-10">
       <div class="row align-items-center my-4">
         <div class="col">
-          <h2 class="h3 mb-0 page-title">Edit Barang</h2>
+          <h2 class="h3 mb-0 page-title">Edit Koreksi Barang</h2>
         </div>
       </div>
-      <form action="{{ route('items.update', $item->id)}}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('inv.update', $inventory->id)}}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <hr class="my-4">
@@ -37,41 +38,61 @@
           </div>
         @endif
         <div class="form-row">
-          <div class="form-group col-md-5">
-            <label for="item_code">Kode Barang</label>
-            <input type="text" class="form-control" id="item_code" name="item_code" value="{{old('item_code', $item->item_code ?? '')}}">
-          </div>
-          <div class="form-group col-md-7">
-            <label for="item_name">Nama Barang</label>
-            <input type="text" class="form-control" id="item_name" name="item_name" value="{{old('item_name', $item->item_name ?? '')}}">
+          <div class="form-group col-md-4">
+            <label for="svDate">Kode</label>
+            <h5>{{ $inventory->inv_code }}</h5>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-3">
-            <label for="sales_price">Harga Jual</label>
-            <input type="number" class="form-control" id="sales_price" name="sales_price" value="{{old('sales_price', $item->sales_price ?? '')}}">
-          </div>
-          <div class="form-group col-md-3">
-            <label for="stock">Stok</label>
-            <input type="number" class="form-control" id="stock" name="stock" value="{{old('stock', $item->stock)}}">
+            <label for="inv_date">Tanggal Koreksi</label>
+            <input type="date" class="form-control" id="inv_date" name="inv_date" value="{{old('inv_date', date('Y-m-d', strtotime($inventory->inv_date)) ?? '')}}">
           </div>
           <div class="form-group col-md-6">
-            <label for="item_image">Gambar</label>
-            <div class="custom-file">
-              <input type="file" class="custom-file-input" id="item_image" name="item_image">
-              <label class="custom-file-label" for="item_image" id="label_photo">Choose file</label>
-              <small>*Format file jpg/jpeg,png dengan ukuran max:2MB</small>
-            </div>
-            <!-- Preview container -->
-            <div class="mt-2">
-                <img id="preview-image" src="{{ asset('storage/'. $item->item_image)}}" alt="Preview" style="max-width: 300px;">
-            </div>
+            <label for="type">Jenis Koreksi</label>
+            <select class="custom-select" name="type" id="type">
+              <option value="">-- Pilih Jenis Koreksi</option>
+              <option value="ADJUSTMENT IN" {{ old('type', $inventory->type ?? '') == 'ADJUSTMENT IN' ? 'selected' : '' }}>Penambahan</option>
+              <option value="ADJUSTMENT OUT" {{ old('type', $inventory->type ?? '') == 'ADJUSTMENT OUT' ? 'selected' : '' }}>Pengurangan</option>
+              <option value="OPERATIONAL" {{ old('type', $inventory->type ?? '') == 'OPERATIONAL' ? 'selected' : '' }}>Operasional</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-12">
+            <label for="remark">Keterangan Koreksi</label>
+            <textarea class="form-control" id="remark" rows="5" name="remark">{{old('remark', $inventory->remark ?? '')}}</textarea>
           </div>
         </div>
         <hr class="my-4">
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="inventoryTable">
+              <thead class="thead-dark">
+                <tr>
+                    <th width="55%">Nama Barang</th>
+                    <th width="40%">Qty</th>
+                    <th><button type="button" class="btn btn-sm btn-success" onclick="addRow()">+</button></th>
+                </tr>
+              </thead>
+                <tbody id="itemsBody">
+                    @foreach ($invDetails as $invd)
+                    <tr>
+                        <td><select name="items[0][item_id]" class="form-control itemSelect" required>
+                             <option value="{{ $invd['item_id'] }}" selected>
+                                {{ $invd['item_name'] ." - [stock: ".$invd['item_stock']."]" ?? 'Search anggota...' }}
+                            </option></select></td>
+                        <td><input type="number" name="items[0][qty]" class="form-control qty" value="{{ $invd['total_qty'] }}" required></td>
+                        <td><button type="button" class="btn btn-sm btn-danger" onclick="removeRow(this)">x</button></td>
+                    </tr>
+                    @endforeach
+                </tbody> 
+            </table>
+        </div>
+ 
         <div class="form-row">
           <div class="col-md-6">
-            <small>*Kode dibuat otomatis oleh sistem</small>
+             {{-- other note --}}
           </div>
           <div class="col-md-6 text-right">
             <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Simpan</button>
@@ -84,27 +105,11 @@
 @endsection
 
 @section('page_script')
+<script src="{{ asset('fedash/js/inventory.js')}}"></script>
+
 <script>
-  $(document).ready(function () { 
-
-    $('#item_image').on('change', function(event) {
-      const file = event.target.files[0];
-      const preview = $('#preview-image');
-      const fileNameDisplay = $('#label_photo');
-      fileNameDisplay.html( file ? file.name.substr(1, 70) : 'Choose file');
-      if (file) {
-        const reader = new FileReader(); 
-        reader.onload = function(e) {
-            preview.prop('src', e.target.result);
-            preview.prop('hidden', false);
-        }
-        reader.readAsDataURL(file);
-      } else {
-        preview.prop('src' , '');
-        preview.prop('hidden' , true);
-      }
-    });
-
+  $(document).ready(function () {
+    initSelectItem();
 
   });
 </script>

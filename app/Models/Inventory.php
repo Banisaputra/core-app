@@ -9,7 +9,7 @@ class Inventory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['code', 'inv_date', 'type', 'remark', 'created_by', 'updated_by'];
+    protected $fillable = ['code', 'inv_date', 'type', 'remark', 'inv_state', 'created_by', 'updated_by'];
 
     public function invDetails() {
         return $this->hasMany(InventoryDetail::class, 'inv_id');

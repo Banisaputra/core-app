@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\MasterItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -55,7 +56,17 @@ class MasterItemController extends Controller
         if ($request->hasFile('item_image')) {
             $photoPath = $request->file('item_image')->store('item_images', 'public');
         }
+
+        // jika symlink tidak tersedia
+        // // start
+        // $sourcePath = storage_path('app/public/' . $photoPath);
+        // $destinationPath = public_path('storage/' . $photoPath);
+         
+        // File::ensureDirectoryExists(dirname($destinationPath));
         
+        // File::copy($sourcePath, $destinationPath);
+        // // end
+
         MasterItem::create([
             "item_code" => $request->item_code,
             "item_name" => $request->item_name,

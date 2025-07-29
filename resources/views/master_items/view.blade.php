@@ -21,7 +21,7 @@
                 <div class="col-4">
                     <div class="card shadow mb-4">
                         <div class="card-body text-center">
-                            <img src="{{ $item->item_image != '' &&file_exists(asset('storage/'.$item->item_image)) 
+                            <img src="{{ $item->item_image != '' && file_exists(public_path('storage/'.$item->item_image)) 
                             ? asset('storage/'.$item->item_image) 
                             : asset('images/default.png') }}" alt="profile" width="300px">
                         </div>

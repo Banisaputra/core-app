@@ -21,6 +21,7 @@ use App\Http\Middleware\PermissionMiddleware;
 use App\Http\Controllers\MasterItemController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\LoanPaymentController;
+use App\Http\Controllers\StorageLinkController;
 
 // auth
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -30,8 +31,10 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::get('/logout', [AuthController::class, 'logout']);
 
 // admin access
-Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(function () {
+Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser'])->group(function () {
 
+    // storage link
+    Route::get('/create-storage-link', [StorageLinkController::class, 'create']); 
     // search
     Route::get('/api/users/search', [UserController::class, 'search']);
     Route::get('/api/roles/search', [RoleController::class, 'search']);
@@ -158,7 +161,7 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin'])->group(f
 }); 
 
 // more role
-Route::middleware([RoleMiddleware::class . ':admin,finance'])->group(function() {
+Route::middleware([RoleMiddleware::class . ':admin,superuser,finance'])->group(function() {
     Route::get('/', function() {
         return view('dashboard');
     })->middleware([PermissionMiddleware::class . ':dashboard']);

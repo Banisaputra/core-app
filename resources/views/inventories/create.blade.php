@@ -46,7 +46,7 @@
         </div>
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label for="inv_date">Tanggal Pembelian</label>
+            <label for="inv_date">Tanggal Koreksi</label>
             <input type="date" class="form-control" id="inv_date" name="inv_date" value="{{old('inv_date')}}">
           </div>
           <div class="form-group col-md-6">

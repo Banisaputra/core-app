@@ -23,15 +23,21 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($data as $i => $row)
-            <tr>
-                <td>{{ $i + 1 }}</td>
-                <td>{{ $row['name'] }}</td>
-                <td>{{ number_format($row['potongan_wajib'], 0, ',', '.') }}</td>
-                <td>{{ number_format($row['potongan_pinjaman'], 0, ',', '.') }}</td>
-                <td>{{ number_format($row['total'], 0, ',', '.') }}</td>
-            </tr>
-            @endforeach
+            @if (count($data) > 0)
+                @foreach($data as $i => $row)
+                <tr>
+                    <td>{{ $i + 1 }}</td>
+                    <td>{{ $row['name'] }}</td>
+                    <td>{{ number_format($row['potongan_wajib'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($row['potongan_pinjaman'], 0, ',', '.') }}</td>
+                    <td>{{ number_format($row['total'], 0, ',', '.') }}</td>
+                </tr>
+                @endforeach
+            @else
+                <tr>
+                    <td span=4>Tidak ada data</td>
+                </tr>
+            @endif
         </tbody>
     </table>
 </body>

@@ -84,6 +84,8 @@
         </ul>
     @endif
 
+    @if (auth()->user()->hasPermission('usaha'))
+        
         <p class="text-muted nav-heading mt-4 mb-1">
             <span>Usaha</span>
         </p>
@@ -107,6 +109,7 @@
                 </a>
             </li>
         </ul>
+    @endif
 
     @if (auth()->user()->hasPermission('koperasi'))
         
@@ -154,6 +157,8 @@
         </ul>
     @endif
 
+    @if (auth()->user()->hasPermission('laporan'))
+        
         <p class="text-muted nav-heading mt-4 mb-1">
             <span>Laporan</span>
         </p>
@@ -191,8 +196,8 @@
                     </li> 
                 </ul>
             </li>
-            
         </ul>
+    @endif
  
     </nav>
   </aside>

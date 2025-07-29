@@ -28,6 +28,11 @@
                 <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ session('credentials') }}
             </div>
             @endif
+            @if (session()->has('success'))
+            <div class="alert alert-success" role="alert">
+                <span class="fe fe-check-circle fe-16 mr-2"></span> {{ session('success') }}
+            </div>
+            @endif
             <div class="form-group">
                 <label for="inputEmail" class="sr-only">Email address</label>
                 <input type="email" id="inputEmail" name="email" class="form-control form-control-lg" tabindex='1' placeholder="Email address" required="" autofocus="">

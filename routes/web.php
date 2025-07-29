@@ -160,11 +160,11 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
 
 }); 
 
+Route::get('/', function() {
+    return view('dashboard');
+})->middleware([PermissionMiddleware::class . ':dashboard']);
 // more role
 Route::middleware([RoleMiddleware::class . ':admin,superuser,finance'])->group(function() {
-    Route::get('/', function() {
-        return view('dashboard');
-    })->middleware([PermissionMiddleware::class . ':dashboard']);
 
     // loans
     Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');

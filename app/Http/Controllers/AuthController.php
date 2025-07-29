@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -47,15 +49,28 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
         ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        session(['user' => $user]);
-        return redirect('/');
+        DB::beginTransaction();
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+            $role = Role::where('name', 'like', 'Member')->first();
+            DB::table('role_user')
+            ->insert([
+                'user_id' => $user->id,
+                'role_id' => $role->id
+            ]); 
+    
+            session(['user' => $user]);
+            DB::commit();
+            return redirect('/login')->with('success', 'Registrasi berhasil, silahkan login');
+        } catch (\Throwable $th) {
+            DB::rollback();
+            dd($th);
+            return redirect()->back()->with('error', 'Terjadi kesalahan, Hubungi administrator');
+        }
     }
 
     public function logout(Request $request) {

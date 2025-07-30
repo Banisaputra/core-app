@@ -40,7 +40,7 @@
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="svDate">Kode</label>
-            <h5>{{ $inventory->inv_code }}</h5>
+            <h5>{{ $inventory->code }}</h5>
           </div>
         </div>
         <div class="form-row">
@@ -50,7 +50,7 @@
           </div>
           <div class="form-group col-md-6">
             <label for="type">Jenis Koreksi</label>
-            <select class="custom-select" name="type" id="type">
+            <select class="custom-select" name="type" id="type" disabled>
               <option value="">-- Pilih Jenis Koreksi</option>
               <option value="ADJUSTMENT IN" {{ old('type', $inventory->type ?? '') == 'ADJUSTMENT IN' ? 'selected' : '' }}>Penambahan</option>
               <option value="ADJUSTMENT OUT" {{ old('type', $inventory->type ?? '') == 'ADJUSTMENT OUT' ? 'selected' : '' }}>Pengurangan</option>

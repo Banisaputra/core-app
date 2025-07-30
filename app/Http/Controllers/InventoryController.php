@@ -155,7 +155,6 @@ class InventoryController extends Controller
          
         $validated = $request->validate([
             'inv_date' => 'required|date',
-            'type' => 'required',
             'remark' => 'required',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:master_items,id',
@@ -165,7 +164,8 @@ class InventoryController extends Controller
         DB::beginTransaction();
         try {
             $inventory = Inventory::findOrFail($id);
-            $inventory->inv_date = $validated['inv_date'];
+            $request['inv_date'] = date('Ymd', strtotime($request['inv_date']));
+            $inventory->update($request->only('code', 'inv_date', 'remark'));
 
             InventoryDetail::where('inv_id', $inventory->id)
             ->delete();
@@ -174,7 +174,7 @@ class InventoryController extends Controller
                 $itemId = $item['item_id'];
                 $qty = $item['qty'];
 
-                if ($validated['type'] == 'ADJUSTMENT IN') {
+                if ($inventory->type == 'ADJUSTMENT IN') {
                     $batch = date('YmdHis');
                     InventoryDetail::create([
                         'inv_id' => $inventory->id,
@@ -213,7 +213,7 @@ class InventoryController extends Controller
             }
                 
             DB::commit();
-            return redirect()->route('inv.index')->with('success', 'Koreksi berhasil disimpan!');
+            return redirect()->route('inv.index')->with('success', 'Koreksi berhasil diubah!');
         } catch (\Exception $e) {
             DB::rollback();
             // $e->getMessage();

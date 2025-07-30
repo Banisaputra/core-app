@@ -58,8 +58,9 @@
                       <th width="15%">Kode</th>
                       <th width="">Anggota</th>
                       <th width="15%">Tanggal</th>
-                      <th width="15%">Jenis</th>
-                      <th width="20%">Nominal</th>
+                      <th width="10%">Jenis</th>
+                      <th width="15%">Nominal</th>
+                      <th width="10%">Status</th>
                       <th width="5%">Action</th>
                     </tr>
                   </thead>
@@ -73,6 +74,16 @@
                             <td>{{ date('d M Y', strtotime($saving->sv_date)) }}</td>
                             <td>{{ $saving->svType->name }}</td>
                             <td>Rp {{ number_format($saving->sv_value, 2) }}</td>
+                              <td>@switch($saving->sv_state)
+                                  @case(99)
+                                    <span class="text-danger">Dibatalkan</span>
+                                    @break
+                                  @case(2)
+                                    <span class="text-success">Dikonfirmasi</span>
+                                    @break
+                                  @default
+                                    <span class="text-info">Pengajuan</span>
+                                @endswitch</td> 
                             <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="text-muted sr-only">Action</span>
                               </button>
@@ -82,7 +93,7 @@
                                 <form action="{{ route('savings.destroy', $saving->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" id="btnDelete" class="dropdown-item">Delete</button>
+                                    <button type="submit" id="btnDelete" class="dropdown-item">Batalkan</button>
                                 </form>
                               </div>
                             </td> 

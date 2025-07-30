@@ -50,23 +50,43 @@ class SavingController extends Controller
         if ($request->hasFile('proof_of_payment')) {
             $photoPath = $request->file('proof_of_payment')->store('proof_of_payment', 'public');
         }
-        try {
-            Saving::create([
-                "sv_code" => $svn_code,
-                "sv_date" => date('Ymd', strtotime($request->sv_date)),
-                "member_id" => $request->member_id,
-                "sv_type_id" => $request->sv_type_id,
-                "sv_value" => $request->sv_value,
-                "proof_of_payment" => $photoPath,
-                "created_by" => auth()->id(),
-                "updated_by" => auth()->id(),
-            ]);
-        } catch (\Throwable $th) {
-            //throw $th;
-            dd($th->message);
-            return redirect()->back()->with('error', json_encode($th->message));
-            // return redirect()->back()->with('error', 'Anggota sudah melakukan jenis simpanan bulan ini.');
-        }    
+
+        // jika symlink tidak tersedia
+        // // start
+        // $sourcePath = storage_path('app/public/' . $photoPath);
+        // $destinationPath = public_path('storage/' . $photoPath);
+         
+        // File::ensureDirectoryExists(dirname($destinationPath));
+        
+        // File::copy($sourcePath, $destinationPath);
+        // // end
+
+        $wajib = SavingType::where('name', 'like', 'Wajib')->first();
+        $month = date('m', strtotime($request->sv_date));
+        $year = date('Y', strtotime($request->sv_date));
+
+        $startOfMonth = (int) ($year . str_pad($month, 2, '0', STR_PAD_LEFT) . '01');
+        $endOfMonth = (int) ($year . str_pad($month, 2, '0', STR_PAD_LEFT) . '31');
+
+        $exists = Saving::where('member_id', $request->member_id)
+            ->where('sv_type_id', $wajib->id)
+            ->whereBetween('sv_date', [$startOfMonth, $endOfMonth])
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'Anggota sudah melakukan simpanan pada bulan ini untuk jenis simpanan tersebut.')->withInput();
+        }
+
+        Saving::create([
+            "sv_code" => $svn_code,
+            "sv_date" => date('Ymd', strtotime($request->sv_date)),
+            "member_id" => $request->member_id,
+            "sv_type_id" => $request->sv_type_id,
+            "sv_value" => $request->sv_value,
+            "proof_of_payment" => $photoPath,
+            "created_by" => auth()->id(),
+            "updated_by" => auth()->id(),
+        ]);
 
         return redirect()->back()->with('success', 'Data simpanan berhasil ditambahkan.');
     }
@@ -82,16 +102,34 @@ class SavingController extends Controller
 
         // loop member
         $members = Member::pluck('id');
+        $wajib = SavingType::where('name', 'like', 'Wajib')->first();
+        $month = date('m', strtotime($request->periode));
+        $year = date('Y', strtotime($request->periode));
+
+        $startOfMonth = (int) ($year . str_pad($month, 2, '0', STR_PAD_LEFT) . '01');
+        $endOfMonth = (int) ($year . str_pad($month, 2, '0', STR_PAD_LEFT) . '31');
 
         foreach ($members as $key => $id) {
             if (!in_array($id, $request->member_id ?? [])) {
+                if ($wajib->id == $request->sv_type_id) {
+                    $exists = Saving::where('member_id', $id)
+                        ->where('sv_type_id', $wajib->id)
+                        ->whereBetween('sv_date', [$startOfMonth, $endOfMonth])
+                        ->exists();
+    
+                    if ($exists) {
+                        return back()->with('error', 'Ada anggota yang sudah melakukan simpanan pada bulan ini untuk jenis simpanan tersebut.')->withInput();
+                    }
+                }
+
                 try {
+                    $svType=SavingType::findOrFail($request->sv_type_id);
                     Saving::create([
                         "sv_code" => Saving::generateCode(date('ym', strtotime($request->periode))),
                         "sv_date" => date('Ymd', strtotime($request->periode)),
                         "member_id" => $id,
                         "sv_type_id" => $request->sv_type_id,
-                        "sv_value" => 50000, // sesuikan settingan
+                        "sv_value" => $svType->value ?? 0, // sesuikan settingan
                         "created_by" => auth()->id(),
                         "updated_by" => auth()->id(),
                     ]);
@@ -103,10 +141,8 @@ class SavingController extends Controller
                     return redirect()->back()->with('error', 'Anggota sudah melakukan jenis simpanan bulan ini.');
                 }    
             }
-
         }
         return redirect()->back()->with('success', 'Data simpanan berhasil digenerate.');
-
     }
 
     public function show(string $id)
@@ -115,7 +151,7 @@ class SavingController extends Controller
         return view('savings.view', compact('saving'));
     }
 
-     public function edit(string $id)
+    public function edit(string $id)
     {
         $saving = Saving::with('member')->findOrFail($id);
         $sv_types = SavingType::all();
@@ -138,14 +174,26 @@ class SavingController extends Controller
 
         // Jika ada file baru
         if ($request->hasFile('proof_of_payment')) {
-            // Hapus foto lama jika ada
             if ($saving->proof_of_payment && Storage::disk('public')->exists($saving->proof_of_payment)) {
                 Storage::disk('public')->delete($saving->proof_of_payment);
             }
-
-            // Simpan foto baru
+            // jika symlink tidak tersedia
+            // if ($saving->proof_of_payment && File::exists(public_path('storage/' . $saving->proof_of_payment))) {
+            //     File::delete(public_path('storage/' . $saving->proof_of_payment));
+            // }
+            
             $newPhoto = $request->file('proof_of_payment')->store('proof_of_payment', 'public');
             $saving->proof_of_payment = $newPhoto;
+            
+            // jika symlink tidak tersedia
+            // // start
+            // $sourcePath = storage_path('app/public/' . $newPhoto);
+            // $destinationPath = public_path('storage/' . $newPhoto);
+            
+            // File::ensureDirectoryExists(dirname($destinationPath));
+            
+            // File::copy($sourcePath, $destinationPath);
+            // // end
         } 
 
         // Update data
@@ -168,13 +216,16 @@ class SavingController extends Controller
         $saving = Saving::findOrFail($id);
         if($saving) {
             // delete picture
-            if ($saving->proof_of_payment && Storage::disk('public')->exists($saving->proof_of_payment)) {
-                Storage::disk('public')->delete($saving->proof_of_payment);
-            }
-            $saving->delete();
+            // if ($saving->proof_of_payment && Storage::disk('public')->exists($saving->proof_of_payment)) {
+            //     Storage::disk('public')->delete($saving->proof_of_payment);
+            // }
+            $saving->update([
+                'sv_state' => 99,
+                'updated_by' => auth()->id()
+            ]);
         }
 
-        return redirect()->back()->with('success', "Data simpanan anggota berhasil dihapus");
+        return redirect()->back()->with('success', "Data simpanan anggota berhasil dibatalkan");
         
     }
 }

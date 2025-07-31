@@ -63,31 +63,31 @@
                   <tbody>
                     
                     @foreach ($purchases as $purchase)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $purchase->pr_code }}</td>
-                            <td>{{ $purchase->supplier }}</td>
-                            <td>{{ $purchase->ref_doc }}</td>
-                            <td>Rp {{ number_format($purchase->total, 0) }}</td> 
-                            <td>@switch($purchase->pr_state)
-                                  @case(99)
-                                    <span class="text-danger">Dibatalkan</span>
-                                    @break
-                                  @case(2)
-                                    <span class="text-success">Dikonfirmasi</span>
-                                    @break
-                                  @default
-                                    <span class="text-info">Pengajuan</span>
-                                @endswitch</td> 
-                            <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="text-muted sr-only">Action</span>
-                              </button>
-                              <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{{ route('purchases.show', $purchase->id) }}">View</a>
-                                <a class="dropdown-item" href="{{ $purchase->pr_state == 1 ? route('purchases.edit', $purchase->id) : "javascript:void(0)" }}">Edit</a>
-                              </div>
-                            </td> 
-                        </tr>
+                      <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $purchase->pr_code }}</td>
+                        <td>{{ $purchase->supplier->name }}</td>
+                        <td>{{ $purchase->ref_doc }}</td>
+                        <td>Rp {{ number_format($purchase->total, 0) }}</td> 
+                        <td>@switch($purchase->pr_state)
+                              @case(99)
+                                <span class="text-danger">Dibatalkan</span>
+                                @break
+                              @case(2)
+                                <span class="text-success">Dikonfirmasi</span>
+                                @break
+                              @default
+                                <span class="text-info">Pengajuan</span>
+                            @endswitch</td> 
+                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="text-muted sr-only">Action</span>
+                          </button>
+                          <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="{{ route('purchases.show', $purchase->id) }}">View</a>
+                            <a class="dropdown-item" href="{{ $purchase->pr_state == 1 ? route('purchases.edit', $purchase->id) : "javascript:void(0)" }}">Edit</a>
+                          </div>
+                        </td> 
+                      </tr>
                     @endforeach
                   </tbody>
                 </table>

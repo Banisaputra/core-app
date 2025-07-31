@@ -67,7 +67,7 @@
                     <div class="row">
                         <p class="col-sm-3 text-right">Supplier</p>
                         <div class="col-sm-9">
-                            <h5>{{ $purchase->supplier }}</h5>
+                            <h5>{{ $purchase->supplier->name }}</h5>
                         </div>
                     </div>
                     <div class="row">

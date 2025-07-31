@@ -88,7 +88,7 @@ class PurchaseController extends Controller
  
     public function show(string $id)
     {
-        $purchase = Purchase::with(['prDetails.item'])->findOrFail($id);
+        $purchase = Purchase::with(['prDetails.item', 'supplier'])->findOrFail($id);
         return view('purchases.view', compact('purchase'));
     }
  

@@ -6,7 +6,7 @@ use App\Models\Loan;
 use App\Models\Member;
 use App\Models\Saving;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\pdf as PDF;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;

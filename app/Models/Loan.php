@@ -46,16 +46,13 @@ class Loan extends Model
 
     public static function formatIdrToNumeric($idrValue)
     {
-        // Remove all non-digit characters except comma
         $numericString = preg_replace('/[^0-9,]/', '', $idrValue);
-        
-        // Replace comma with dot for decimal
         $numericString = str_replace(',', '.', $numericString);
-        
-        // Remove thousand separators
         $numericString = str_replace('.', '', $numericString);
-        
+
         return (int)$numericString;
     }
+
+    
 
 }

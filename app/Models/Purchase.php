@@ -15,6 +15,10 @@ class Purchase extends Model
         return $this->hasMany(PurchaseDetail::class, "pr_id");
     }
 
+    public function supplier() {
+        return $this->belongsTo(Supplier::class, "supplier_id");
+    }
+
     public static function generateCode($periode = null)
     {
         $prefix = 'PRC-';

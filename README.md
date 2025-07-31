@@ -5,7 +5,9 @@
 - supplier (CRUD, import)
 - pos (cash,credit)
 - pembelian
-- 
+- inventory
+- simpanan
+- pinjaman
 
-# unfinish
-- bug view (purchase) supplier
+# unfinish 
+- edit flow (loans)

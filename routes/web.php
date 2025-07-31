@@ -94,6 +94,7 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
     Route::get('/savings/generate', [SavingController::class, 'generate'])->name('savings.generate');
     Route::post('/savings/generate', [SavingController::class, 'generated'])->name('savings.generated');
     Route::post('/savings', [SavingController::class, 'store'])->name('savings.store');
+    Route::post('/savings/confirm', [SavingController::class, 'confirmation'])->name('savings.confirm');
     Route::get('/savings/{id}', [SavingController::class, 'show'])->name('savings.show');
     Route::get('/savings/{id}/edit', [SavingController::class, 'edit'])->name('savings.edit');
     Route::put('/savings/{id}', [SavingController::class, 'update'])->name('savings.update');

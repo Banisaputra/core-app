@@ -59,14 +59,14 @@ class LoanController extends Controller
         $member = Member::findOrFail($request->member_id);
         $maxLoan = $member->maxLoanAmount();
         $is_agunan = isset($request->cbAgunan) ? true : false;
+
         // check policy max loan non agunan
-        if ($loan_value > $maxLoan || $is_agunan === true)
+        if ($loan_value > $maxLoan && $is_agunan === false)
             return redirect()->back()->with('error', 'Plafon pinjaman melebihi batas maksimal sebesar Rp ' . number_format($maxLoan, 0, ',', '.'));
         if ($request->loan_tenor > 12 && $is_agunan === false)
-            return redirect()->back()->with('error', 'Tenor pinjaman melebihi batas maksimal 12 bulan');
-
-
-
+            return redirect()->back()->with('error', 'Tenor pinjaman melebihi batas maksimal 12 bulan, gunakan agunan untuk tenor yang lebih lama');
+        if ($request->loan_tenor > 36 && $is_agunan === true)
+            return redirect()->back()->with('error', 'Tenor pinjaman dengan agunan melebihi batas maksimal 36 bulan');
 
         if ($loan_value > 3000000) {
             $request->validate([
@@ -149,8 +149,6 @@ class LoanController extends Controller
             return redirect()->back()->withInput()->with('error', $e->getMessage());
             // return redirect()->back()->withInput()->with('error', 'Data Pinjaman gagal ditambahkan.');
         }
-
-
 
     }
 

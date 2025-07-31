@@ -48,7 +48,7 @@
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="simple-select2">Anggota</label>
-            <select id="memberSelect" name="member_id" class="form-control" {{ $loan->loan_state>1 ? "disabled" : ''}}>
+            <select id="memberSelect" name="member_id" class="form-control" {{ $loan->loan_state>0 ? "disabled" : ''}}>
               <option value="{{ $loan->member_id }}" selected>
                 {{ $loan->member->name ?? 'Search anggota...' }}
               </option>
@@ -56,21 +56,21 @@
           </div>
           <div class="form-group col-md-3">
             <label for="loan_date">Tanggal Pinjaman</label>
-            <input type="date" class="form-control" id="loan_date" name="loan_date" value="{{old('loan_date', date('Y-m-d', strtotime($loan->loan_date)) ?? '')}}" {{ $loan->loan_state>1 ? "readonly" : ''}}>
+            <input type="date" class="form-control" id="loan_date" name="loan_date" value="{{old('loan_date', date('Y-m-d', strtotime($loan->loan_date)) ?? '')}}" {{ $loan->loan_state>0 ? "readonly" : ''}}>
           </div>
           <div class="form-group col-md-3">
             <label for="loan_value">Jumlah Pinjaman</label>
-            <input type="text" class="form-control" id="loan_value" name="loan_value" value="{{old('loan_value', $loan->loan_value*1 ?? '')}}" {{ $loan->loan_state>1 ? "readonly" : ''}}>
+            <input type="text" class="form-control" id="loan_value" name="loan_value" value="{{old('loan_value', $loan->loan_value*1 ?? '')}}" {{ $loan->loan_state>0 ? "readonly" : ''}}>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-3">
             <label for="loan_tenor">Tenor Bulan</label>
-            <input type="number" class="form-control" id="loan_tenor" name="loan_tenor" value="{{old('loan_tenor', $loan->loan_tenor ?? '')}}" {{ $loan->loan_state>1 ? "readonly" : ''}}>
+            <input type="number" class="form-control" id="loan_tenor" name="loan_tenor" value="{{old('loan_tenor', $loan->loan_tenor ?? '')}}" {{ $loan->loan_state>0 ? "readonly" : ''}}>
           </div>
           <div class="form-group col-md-3">
             <label for="interest_percent">Bunga Cicilan(%)</label>
-            <input type="number" class="form-control" id="interest_percent" name="interest_percent" value="{{old('interest_percent', $loan->interest_percent ?? '')}}" {{ $loan->loan_state>1 ? "readonly" : ''}}>
+            <input type="number" class="form-control" id="interest_percent" name="interest_percent" value="{{old('interest_percent', $loan->interest_percent ?? '')}}" {{ $loan->loan_state>0 ? "readonly" : ''}}>
           </div>
           <div class="form-group col-md-3">
             <label for="due_date">Jatuh Tempo</label>

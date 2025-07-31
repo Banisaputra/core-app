@@ -73,13 +73,13 @@
                             <td>
                               @switch($loan->loan_state)
                                   @case(99)
-                                      Ditolak
-                                      @break
+                                    <span class="text-danger">Ditolak</span>
+                                    @break
                                   @case(2)
-                                      Disetujui
-                                      @break
+                                    <span class="text-success">Disetujui</span>
+                                    @break
                                   @default
-                                      Pengajuan
+                                    <span class="text-info">Pengajuan</span>
                               @endswitch
                             </td>
                             <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

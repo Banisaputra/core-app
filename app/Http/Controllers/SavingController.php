@@ -6,6 +6,8 @@ use App\Models\Member;
 use App\Models\Saving;
 use App\Models\SavingType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class SavingController extends Controller
@@ -49,17 +51,17 @@ class SavingController extends Controller
         $photoPath = null;
         if ($request->hasFile('proof_of_payment')) {
             $photoPath = $request->file('proof_of_payment')->store('proof_of_payment', 'public');
+            // jika symlink tidak tersedia
+            // // start
+            $sourcePath = storage_path('app/public/' . $photoPath);
+            $destinationPath = public_path('storage/' . $photoPath);
+             
+            File::ensureDirectoryExists(dirname($destinationPath));
+            
+            File::copy($sourcePath, $destinationPath);
+            // // end
         }
-
-        // jika symlink tidak tersedia
-        // // start
-        // $sourcePath = storage_path('app/public/' . $photoPath);
-        // $destinationPath = public_path('storage/' . $photoPath);
-         
-        // File::ensureDirectoryExists(dirname($destinationPath));
         
-        // File::copy($sourcePath, $destinationPath);
-        // // end
 
         $wajib = SavingType::where('name', 'like', 'Wajib')->first();
         $month = date('m', strtotime($request->sv_date));
@@ -70,10 +72,11 @@ class SavingController extends Controller
 
         $exists = Saving::where('member_id', $request->member_id)
             ->where('sv_type_id', $wajib->id)
+            ->where('sv_state', '<>', 99)
             ->whereBetween('sv_date', [$startOfMonth, $endOfMonth])
             ->exists();
 
-        if ($exists) {
+        if ($exists && $wajib->id == $request->sv_type_id) {
             return back()->with('error', 'Anggota sudah melakukan simpanan pada bulan ini untuk jenis simpanan tersebut.')->withInput();
         }
 
@@ -178,21 +181,21 @@ class SavingController extends Controller
                 Storage::disk('public')->delete($saving->proof_of_payment);
             }
             // jika symlink tidak tersedia
-            // if ($saving->proof_of_payment && File::exists(public_path('storage/' . $saving->proof_of_payment))) {
-            //     File::delete(public_path('storage/' . $saving->proof_of_payment));
-            // }
+            if ($saving->proof_of_payment && File::exists(public_path('storage/' . $saving->proof_of_payment))) {
+                File::delete(public_path('storage/' . $saving->proof_of_payment));
+            }
             
             $newPhoto = $request->file('proof_of_payment')->store('proof_of_payment', 'public');
             $saving->proof_of_payment = $newPhoto;
             
             // jika symlink tidak tersedia
             // // start
-            // $sourcePath = storage_path('app/public/' . $newPhoto);
-            // $destinationPath = public_path('storage/' . $newPhoto);
+            $sourcePath = storage_path('app/public/' . $newPhoto);
+            $destinationPath = public_path('storage/' . $newPhoto);
             
-            // File::ensureDirectoryExists(dirname($destinationPath));
+            File::ensureDirectoryExists(dirname($destinationPath));
             
-            // File::copy($sourcePath, $destinationPath);
+            File::copy($sourcePath, $destinationPath);
             // // end
         } 
 
@@ -228,4 +231,30 @@ class SavingController extends Controller
         return redirect()->back()->with('success', "Data simpanan anggota berhasil dibatalkan");
         
     }
+
+    public function confirmation(Request $request) 
+    {
+        $request->validate([
+            'sv_id' => 'required|exists:savings,id'
+        ]);
+
+        $saving = Saving::with(['member'])->findOrFail($request->sv_id);
+        if ($saving->sv_state != 1) return redirect()->back()->with('error', 'Dokumen Simpanan tidak valid, atau sudah pernah dikonfrimasi');
+
+        DB::beginTransaction();
+        try {
+            $saving->update([
+                'sv_state' => 2,
+                'updated_by' => auth()->id()
+            ]);
+            Member::where('id', $saving->member_id)->increment('balance', $saving->sv_value);
+            
+            DB::commit();
+            return redirect()->back()->with('success', 'Pembelian berhasil dikonfirmasi');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Gagal menyimpan pembelian: ' . $e->getMessage())->withInput();
+        }
+    }
+
 }

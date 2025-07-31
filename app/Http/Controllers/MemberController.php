@@ -244,7 +244,7 @@ class MemberController extends Controller
             $mExists = Member::where('nip', $data['nip'])->first();
             $rules = $mExists ? 'exists' : 'unique';
             $validator = Validator::make($data, [
-                'nip' => 'requires|'.$rules.':members,nip',
+                'nip' => 'required|'.$rules.':members,nip',
                 'name' => 'required|string|max:100',
                 'email' => 'required|email|unique:users,email',
                 'date_of_birth' => 'required',

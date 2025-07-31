@@ -19,6 +19,7 @@ class RepaymentController extends Controller
         ->orderBy('id')
         ->get();
 
-        return view('repayments.index', compact('loanDetails'));
+        // return view('repayments.index', compact('loanDetails'));
+        return view('layouts.maintenance', compact('loanDetails'));
     }   
 }

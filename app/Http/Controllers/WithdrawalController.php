@@ -14,7 +14,8 @@ class WithdrawalController extends Controller
     public function index()
     {
         $withdrawals = Withdrawal::with('member')->latest()->get();
-        return view('withdrawals.index', compact('withdrawals'));
+        // return view('withdrawals.index', compact('withdrawals'));
+        return view('layouts.maintenance', compact('withdrawals'));
     }
 
     /**

@@ -9,6 +9,7 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\CategoryController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\RepaymentController;
 use App\Http\Middleware\PermissionMiddleware;
 use App\Http\Controllers\MasterItemController;
+use App\Http\Controllers\SavingTypeController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\LoanPaymentController;
 use App\Http\Controllers\StorageLinkController;
@@ -157,7 +159,17 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
     Route::delete('/purchase/{id}', [PurchaseController::class, 'destroy'])->name('purchases.destroy');
 
     // policy
-    Route::get('/policy', [PurchaseController::class, 'index'])->name('policy.index');
+    Route::get('/policy', [PolicyController::class, 'index'])->name('policy.index');
+    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policy.upload');
+
+    // saving_type
+    Route::prefix('saving-types')->name('saving-types.')->group(function () {
+        Route::get('/', [SavingTypeController::class, 'index'])->name('index');
+        Route::post('/', [SavingTypeController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [SavingTypeController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [SavingTypeController::class, 'update'])->name('update');
+        Route::delete('/{id}', [SavingTypeController::class, 'destroy'])->name('destroy');
+    });
 
 }); 
 

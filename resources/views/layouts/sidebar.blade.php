@@ -141,19 +141,13 @@
                     <span class="ml-3 item-text">Pelunasan</span>
                 </a>
             </li>
-            <li class="nav-item dropdown">
-                <a href="#kopSetting" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+            <li class="nav-item w-100">
+                <a class="nav-link" href="{{ route('policy.index')}}">
                     <i class="fe fe-settings fe-16"></i>
                     <span class="ml-3 item-text">Pengaturan</span>
                 </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="kopSetting">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('policy.index')}}">
-                            <span class="ml-1 item-text">Syarat & Ketentuan</span>
-                        </a>
-                    </li>   
-                </ul>
             </li>
+             
         </ul>
     @endif
 

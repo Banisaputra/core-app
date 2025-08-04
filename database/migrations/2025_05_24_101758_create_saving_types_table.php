@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name', 100);
             $table->text('description')->nullable();
             $table->integer('value')->nullable();
+            $table->unsignedTinyInteger('auto_day')->nullable();
+            $table->tinyInteger('is_auto')->default(0);
             $table->tinyInteger('is_transactional')->default(1);
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('set null');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('set null');

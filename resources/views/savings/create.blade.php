@@ -54,7 +54,7 @@
             <select id="svType" name="sv_type_id" class="form-control">
               <option value="">-- Pilih jenis simpanan</option>
               @foreach ($sv_types as $type)
-                  <option value="{{ $type->id }}">{{ ucwords($type->name) }}</option>
+                  <option value="{{ $type->id }}" data-value="{{ $type->value}}">{{ ucwords($type->name) }}</option>
               @endforeach
             </select>
           </div>
@@ -66,7 +66,7 @@
         <div class="form-row">
           <div class="form-group col-md-4">
             <label for="sv_value">Jumlah</label>
-            <input type="number" class="form-control" id="sv_value" name="sv_value" value="{{old('sv_value')}}">
+            <input type="number" class="form-control" id="sv_value" name="sv_value" value="{{old('sv_value')}}" readonly>
           </div>
           <div class="form-group col-md-6">
             <label for="proof_of_payment">Payment Photo</label>
@@ -144,6 +144,11 @@
       }
     });
 
+    $('#svType').on('change', function (e) {
+      const selected = $(this).find(':selected');
+      const value = selected.data('value') || 0;
+      $('#sv_value').val(value);
+    })
 
   });
 </script>

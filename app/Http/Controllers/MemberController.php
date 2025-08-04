@@ -7,6 +7,8 @@ use Exception;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Member;
+use App\Models\Saving;
+use App\Models\SavingType;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -88,7 +90,23 @@ class MemberController extends Controller
             'updated_by' => auth()->id(),
         ]);
 
-        if ($user && $member) {
+        $svn_code = Saving::generateCode();
+        $pokok = SavingType::where('name', 'like', 'Pokok')->first();
+        if ($pokok) {
+            $svp=Saving::create([
+                "sv_code" => $svn_code,
+                'sv_date' => now()->format('Ymd'),
+                'member_id' => $member->id,
+                'sv_type_id' => $pokok->id,
+                'sv_value' => $pokok->value,
+                "proof_of_payment" => '',
+                'remark' => 'Otomatis saat pendaftaran anggota',
+                "created_by" => auth()->id(),
+                "updated_by" => auth()->id(),
+            ]);
+        }
+ 
+        if ($user && $member && $svp) {
             return redirect()->back()->with('success', 'Anggota baru berhasil ditambahkan.');
         } else {
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan sistem, hubungi administrator');

@@ -13,6 +13,7 @@ use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SavingController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DevisionController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SupplierController;
@@ -44,6 +45,7 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
     Route::get('/api/items/search', [MasterItemController::class, 'search']);
     Route::get('/api/category/search', [CategoryController::class, 'search']);
     Route::get('/api/supplier/search', [SupplierController::class, 'search']);
+    Route::get('/api/saving-type/search', [SavingTypeController::class, 'search']);
 
     // info
     Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
@@ -68,6 +70,16 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
     Route::get('/category/{id}/edit', [CategoryController::class, 'edit'])->name('category.edit');
     Route::put('/category/{id}', [CategoryController::class, 'update'])->name('category.update');
     Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('category.destroy');
+    
+    // devisions
+    Route::get('/devision', [DevisionController::class, 'index'])->name('devision.index');
+    Route::get('/devision/create', [DevisionController::class, 'create'])->name('devision.create');
+    Route::get('/devision/import', [DevisionController::class, 'downloadTemplate'])->name('devision.template');
+    Route::post('/devision/import', [DevisionController::class, 'import'])->name('devision.import');
+    Route::post('/devision', [DevisionController::class, 'store'])->name('devision.store');
+    Route::get('/devision/{id}/edit', [DevisionController::class, 'edit'])->name('devision.edit');
+    Route::put('/devision/{id}', [DevisionController::class, 'update'])->name('devision.update');
+    Route::delete('/devision/{id}', [DevisionController::class, 'destroy'])->name('devision.destroy');
     
     // member
     Route::get('/members', [MemberController::class, 'index'])->name('members.index');
@@ -166,6 +178,7 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
     Route::prefix('saving-types')->name('saving-types.')->group(function () {
         Route::get('/', [SavingTypeController::class, 'index'])->name('index');
         Route::post('/', [SavingTypeController::class, 'store'])->name('store');
+        Route::post('/schedule', [SavingTypeController::class, 'schedule'])->name('schedule');
         Route::get('/{id}/edit', [SavingTypeController::class, 'edit'])->name('edit');
         Route::put('/{id}', [SavingTypeController::class, 'update'])->name('update');
         Route::delete('/{id}', [SavingTypeController::class, 'destroy'])->name('destroy');

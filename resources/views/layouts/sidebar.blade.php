@@ -46,7 +46,6 @@
                             <span class="ml-1 item-text">Permission</span>
                         </a>
                     </li>
-                    
                 </ul>
                 @endif
                 <li class="nav-item w-100">
@@ -59,6 +58,12 @@
                     <a class="nav-link" href="{{ route('members.index')}}">
                         <i class="fe fe-user fe-16"></i>
                         <span class="ml-3 item-text">Anggota</span>
+                    </a>
+                </li>
+                <li class="nav-item w-100">
+                    <a class="nav-link" href="{{ route('devision.index')}}">
+                        <i class="fe fe-briefcase fe-16"></i>
+                        <span class="ml-3 item-text">Bagian</span>
                     </a>
                 </li>
                 <li class="nav-item w-100">

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('member_id')->references('id')->on('members')->onDelete('cascade')->unique();
             $table->foreignId('sv_type_id')->references('id')->on('saving_types')->onDelete('cascade')->unique();
             $table->string('sv_value', 100);
+            $table->text('remark')->default('')->comment('catatan transaksi');
             $table->tinyInteger('sv_state')->length(2)->default(1);
             $table->string('proof_of_payment', 255)->nullable()->comment('url bukti bayar');
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');

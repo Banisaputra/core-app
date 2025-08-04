@@ -139,7 +139,7 @@ class CategoryController extends Controller
             $rules = $cExists ? 'exists' : 'unique';
 
             $validator = Validator::make($data, [
-                'code' => 'required|string|max:50|'.$rules.':categories, code',
+                'code' => 'required|string|max:50|'.$rules.':categories,code',
                 'name' => 'required|string|max:100',
             ]);
 

@@ -25,154 +25,56 @@
     <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
     </div>
 @endif
-{{-- modal saving --}}
-<div class="modal fade" id="savingTypeModal" tabindex="-1">
-  <div class="modal-dialog">
-    <form id="savingTypeForm">
-      @csrf
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Form Jenis Simpanan</h5>
-           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">x</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" name="_method" id="method">
-          <input type="hidden" id="type_id">
-          <div class="mb-3">
-            <label>Nama</label>
-            <input type="text" name="name" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label>Deskripsi</label>
-            <textarea name="description" class="form-control" required></textarea>
-          </div>
-          <div class="mb-3">
-            <label>Nominal</label>
-            <input type="number" name="value" class="form-control" min="1" required></input>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn mb-2 btn-primary">Simpan</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
+
 
     <div class="col-md-12 mb-3">
         <div class="card shadow">
             <div class="card-body py-4 mb-1">
                 <div class="row">
                     {{-- menu --}}
-                <div class="col-2">
-                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                        <a class="nav-link active" id="v-pills-condition-tab" data-toggle="pill" href="#v-pills-condition" role="tab" aria-controls="v-pills-condition" aria-selected="true">Syarat Ketentuan</a>
-                        <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Simpanan</a>
-                        <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Pinjaman</a>
+                    <div class="col-2">
+                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                            <a class="nav-link active" id="v-pills-terms-tab" data-toggle="pill" href="#v-pills-terms" role="tab" aria-controls="v-pills-terms" aria-selected="true">Syarat Ketentuan</a>
+                            <a class="nav-link" id="v-pills-saving-tab" data-toggle="pill" href="#v-pills-saving" role="tab" aria-controls="v-pills-saving" aria-selected="false">Simpanan</a>
+                            <a class="nav-link" id="v-pills-loan-tab" data-toggle="pill" href="#v-pills-loan" role="tab" aria-controls="v-pills-loan" aria-selected="false">Pinjaman</a>
+                        </div>
                     </div>
-                </div>
-                {{-- content --}}
-                <div class="col-10">
-                    <div class="tab-content mb-4" id="v-pills-tabContent">
-                    <div class="tab-pane fade active show" id="v-pills-condition" role="tabpanel" aria-labelledby="v-pills-condition-tab">
-                        <form action="{{ route('policy.upload') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="form-group">
-                                <label for="terms">Syarat & Ketentuan</label>
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="terms" name="fileTerms">
-                                    <label class="custom-file-label" for="terms" id="label_terms">Choose file</label>
-                                    <small>*Format file PDF dengan ukuran max:10MB</small>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Upload</button>
-                        </form>
-                        <hr class="my-4" style="border-top: 1px solid #919192;">
-                        <h4>Syarat dan Ketentuan</h4>
-
-                        @if ($pdfExists)
-                            <div class="embed-responsive embed-responsive-16by9" style="height: 80vh;">
-                                <iframe src="{{ $fileUrl }}" width="100%" height="100%" frameborder="0"></iframe>
-                            </div>
-                        @else
-                            <div class="alert alert-warning">
-                                File syarat dan ketentuan belum tersedia.
-                            </div>
-                        @endif
-
-                    </div>
-                    <div class="tab-pane fade mb-4" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-                        <div class="container-fluid">
-                            <div class="row justify-content-center">
-                            <div class="col-12">
-                                <div class="col">
-                                    <h2 class="h3 mb-0 page-title">Jenis Simpanan</h2>
-                                </div>
-                                <div class="row align-items-center my-4">
-                                    <div class="col">
-                                       <button class="btn btn-primary mb-3" id="btnAdd">Tambah Data</button>
-                                    </div>
-                                    <div class="col-auto">
-                                        {{-- other button --}}
-                                    </div>
-                                </div>
-                            
-                                <div class="row my-4"> 
-                                    <div class="col">
-                                        <div class="card shadow">
-                                        <div class="card-body"> 
-                                            <table class="table datatables" id="savingType">
-                                            <thead>
-                                                <tr>
-                                                <th width="5%">No.</th> 
-                                                <th width="15%">Nama</th>
-                                                <th width="45%">Deskripsi</th>
-                                                <th width="20%">Nominal</th>
-                                                <th width="10%">Status</th>
-                                                <th width="5%">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                
-                                                @foreach ($svTypes as $svt)
-                                                <tr data-id="{{ $svt->id }}">
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $svt->name }}</td>
-                                                    <td>{{ $svt->description }}</td>
-                                                    <td>Rp {{ number_format($svt->value, 2) }}</td>
-                                                    <td>{!! $svt->is_transactional == 1 ? "<span class='dot dot-lg bg-success mr-1'></span>Aktif" : "<span class='dot dot-lg bg-secondary mr-1'></span>Tidak Aktif" !!}</td>
-                                                    <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        <span class="text-muted sr-only">Action</span>
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-right">
-                                                        <button class="dropdown-item btn-edit">Edit</button>
-                                                        <form action="{{ route('saving-types.destroy', $svt->id) }}" method="POST" style="display: inline;" id="deleteForm">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" id="btnDelete" class="dropdown-item">{{ $svt->is_transactional==1 ? "Nonaktifkan" : "Aktifkan"}}</button>
-                                                        </form>
-                                                    </div>
-                                                    </td> 
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                            </table>
-                                        </div>
+                    {{-- content --}}
+                    <div class="col-10">
+                        <div class="tab-content mb-4" id="v-pills-tabContent">
+                            <div class="tab-pane fade active show" id="v-pills-terms" role="tabpanel" aria-labelledby="v-pills-terms-tab">
+                                <form action="{{ route('policy.upload') }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="form-group">
+                                        <label for="terms">Syarat & Ketentuan</label>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="terms" name="fileTerms">
+                                            <label class="custom-file-label" for="terms" id="label_terms">Choose file</label>
+                                            <small>*Format file PDF dengan ukuran max:10MB</small>
                                         </div>
                                     </div>
-                                </div>
+                                    <button type="submit" class="btn btn-primary">Upload</button>
+                                </form>
+                                <hr class="my-4" style="border-top: 1px solid #919192;">
+                                <h4>Syarat dan Ketentuan</h4>
+                                @if ($pdfExists)
+                                    <div class="embed-responsive embed-responsive-16by9" style="height: 80vh;">
+                                        <iframe src="{{ $fileUrl }}" width="100%" height="100%" frameborder="0"></iframe>
+                                    </div>
+                                @else
+                                    <div class="alert alert-warning">
+                                        File syarat dan ketentuan belum tersedia.
+                                    </div>
+                                @endif
                             </div>
+                            <div class="tab-pane fade mb-4" id="v-pills-saving" role="tabpanel" aria-labelledby="v-pills-saving-tab">
+                                @include('policies.saving')
+                            </div>
+                            <div class="tab-pane fade mb-4" id="v-pills-loan" role="tabpanel" aria-labelledby="v-pills-loan-tab"> 
+                                @include('policies.loan')
                             </div>
                         </div>
-
                     </div>
-                    <div class="tab-pane fade mb-4" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab"> Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. </div>
-                    <div class="tab-pane fade mb-4" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab"> Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. </div>
-                    </div>
-                </div>
                 </div>
             </div>
         </div>
@@ -274,6 +176,35 @@ $(document).ready(function() {
             }
         });
     });
+
+    $('#svtSelect').select2({
+        placeholder: 'Search Simpanan...',
+        theme: 'bootstrap4',
+        minimumInputLength: 2,
+        multiple: true,
+        ajax: {
+            url: '/api/saving-type/search',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    q: params.term
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.name
+                        };
+                    })
+                };
+            },
+            cache: true
+        }
+    });
+
 });
 </script>
 

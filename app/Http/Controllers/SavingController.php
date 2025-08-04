@@ -21,7 +21,7 @@ class SavingController extends Controller
     public function create() 
     {
         $data = [
-            "sv_types" => SavingType::all(),
+            "sv_types" => SavingType::where('is_transactional', 1)->get(),
             "sv_code" => Saving::generateCode()
         ];
         return view('savings.create', $data);
@@ -63,6 +63,7 @@ class SavingController extends Controller
         }
         
 
+        $pokok = SavingType::where('name', 'like', 'Pokok')->first();
         $wajib = SavingType::where('name', 'like', 'Wajib')->first();
         $month = date('m', strtotime($request->sv_date));
         $year = date('Y', strtotime($request->sv_date));
@@ -70,14 +71,21 @@ class SavingController extends Controller
         $startOfMonth = (int) ($year . str_pad($month, 2, '0', STR_PAD_LEFT) . '01');
         $endOfMonth = (int) ($year . str_pad($month, 2, '0', STR_PAD_LEFT) . '31');
 
-        $exists = Saving::where('member_id', $request->member_id)
+        $w_exists = Saving::where('member_id', $request->member_id)
             ->where('sv_type_id', $wajib->id)
             ->where('sv_state', '<>', 99)
             ->whereBetween('sv_date', [$startOfMonth, $endOfMonth])
             ->exists();
 
-        if ($exists && $wajib->id == $request->sv_type_id) {
-            return back()->with('error', 'Anggota sudah melakukan simpanan pada bulan ini untuk jenis simpanan tersebut.')->withInput();
+        $p_exists = Saving::where('member_id', $request->member_id)
+            ->where('sv_type_id', $pokok->id)
+            ->where('sv_state', '<>', 99)
+            ->exists();
+
+        if ($w_exists && $wajib->id == $request->sv_type_id) {
+            return back()->with('error', 'Anggota sudah melakukan simpanan wajin pada bulan ini.')->withInput();
+        } else if ($p_exists && $pokok->id == $request->sv_type_id) {
+            return back()->with('error', 'Anggota sudah pernah melakukan simpanan pokok')->withInput();
         }
 
         Saving::create([

@@ -55,6 +55,12 @@
                     </a>
                 </li>
                 <li class="nav-item w-100">
+                    <a class="nav-link" href="{{ route('position.index')}}">
+                        <i class="fe fe-pocket fe-16"></i>
+                        <span class="ml-3 item-text">Jabatan</span>
+                    </a>
+                </li>
+                <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('members.index')}}">
                         <i class="fe fe-user fe-16"></i>
                         <span class="ml-3 item-text">Anggota</span>

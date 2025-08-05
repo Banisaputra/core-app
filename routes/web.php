@@ -15,6 +15,7 @@ use App\Http\Controllers\SavingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DevisionController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\PositionController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\InventoryController;
@@ -80,6 +81,16 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
     Route::get('/devision/{id}/edit', [DevisionController::class, 'edit'])->name('devision.edit');
     Route::put('/devision/{id}', [DevisionController::class, 'update'])->name('devision.update');
     Route::delete('/devision/{id}', [DevisionController::class, 'destroy'])->name('devision.destroy');
+    
+    // positions
+    Route::get('/position', [PositionController::class, 'index'])->name('position.index');
+    Route::get('/position/create', [PositionController::class, 'create'])->name('position.create');
+    Route::get('/position/import', [PositionController::class, 'downloadTemplate'])->name('position.template');
+    Route::post('/position/import', [PositionController::class, 'import'])->name('position.import');
+    Route::post('/position', [PositionController::class, 'store'])->name('position.store');
+    Route::get('/position/{id}/edit', [PositionController::class, 'edit'])->name('position.edit');
+    Route::put('/position/{id}', [PositionController::class, 'update'])->name('position.update');
+    Route::delete('/position/{id}', [PositionController::class, 'destroy'])->name('position.destroy');
     
     // member
     Route::get('/members', [MemberController::class, 'index'])->name('members.index');
@@ -183,11 +194,11 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
         Route::put('/{id}', [SavingTypeController::class, 'update'])->name('update');
         Route::delete('/{id}', [SavingTypeController::class, 'destroy'])->name('destroy');
     });
-
 }); 
 
 Route::get('/', function() {
     return view('dashboard');
+    // return view('layouts.maintenance');
 })->middleware([PermissionMiddleware::class . ':dashboard']);
 // more role
 Route::middleware([RoleMiddleware::class . ':admin,superuser,finance'])->group(function() {

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('code', 50);
             $table->string('name', 100);
             $table->text('address');
+            $table->string('telphone', 15)->nullable();
             $table->tinyInteger('is_active');
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade');

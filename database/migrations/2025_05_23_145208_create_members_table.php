@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->string('nip', 50);
+            $table->foreignId('position_id')->references('id')->on('positions')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('devision_id')->references('id')->on('devisions')->onUpdate('cascade')->onDelete('cascade');
             $table->string('name', 191);
             $table->string('telphone', 20);
-            $table->string('religion', 20)->nullable();
             $table->string('gender', 20);
-            $table->date('date_of_birth');
-            $table->string('departement', 100)->nullable();
+            $table->string('no_kk', 20);
+            $table->string('no_ktp', 20);
             $table->text('address')->nullable();
             $table->string('image', 255)->nullable();
             $table->decimal('balance', 10, 2)->default(0);

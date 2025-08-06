@@ -11,8 +11,11 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showLogin() 
+    public function showLogin()
     {
+        if (auth()->check()) {
+            return redirect('/');
+        }
         return view('auth.login');
     }
 

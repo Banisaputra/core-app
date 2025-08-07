@@ -35,18 +35,19 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::get('/logout', [AuthController::class, 'logout']);
 
 // admin access
-Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser'])->group(function () {
+Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])->group(function () {
 
     // storage link
-    Route::get('/create-storage-link', [StorageLinkController::class, 'create']); 
-    // search
-    Route::get('/api/users/search', [UserController::class, 'search']);
-    Route::get('/api/roles/search', [RoleController::class, 'search']);
-    Route::get('/api/members/search', [MemberController::class, 'search']);
-    Route::get('/api/items/search', [MasterItemController::class, 'search']);
-    Route::get('/api/category/search', [CategoryController::class, 'search']);
-    Route::get('/api/supplier/search', [SupplierController::class, 'search']);
-    Route::get('/api/saving-type/search', [SavingTypeController::class, 'search']);
+    Route::get('/create-storage-link', [StorageLinkController::class, 'create']);
+
+    // role
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::get('/roles/asign', [RoleController::class, 'asign'])->name('roles.asign');
+    Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    Route::post('/roles/asign', [RoleController::class, 'updateRoles'])->name('roles.asigned');
+    Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::put('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
 
     // info
     Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
@@ -104,14 +105,71 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
     Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');
     Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('members.destroy');
     
-    // role
-    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
-    Route::get('/roles/asign', [RoleController::class, 'asign'])->name('roles.asign');
-    Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
-    Route::post('/roles/asign', [RoleController::class, 'updateRoles'])->name('roles.asigned');
-    Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('roles.edit');
-    Route::put('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
-    Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
+    // items
+    Route::get('/items', [MasterItemController::class, 'index'])->name('items.index');
+    Route::get('/items/create', [MasterItemController::class, 'create'])->name('items.create');
+    Route::post('/items', [MasterItemController::class, 'store'])->name('items.store');
+    Route::get('/items/import', [MasterItemController::class, 'downloadTemplate'])->name('items.template');
+    Route::post('/items/import', [MasterItemController::class, 'import'])->name('items.import');
+    Route::get('/items/{id}', [MasterItemController::class, 'show'])->name('items.show');
+    Route::get('/items/{id}/edit', [MasterItemController::class, 'edit'])->name('items.edit');
+    Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
+    Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');
+
+   
+   
+
+    // policy
+    Route::get('/policy', [PolicyController::class, 'index'])->name('policy.index');
+    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policy.upload');
+
+   
+}); 
+
+Route::get('/', function() {
+    return view('dashboard');
+    // return view('layouts.maintenance');
+})->middleware([PermissionMiddleware::class . ':dashboard']);
+
+// role general
+Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara,kepala toko,admin toko'])->group(function() {
+    // search
+    Route::get('/api/users/search', [UserController::class, 'search']);
+    Route::get('/api/roles/search', [RoleController::class, 'search']);
+    Route::get('/api/members/search', [MemberController::class, 'search']);
+    Route::get('/api/items/search', [MasterItemController::class, 'search']);
+    Route::get('/api/category/search', [CategoryController::class, 'search']);
+    Route::get('/api/supplier/search', [SupplierController::class, 'search']);
+    Route::get('/api/saving-type/search', [SavingTypeController::class, 'search']);
+
+    //reports
+    Route::get('/report', [ReportController::class, 'index'])->name('reports.index');
+    Route::post('/report/get', [ReportController::class, 'getReport'])->name('reports.getReport');
+    Route::get('/report/pdf-deduction', [ReportController::class, 'deduction'])->name('reports.deductionPdf');
+    Route::get('/report/xlsx-deduction', [ReportController::class, 'exportPotonganGajiExcel'])->name('reports.deductionXlsx');
+
+
+});
+
+Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara'])->group(function() {
+    // loans
+    Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
+    Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
+    Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
+    Route::get('/loans/{id}', [LoanController::class, 'show'])->name('loans.show');
+    Route::get('/loans/{id}/edit', [LoanController::class, 'edit'])->name('loans.edit');
+    Route::put('/loans/{id}', [LoanController::class, 'update'])->name('loans.update');
+    Route::delete('/loans/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
+
+    // saving_type
+    Route::prefix('saving-types')->name('saving-types.')->group(function () {
+        Route::get('/', [SavingTypeController::class, 'index'])->name('index');
+        Route::post('/', [SavingTypeController::class, 'store'])->name('store');
+        Route::post('/schedule', [SavingTypeController::class, 'schedule'])->name('schedule');
+        Route::get('/{id}/edit', [SavingTypeController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [SavingTypeController::class, 'update'])->name('update');
+        Route::delete('/{id}', [SavingTypeController::class, 'destroy'])->name('destroy');
+    });
 
     // savings
     Route::get('/savings', [SavingController::class, 'index'])->name('savings.index');
@@ -128,6 +186,9 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
     // loan_payment
     Route::get('/loanPayments/create', [LoanPaymentController::class, 'create'])->name('loanPayments.create');
 
+    // repayments
+    Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index');
+
     // withdrawla
     Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
     Route::get('/withdrawals/create', [WithdrawalController::class, 'create'])->name('withdrawals.create');
@@ -137,39 +198,12 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
     Route::put('/withdrawals/{id}', [WithdrawalController::class, 'update'])->name('withdrawals.update');
     Route::delete('/withdrawals/{id}', [WithdrawalController::class, 'destroy'])->name('withdrawals.destroy');
 
+});
+
+Route::middleware([RoleMiddleware::class . ':administrator,kepala toko,admin toko'])->group(function() {
     // pos
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
     Route::post('/submit-sale', [PosController::class, 'store']);
-
-    // items
-    Route::get('/items', [MasterItemController::class, 'index'])->name('items.index');
-    Route::get('/items/create', [MasterItemController::class, 'create'])->name('items.create');
-    Route::post('/items', [MasterItemController::class, 'store'])->name('items.store');
-    Route::get('/items/import', [MasterItemController::class, 'downloadTemplate'])->name('items.template');
-    Route::post('/items/import', [MasterItemController::class, 'import'])->name('items.import');
-    Route::get('/items/{id}', [MasterItemController::class, 'show'])->name('items.show');
-    Route::get('/items/{id}/edit', [MasterItemController::class, 'edit'])->name('items.edit');
-    Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
-    Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');
-
-    //reports
-    Route::get('/report', [ReportController::class, 'index'])->name('reports.index');
-    Route::post('/report/get', [ReportController::class, 'getReport'])->name('reports.getReport');
-    Route::get('/report/pdf-deduction', [ReportController::class, 'deduction'])->name('reports.deductionPdf');
-    Route::get('/report/xlsx-deduction', [ReportController::class, 'exportPotonganGajiExcel'])->name('reports.deductionXlsx');
-
-    // repayments
-    Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index');
-
-    // inventories
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inv.index');
-    Route::get('/inventory/create', [InventoryController::class, 'create'])->name('inv.create');
-    Route::post('/inventory', [InventoryController::class, 'store'])->name('inv.store');
-    Route::post('/inventory/confirm', [InventoryController::class, 'confirmation'])->name('inv.confirm');
-    Route::get('/inventory/{id}', [InventoryController::class, 'show'])->name('inv.show');
-    Route::get('/inventory/{id}/edit', [InventoryController::class, 'edit'])->name('inv.edit');
-    Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inv.update');
-    Route::delete('/inventory/{id}', [InventoryController::class, 'destroy'])->name('inv.destroy');
 
     // purchase
     Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index');
@@ -181,35 +215,14 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':admin,superuser']
     Route::put('/purchase/{id}', [PurchaseController::class, 'update'])->name('purchases.update');
     Route::delete('/purchase/{id}', [PurchaseController::class, 'destroy'])->name('purchases.destroy');
 
-    // policy
-    Route::get('/policy', [PolicyController::class, 'index'])->name('policy.index');
-    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policy.upload');
-
-    // saving_type
-    Route::prefix('saving-types')->name('saving-types.')->group(function () {
-        Route::get('/', [SavingTypeController::class, 'index'])->name('index');
-        Route::post('/', [SavingTypeController::class, 'store'])->name('store');
-        Route::post('/schedule', [SavingTypeController::class, 'schedule'])->name('schedule');
-        Route::get('/{id}/edit', [SavingTypeController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [SavingTypeController::class, 'update'])->name('update');
-        Route::delete('/{id}', [SavingTypeController::class, 'destroy'])->name('destroy');
-    });
-}); 
-
-Route::get('/', function() {
-    return view('dashboard');
-    // return view('layouts.maintenance');
-})->middleware([PermissionMiddleware::class . ':dashboard']);
-// more role
-Route::middleware([RoleMiddleware::class . ':admin,superuser,finance'])->group(function() {
-
-    // loans
-    Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
-    Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
-    Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
-    Route::get('/loans/{id}', [LoanController::class, 'show'])->name('loans.show');
-    Route::get('/loans/{id}/edit', [LoanController::class, 'edit'])->name('loans.edit');
-    Route::put('/loans/{id}', [LoanController::class, 'update'])->name('loans.update');
-    Route::delete('/loans/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
+    // inventories
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inv.index');
+    Route::get('/inventory/create', [InventoryController::class, 'create'])->name('inv.create');
+    Route::post('/inventory', [InventoryController::class, 'store'])->name('inv.store');
+    Route::post('/inventory/confirm', [InventoryController::class, 'confirmation'])->name('inv.confirm');
+    Route::get('/inventory/{id}', [InventoryController::class, 'show'])->name('inv.show');
+    Route::get('/inventory/{id}/edit', [InventoryController::class, 'edit'])->name('inv.edit');
+    Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inv.update');
+    Route::delete('/inventory/{id}', [InventoryController::class, 'destroy'])->name('inv.destroy');
 
 });

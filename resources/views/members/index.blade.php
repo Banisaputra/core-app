@@ -102,8 +102,9 @@
                       <th width="5%">No.</th>
                       <th width="15%">NIP</th>
                       <th>Nama</th>
+                      <th width="15%">Jabatan</th>
+                      <th width="15%">Bagian</th>
                       <th width="15%">No.Telp</th>
-                      <th width="15%">Saldo</th>
                       <th width="10%">Status</th>
                       <th width="5%">Action</th>
                     </tr>

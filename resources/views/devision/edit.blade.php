@@ -59,7 +59,7 @@
         <div class="form-row"> 
           <div class="form-group col-md-6">
             <div class="custom-control custom-switch mb-2">
-               <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" {{ $devision->is_active == 1 ? "checked" : ""}}>
+               <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" {{ $devision->is_transactional == 1 ? "checked" : ""}}>
                <label class="custom-control-label" for="is_active">Status Aktifasi</label>
             </div>
           </div>

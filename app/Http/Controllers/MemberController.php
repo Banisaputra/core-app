@@ -8,6 +8,8 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Member;
 use App\Models\Saving;
+use App\Models\Devision;
+use App\Models\Position;
 use App\Models\SavingType;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -248,27 +250,32 @@ class MemberController extends Controller
             if ($index <= 2) continue; // skip header and info 
             $data = [
                 'nip' => $row[0] ?? null,
-                'name' => $row[1] ?? null,
-                'email' => $row[2] ?? null,
-                'telphone' => $row[3] ?? null,
-                'date_of_birth' => $row[4] ?? null,
-                'gender' => $row[5] ?? null,
-                'religion' => $row[6] ?? null,
-                'date_joined' => $row[7] ?? null,
-                'address' => $row[8] ?? null,
-                'accountGenerate' => $row[9] ?? null,
+                'position' => $row[1] ?? null,
+                'devision' => $row[2] ?? null,
+                'name' => $row[3] ?? null,
+                'email' => $row[4] ?? null,
+                'telphone' => $row[5] ?? null,
+                'gender' => $row[6] ?? null,
+                'no_kk' => $row[7] ?? null,
+                'no_ktp' => $row[8] ?? null,
+                'date_joined' => $row[9] ?? null,
+                'address' => $row[10] ?? null,
+                'accountGenerate' => $row[11] ?? null,
             ];
 
+           
             $mExists = Member::where('nip', $data['nip'])->first();
             $rules = $mExists ? 'exists' : 'unique';
             $validator = Validator::make($data, [
                 'nip' => 'required|'.$rules.':members,nip',
+                'position' => 'required|exists:positions,code',
+                'devision' => 'required|exists:devisions,code',
                 'name' => 'required|string|max:100',
                 'email' => 'required|email|unique:users,email',
-                'date_of_birth' => 'required',
                 'telphone' => 'required',
                 'gender' => 'required',
-                'religion' => 'required',
+                'no_kk' => 'required|string|max:20',
+                'no_ktp' => 'required|string|max:20',
                 'date_joined' => 'required',
                 'address' => 'required',
             ]);
@@ -277,6 +284,9 @@ class MemberController extends Controller
                 $failed[] = ['row' => $index + 1, 'errors' => $validator->errors()->all()];
                 continue;
             }
+
+            $position = Position::where('code', $data['position'])->first();
+            $devision = Devision::where('code', $data['devision'])->first();
 
             // check generate account
             $password = Hash::make(Str::random(8));
@@ -296,11 +306,13 @@ class MemberController extends Controller
                 ]);
 
                 $mExists->update([
+                    'position_id' => $position->id,
+                    'devision_id' => $devision->id,
                     'name' => $data['name'],
                     'telphone' => $data['telphone'],
-                    'religion' => $data['religion'],
                     'gender' => $data['gender'],
-                    'date_of_birth' => $data['date_of_birth'],
+                    'no_kk' => $data['no_kk'],
+                    'no_ktp' => $data['no_ktp'],
                     'address' => $data['address'],
                     'date_joined' => $data['date_joined'],
                     'updated_by' => auth()->id(),
@@ -316,11 +328,13 @@ class MemberController extends Controller
                 $member = Member::create([
                     'user_id' => $user->id,
                     'nip' => $data['nip'],
+                    'position_id' => $position->id,
+                    'devision_id' => $devision->id,
                     'name' => $data['name'],
                     'telphone' => $data['telphone'],
-                    'religion' => $data['religion'],
                     'gender' => $data['gender'],
-                    'date_of_birth' => $data['date_of_birth'],
+                    'no_kk' => $data['no_kk'],
+                    'no_ktp' => $data['no_ktp'],
                     'address' => $data['address'],
                     'date_joined' => $data['date_joined'],
                     'created_by' => auth()->id(),
@@ -353,11 +367,11 @@ class MemberController extends Controller
         ]);
 
         // Header
-        $headers = ['NIP', 'Nama Lengkap', 'Email', 'No.Telp', 'Tgl. Lahir', 'Jenis Kelamin', 'Agama', 'Tgl. Bergabung', 'Alamat', 'Akun Anggota'];
+        $headers = ['NIP', 'Kode Jabatan', 'Kode Bagian', 'Nama Lengkap', 'Email', 'No.Telp', 'Jenis Kelamin', 'No KK', 'No KTP', 'Tgl. Bergabung', 'Alamat', 'Akun Anggota'];
         $sheet->fromArray($headers, null, 'A2');
 
         // Style header
-        $sheet->getStyle('A2:J2')->applyFromArray([
+        $sheet->getStyle('A2:L2')->applyFromArray([
             'font' => ['bold' => true],
             'alignment' => ['horizontal' => 'center'],
             'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
@@ -365,15 +379,15 @@ class MemberController extends Controller
 
         // Keterangan
         $notes = [
-            '', 'Harus diisi', 'Harus diisi', 'Harus diisi',
-            "Format penulisan\nYYYY.MM.DD\nExp :\n - 2025.12.31\n - 2002.05.07",
+            "Harus diisi", "Sesuai dengan\nMaster Jabatan", "Sesuai dengan\nMaster Bagian",
+            "Harus diisi", "Harus diisi", "Harus diisi",
             "PRIA / WANITA\nHarus diisi",
-            '',
+            "Harus diisi", "Harus diisi",
             "Format penulisan\nYYYY.MM.DD\nExp :\n - 2025.12.31\n - 2002.05.07",
-            'Harus diisi', 'YA / TIDAK'
+            'Harus diisi', "YA / TIDAK\nYA untuk membuat account"
         ];
 
-        foreach (range('A', 'J') as $col) {
+        foreach (range('A', 'L') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

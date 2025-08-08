@@ -122,6 +122,9 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
     // policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy.index');
     Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policy.upload');
+    Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policy.loanUmum');
+    Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policy.loanKhusus');
+    Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policy.loanAgunan');
 
    
 }); 

@@ -43,8 +43,8 @@ class AutoGenerateSavings extends Command
 
             $this->info("Processing auto savings for type: {$type->name}");
             $members = Member::where('is_transactional', 1)->get();
-
             foreach ($members as $member) {
+
                 // Cek apakah sudah ada untuk bulan ini
                 $exists = Saving::where('member_id', $member->id)
                     ->where('sv_type_id', $type->id)
@@ -66,7 +66,10 @@ class AutoGenerateSavings extends Command
                         'updated_by' => 0,
                     ]);
                     $this->info("  ✔ Added for member: {$member->name}");
+                } else {
+                    $this->info(" >> Skiped for member: {$member->name}");
                 }
+
             }
         }
 

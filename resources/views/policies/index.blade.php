@@ -205,6 +205,49 @@ $(document).ready(function() {
         }
     });
 
+    // pijaman
+    $(document).on({
+        input: function() {
+            // Save cursor position
+            const cursorPosition = this.selectionStart;
+            const originalLength = this.value.length;
+            
+            // Get raw value without formatting
+            let value = $(this).val().replace(/[^\d]/g, '');
+            
+            // Format to IDR
+            if (value.length > 0) {
+                let formattedValue = '';
+                for (let i = 0; i < value.length; i++) {
+                    if (i > 0 && (value.length - i) % 3 === 0) {
+                        formattedValue += '.';
+                    }
+                    formattedValue += value[i];
+                }
+                
+                $(this).val(formattedValue);
+                
+                // Adjust cursor position based on added dots
+                const newLength = formattedValue.length;
+                const lengthDiff = newLength - originalLength;
+                const newCursorPosition = cursorPosition + lengthDiff;
+                this.setSelectionRange(newCursorPosition, newCursorPosition);
+            } else {
+                $(this).val('');
+            }
+        }
+    }, '#maxAngsuranPokok, #minAngsuranPokok, #maxPotongStaff, #maxPotongOperator' );
+
+    // For form submission
+    $(document).on({
+        blur: function(e) {
+            console.log($(this));
+            
+            const numericValue = $(this).val().replace(/\./g, '');
+      $(this).attr('data-value', numericValue)
+        }
+    },'#maxAngsuranPokok, #minAngsuranPokok, #maxPotongStaff, #maxPotongOperator' );
+
 });
 </script>
 

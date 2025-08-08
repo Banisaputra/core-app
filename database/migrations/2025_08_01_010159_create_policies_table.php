@@ -13,22 +13,12 @@ return new class extends Migration
     {
         Schema::create('policies', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 50)->unique();
-            $table->string('doc_type', 100);
+            $table->string('pl_name', 100);
+            $table->enum('doc_type', ['TERMS','SAVING','LOAN']);
             $table->text('description');
-            $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
-            $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
+            $table->text('pl_value');
+            $table->tinyInteger('is_transactional')->default(1);
             $table->timestamps();
-        });
-
-        Schema::create('policy_detail', function (Blueprint $table) {
-            $table->foreignId('pl_id')->notNull()->references('id')->on('policies')->onUpdate('cascade');
-            $table->integer('min_year')->nullable();
-            $table->integer('max_year')->nullable();
-            $table->integer('min_value')->nullable();
-            $table->integer('max_value')->nullable();
-            $table->text('file_path')->nullable();
-            $table->tinyInteger('sort');
         });
     }
 

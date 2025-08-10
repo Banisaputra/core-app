@@ -114,17 +114,15 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
     Route::get('/items/{id}', [MasterItemController::class, 'show'])->name('items.show');
     Route::get('/items/{id}/edit', [MasterItemController::class, 'edit'])->name('items.edit');
     Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
-    Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');
-
-   
-   
-
+    Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');   
+    
     // policy
     Route::get('/policy', [PolicyController::class, 'index'])->name('policy.index');
     Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policy.upload');
     Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policy.loanUmum');
     Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policy.loanKhusus');
     Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policy.loanAgunan');
+    Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policy.agDestroy');
 
    
 }); 

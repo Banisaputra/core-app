@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Policy;
 use App\Models\SavingType;
+use App\Models\AgunanPolicy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -46,7 +47,12 @@ class PolicyController extends Controller
         ->all();
         $data['loanPolicies'] = [];
         if ($loanPolicies) $data['loanPolicies'] = $loanPolicies;
-
+        
+        // get agunan
+        $agunans = AgunanPolicy::orderBy('agp_value')->get();
+        $data['agunans'] = [];
+        if ($agunans) $data['agunans'] = $agunans;
+        
 
         return view("policies.index", $data);
     }
@@ -107,7 +113,7 @@ class PolicyController extends Controller
             $bunga = Policy::where('doc_type', 'LOAN')
             ->where('pl_name', 'bunga_pinjaman')->first();
             if ($bunga) {
-                if ($bungaPinjam != '') {
+                if ($bungaPinjam > 0) {
                     DB::table('policies')->where('id',$bunga->id)
                     ->update([
                         'pl_value' => $bungaPinjam
@@ -125,7 +131,7 @@ class PolicyController extends Controller
             $mxpa = Policy::where('doc_type', 'LOAN')
             ->where('pl_name', 'max_pokok_angsuran')->first();
             if ($mxpa) {
-                if ($maxPkAngsur != '') {
+                if ($maxPkAngsur > 0) {
                     DB::table('policies')->where('id', $mxpa->id)
                     ->update([
                         'pl_value' => $maxPkAngsur
@@ -162,7 +168,7 @@ class PolicyController extends Controller
             $mxpgs = Policy::where('doc_type', 'LOAN')
             ->where('pl_name', 'max_potong_gaji_staff')->first();
             if ($mxpgs) {
-                if ($maxPtStaff != '') {
+                if ($maxPtStaff > 0) {
                     $mxpgs->pl_value = $maxPtStaff;
                     $mxpgs->save();
                 }
@@ -178,7 +184,7 @@ class PolicyController extends Controller
             $mxpgo = Policy::where('doc_type', 'LOAN')
             ->where('pl_name', 'max_potong_gaji_operator')->first();
             if ($mxpgo) {
-                if ($maxPtOperator != '') {
+                if ($maxPtOperator > 0) {
                     $mxpgo->pl_value = $maxPtOperator;
                     $mxpgo->save();
                 }
@@ -193,7 +199,82 @@ class PolicyController extends Controller
 
 
             DB::commit();
-            return redirect()->route('policy.index')->with('success', 'File syarat dan ketentuan berhasil diunggah.');
+            return redirect()->route('policy.index')->with('success', 'Syarat Ketentuan Umum berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator' . $e->getMessage())->withInput();
+        }
+
+
+    }
+   
+    public function loanKhusus(Request $request) {
+        $agunan01 = str_replace('.', '', $request->maxAgunan01 ?? 0);
+        $agunan15 = str_replace('.', '', $request->maxAgunan15 ?? 0);
+        $agunan50 = str_replace('.', '', $request->maxAgunan50 ?? 0);
+        
+        DB::beginTransaction();
+        try {
+            // max angsur kurang dari 1 tahun
+            $mxa01 = Policy::where('doc_type', 'LOAN')
+            ->where('pl_name', 'max_agunan_0_1')->first();
+            if ($mxa01) {
+                if ($agunan01 > 0) {
+                    DB::table('policies')->where('id', $mxa01->id)
+                    ->update([
+                        'pl_value' => $agunan01
+                    ]);
+                }
+            } else {
+                DB::table('policies')
+                ->insert([
+                    'pl_name' => 'max_agunan_0_1',
+                    'doc_type' => 'LOAN',
+                    'description' => 'nilai maksimal pinjaman kurang dari 1 tahun',
+                    'pl_value' => $agunan01
+                ]);
+            }
+            // max angsur kurang dari 5 tahun lebih dari 1 tahun
+            $mxa15 = Policy::where('doc_type', 'LOAN')
+            ->where('pl_name', 'max_agunan_1_5')->first();
+            if ($mxa15) {
+                if ($agunan15 > 0) {
+                    DB::table('policies')->where('id', $mxa15->id)
+                    ->update([
+                        'pl_value' => $agunan15
+                    ]);
+                }
+            } else {
+                DB::table('policies')
+                ->insert([
+                    'pl_name' => 'max_agunan_1_5',
+                    'doc_type' => 'LOAN',
+                    'description' => 'nilai maksimal pinjaman kurang dari 5 tahun dan lebih dari 1 tahun',
+                    'pl_value' => $agunan15
+                ]);
+            }
+            // max angsur lebih dari 5 tahun
+            $mxa50 = Policy::where('doc_type', 'LOAN')
+            ->where('pl_name', 'max_agunan_5_0')->first();
+            if ($mxa50) {
+                if ($agunan50 > 0) {
+                    DB::table('policies')->where('id', $mxa50->id)
+                    ->update([
+                        'pl_value' => $agunan50
+                    ]);
+                }
+            } else {
+                DB::table('policies')
+                ->insert([
+                    'pl_name' => 'max_agunan_5_0',
+                    'doc_type' => 'LOAN',
+                    'description' => 'nilai maksimal pinjaman lebih dari 5 tahun',
+                    'pl_value' => $agunan50
+                ]);
+            }
+             
+            DB::commit();
+            return redirect()->route('policy.index')->with('success', 'Syarat Ketentuan Khusus berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator' . $e->getMessage())->withInput();
@@ -202,16 +283,122 @@ class PolicyController extends Controller
 
     }
 
-    public function loanKhusus(Request $request) {
-        dd($request->all());
-
-    }
-
     public function loanAgunan(Request $request) {
-        dd($request->all());
+        $agMotor = str_replace('.', '', $request->bpkbMotor ?? 0);
+        $agMotorStart = $request->startBPM;
+        $agMotorEnd = $request->endBPM;
+        $agMobil = str_replace('.', '', $request->bpkbMobil ?? 0);
+        $agMobilStart = $request->startBPC;
+        $agMobilEnd = $request->endBPC;
+        $agSertify = str_replace('.', '', $request->sertify ?? 0);
+        $agSertifyStart = $request->startSertify;
+        $agSertifyEnd = $request->endSertify;
+        
+        DB::beginTransaction();
+        try {
+            // cek agunan type bpkb motor
+            $agpMt = AgunanPolicy::where('doc_type', 'MOTOR')
+            ->where(function($query) use ($agMotorStart, $agMotorEnd) {
+                $query->where('start_year', '=', $agMotorStart)
+                      ->orWhere('end_year', '=', $agMotorEnd);
+            })->first();
+            // dd($agpMt);
+            if ($agpMt) {
+                if ($agMotor > 0) {
+                    DB::table('agunan_policies')->where('id', $agpMt->id)
+                    ->update([
+                        'start_year' => $agMotorStart,
+                        'end_year' => $agMotorEnd,
+                        'agp_value' => $agMotor
+                    ]);
+                }
+            } else {
+                if ($agMotor > 0 && $agMotorStart && $agMotorEnd) {
+                    DB::table('agunan_policies')
+                    ->insert([
+                        'agp_name' => 'bpkb_motor',
+                        'doc_type' => 'MOTOR',
+                        'description' => 'nilai maksimal pinjaman dengan agunan bpkb motor',
+                        'agp_value' => $agMotor,
+                        'start_year' => $agMotorStart,
+                        'end_year' => $agMotorEnd
+                    ]);
+                }
+            }
+            
+            // cek agunan type bpkb mobil
+            $agpMb = AgunanPolicy::where('doc_type', 'MOBIL')
+            ->where(function($query) use ($agMobilStart, $agMobilEnd) {
+                $query->where('start_year', '=', $agMobilStart)
+                      ->orWhere('end_year', '=', $agMobilEnd);
+            })->first();
+            if ($agpMb) {
+                if ($agMobil > 0) {
+                    DB::table('agunan_policies')->where('id', $agpMb->id)
+                    ->update([
+                        'start_year' => $agMobilStart,
+                        'end_year' => $agMobilEnd,
+                        'agp_value' => $agMobil
+                    ]);
+                }
+            } else {
+                if ($agMobil > 0 && $agMobilStart && $agMobilEnd) {
+                    DB::table('agunan_policies')
+                    ->insert([
+                        'agp_name' => 'bpkb_mobil',
+                        'doc_type' => 'MOBIL',
+                        'description' => 'nilai maksimal pinjaman dengan agunan bpkb mobil',
+                        'agp_value' => $agMobil,
+                        'start_year' => $agMobilStart,
+                        'end_year' => $agMobilEnd
+                    ]);
+                }
+            }
+           
+            // cek agunan type sertifikat
+            $agpSf = AgunanPolicy::where('doc_type', 'SERTIFIKAT')
+            ->where(function($query) use ($agSertifyStart, $agSertifyEnd) {
+                $query->where('start_year', '=', $agSertifyStart)
+                      ->orWhere('end_year', '=', $agSertifyEnd);
+            })->first();
+            if ($agpSf) {
+                if ($agSertify > 0) {
+                    DB::table('agunan_policies')->where('id', $agpSf->id)
+                    ->update([
+                        'start_year' => $agSertifyStart,
+                        'end_year' => $agSertifyEnd,
+                        'agp_value' => $agSertify
+                    ]);
+                }
+            } else {
+                if ($agSertify > 0 && $agSertifyStart && $agSertifyEnd) {
+                    DB::table('agunan_policies')
+                    ->insert([
+                        'agp_name' => 'sertifikat_letter',
+                        'doc_type' => 'SERTIFIKAT',
+                        'description' => 'nilai maksimal pinjaman dengan agunan sertifikat',
+                        'agp_value' => $agSertify,
+                        'start_year' => $agSertifyStart,
+                        'end_year' => $agSertifyEnd
+                    ]);
+                }
+            }
 
+            DB::commit();
+            return redirect()->route('policy.index')->with('success', 'Syarat Ketentuan Agunan berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator' . $e->getMessage())->withInput();
+        }
+    }
+   
+    public function agDestroy(string $id)
+    {
+        $agp = AgunanPolicy::findOrFail($id);
+        if ($agp) $agp->delete();
+
+        return redirect()->back()->with('success', "Syarat Agunan berhasil dihapus");
+        
     }
 
-
-   
 }

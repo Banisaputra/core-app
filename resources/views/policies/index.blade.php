@@ -236,7 +236,7 @@ $(document).ready(function() {
                 $(this).val('');
             }
         }
-    }, '#maxAngsuranPokok, #minAngsuranPokok, #maxPotongStaff, #maxPotongOperator' );
+    }, '#maxAngsuranPokok, #minAngsuranPokok, #maxPotongStaff, #maxPotongOperator, #maxAgunan01, #maxAgunan15, #maxAgunan50, #bpkbMotor, #bpkbMobil, #sertify' );
 
     // For form submission
     $(document).on({
@@ -246,7 +246,7 @@ $(document).ready(function() {
             const numericValue = $(this).val().replace(/\./g, '');
       $(this).attr('data-value', numericValue)
         }
-    },'#maxAngsuranPokok, #minAngsuranPokok, #maxPotongStaff, #maxPotongOperator' );
+    },'#maxAngsuranPokok, #minAngsuranPokok, #maxPotongStaff, #maxPotongOperator, #maxAgunan01, #maxAgunan15, #maxAgunan50, #bpkbMotor, #bpkbMobil, #sertify' );
 
 });
 </script>

@@ -138,7 +138,8 @@ class SupplierController extends Controller
                 'code' => $row[0] ?? null,
                 'name' => $row[1] ?? null,
                 'address' => $row[2] ?? null,
-                'is_active' => $row[3] ?? null,
+                'telphone' => $row[3] ?? null,
+                'is_active' => $row[4] ?? null,
             ];
 
             $sExists = Supplier::where('code', $data['code'])->first();
@@ -147,6 +148,7 @@ class SupplierController extends Controller
             $validator = Validator::make($data, [
                 'code' => 'required|string|max:50|'.$rules.':suppliers,code',
                 'name' => 'required|string|max:100',
+                'telphone' => 'nullable|integer',
                 'address' => 'required|max:255',
             ]);
 
@@ -159,6 +161,7 @@ class SupplierController extends Controller
                 $sExists->update([
                     'name' => $data['name'],
                     'address' => $data['address'],
+                    'telphone' => $data['telphone'],
                     'is_active' => $data['is_active'],
                     'updated_by' => auth()->id(),
                 ]);
@@ -167,6 +170,7 @@ class SupplierController extends Controller
                     'code' => $data['code'],
                     'name' => $data['name'],
                     'address' => $data['address'],
+                    'telphone' => $data['telphone'],
                     'is_active' => $data['is_active'],
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
@@ -187,7 +191,7 @@ class SupplierController extends Controller
         $sheet->setTitle('Template Master Supplier');
 
         // Judul besar
-        $sheet->mergeCells('A1:D1');
+        $sheet->mergeCells('A1:E1');
         $sheet->setCellValue('A1', 'Template Master Supplier');
         $sheet->getStyle('A1')->applyFromArray([
             'font' => ['bold' => true, 'size' => 14],
@@ -199,11 +203,11 @@ class SupplierController extends Controller
         ]);
 
         // Header
-        $headers = ['Kode', 'Nama Supplier', 'Alamat', 'Status'];
+        $headers = ['Kode', 'Nama Supplier', 'Alamat', 'Telphone', 'Status'];
         $sheet->fromArray($headers, null, 'A2');
 
         // Style header
-        $sheet->getStyle('A2:D2')->applyFromArray([
+        $sheet->getStyle('A2:E2')->applyFromArray([
             'font' => ['bold' => true],
             'alignment' => ['horizontal' => 'center'],
             'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
@@ -211,11 +215,11 @@ class SupplierController extends Controller
 
         // Keterangan wajib isi
         $notes = [
-            'Harus diisi', 'Harus diisi', ' Harus diisi',
+            'Harus diisi', 'Harus diisi', 'Harus diisi', 'Opsional',
             "Aktif = 1\nTidak Aktif = 0",
         ];
 
-        foreach (range('A', 'D') as $col) {
+        foreach (range('A', 'E') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
@@ -238,7 +242,5 @@ class SupplierController extends Controller
             "Cache-Control" => "max-age=0",
         ]);
     }
-
-
 
 }

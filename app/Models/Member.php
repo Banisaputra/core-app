@@ -24,6 +24,14 @@ class Member extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function position() {
+        return $this->belongsTo(Position::class, 'position_id');
+    }
+
+    public function devision() {
+        return $this->belongsTo(Devision::class, 'devision_id');
+    }
+
     public function withdrawals() {
         return $this->hasMany(Withdrawal::class);
     }

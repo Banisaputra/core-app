@@ -100,7 +100,7 @@
                   <thead>
                     <tr>
                       <th width="5%">No.</th>
-                      <th width="15%">NIP</th>
+                      <th width="13%">NIP</th>
                       <th>Nama</th>
                       <th width="15%">Jabatan</th>
                       <th width="15%">Bagian</th>
@@ -116,8 +116,9 @@
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $member->nip }}</td>
                         <td>{{ $member->name }}</td>
+                        <td>{{ $member->position->name }}</td>
+                        <td>{{ $member->devision->name }}</td>
                         <td>{{ $member->telphone }}</td>
-                        <td>Rp {{ number_format($member->balance,0) }}</td>
                         <td>{!! $member->is_transactional == 1 ? "<span class='dot dot-lg bg-success mr-1'></span>Aktif" : "<span class='dot dot-lg bg-secondary mr-1'></span>Tidak Aktif" !!}</td>
 
                         <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

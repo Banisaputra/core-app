@@ -30,7 +30,7 @@ class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::with('user')->latest()->paginate();
+        $members = Member::with('user', 'position', 'devision')->latest()->paginate();
         return view('members.index', compact('members'));
     }
 
@@ -217,6 +217,8 @@ class MemberController extends Controller
     public function search(Request $request)
     {
         $search = $request->q;
+        $is_active = $request->active;
+        // Log::debug('Request Data:', $request->all());
 
         $members = Member::when($search, function($query) use ($search) {
             $query->where(function($q) use ($search) {
@@ -224,7 +226,7 @@ class MemberController extends Controller
                   ->orWhere('nip', 'like', "%$search%");
             });
         })
-        ->where('is_transactional', 1)
+        ->where('is_transactional', $is_active)
         ->select('id', 'name')
         ->limit(10)
         ->get();
@@ -444,7 +446,6 @@ class MemberController extends Controller
             return back()->with('error', 'Gagal menyimpan pembelian: ' . $e->getMessage())->withInput();
         }
 
-    }   
-
+    }
 
 }

@@ -8,6 +8,7 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// develop only
 Schedule::command('savings:auto-generate')->everyMinute()
     ->appendOutputTo(storage_path('logs/auto_saving.log')); //for develop only
 

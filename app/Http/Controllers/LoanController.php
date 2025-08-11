@@ -6,10 +6,12 @@ use DateTime;
 use DateInterval;
 use App\Models\Loan;
 use App\Models\Member;
+use App\Models\Policy;
 use App\Models\LoanAgunan;
 use App\Models\LoanPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class LoanController extends Controller
 {
@@ -28,8 +30,21 @@ class LoanController extends Controller
     public function create()
     {
         $data = [
+            "loan_policies" => Policy::getLoanPolicies(),
             "loan_code" => Loan::generateCode()
         ];
+        // get file terms pdf
+        $policy = Policy::where('doc_type', 'TERMS')
+        ->where('pl_name', 'policy_information')->first();
+
+        $filePath = $policy->pl_value ?? 'empty';
+        if (!Storage::disk('public')->exists($filePath)) {
+            $data['pdfExists'] = false;
+        } else {
+            $fileUrl = asset('storage/' . $filePath);
+            $data['pdfExists'] = true;
+            $data['fileUrl'] = $fileUrl;
+        }
         return view('loans.create', $data);
     }
 
@@ -58,28 +73,50 @@ class LoanController extends Controller
         // get anggota
         $member = Member::findOrFail($request->member_id);
         $maxLoan = $member->maxLoanAmount();
+        $tenor = $member->tenorAmount($loan_value);
+        $currentLoan = $member->getTotalLoan();
         $is_agunan = isset($request->cbAgunan) ? true : false;
-
+dd($currentLoan);
         // check policy max loan non agunan
         if ($loan_value > $maxLoan && $is_agunan === false)
             return redirect()->back()->with('error', 'Plafon pinjaman melebihi batas maksimal sebesar Rp ' . number_format($maxLoan, 0, ',', '.'));
-        if ($request->loan_tenor > 12 && $is_agunan === false)
-            return redirect()->back()->with('error', 'Tenor pinjaman melebihi batas maksimal 12 bulan, gunakan agunan untuk tenor yang lebih lama');
-        if ($request->loan_tenor > 36 && $is_agunan === true)
-            return redirect()->back()->with('error', 'Tenor pinjaman dengan agunan melebihi batas maksimal 36 bulan');
 
-        if ($loan_value > 3000000) {
+        if ($request->loan_tenor > $tenor['tenorMax'] && $is_agunan === false)
+            return redirect()->back()->with('error', 'Tenor pinjaman melebihi batas maksimal '.(int) $tenor['tenorMax'].' bulan, gunakan agunan untuk tenor yang lebih lama');
+       
+        if ($is_agunan) {
             $request->validate([
                 'ln_agunan' => 'required|string',
+                'ln_docYear' => 'required|integer',
                 'ln_docNumber' => 'required|string',
                 'ln_docDetail' => 'required|string',
             ], [
                 'ln_agunan.required' => 'Jaminan diperlukan untuk pinjaman ini',
+                'ln_docYear.required' => 'Tahun Jaminan diperlukan untuk pinjaman ini',
                 'ln_docNumber.required' => 'Nomor Jaminan diperlukan untuk pinjaman ini',
                 'ln_docDetail.required' => 'Data Jaminan diperlukan untuk pinjaman ini',
             ]);
- 
+
+            $typeAgunan = $request->ln_agunan;
+            $maxTenorAgunan = 0;
+            switch ($typeAgunan) {
+                case 'SERTIFIKAT':
+                    $maxTenorAgunan = 48;
+                    break;
+                default:
+                    $maxTenorAgunan = 36;
+                    break;
+            }
+
+            if ($request->loan_tenor > $maxTenorAgunan)
+                return redirect()->back()->with('error', 'Tenor pinjaman dengan agunan melebihi batas maksimal 36 bulan');
         }
+
+        if ($currentLoan['total_pokok'] > $currentLoan['maxPokok'])
+            return redirect()->back()->with('error', 'Angsuran Pokok melebihi batas maksimal '.(int) $currentLoan['maxPokok'].' per anggota');
+        $totalBayar = ($currentLoan['total_bayar']*1) + ($request->loan_value / $request->loan_tenor);
+        if ($totalBayar > $currentLoan['maxBayar'])
+            return redirect()->back()->with('error', 'Pembayaran Angsuran melebihi batas maksimal '.(int) $currentLoan['maxBayar'].'');
 
         DB::beginTransaction();
         try {

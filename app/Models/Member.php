@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use App\Models\LoanPayment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -39,15 +40,92 @@ class Member extends Model
     public function maxLoanAmount(): int
     {
         $selisihTahun = Carbon::parse($this->date_joined)->diffInYears(Carbon::now());
+        $loanPolicy = Policy::getLoanPolicies();
 
         if ($selisihTahun < 1) {
-            return 2000000;
-        } elseif ($selisihTahun < 5) {
-            return 3500000;
+            return $loanPolicy['max_agunan_0_1']['value'];
+        } elseif ($selisihTahun < 5 && $selisihTahun > 1) {
+            return $loanPolicy['max_agunan_1_5']['value'];
         } else {
-            return 5500000;
+            return $loanPolicy['max_agunan_5_0']['value'];
         }
-         
+        
+    }
+
+    public function tenorAmount($loan): array
+    {
+        $selisihTahun = Carbon::parse($this->date_joined)->diffInYears(Carbon::now());
+        $loanPolicy = Policy::getLoanPolicies();
+        $min_angsur = $loanPolicy['min_pokok_angsuran']['value'] * 1;
+        $max_angsur = $loanPolicy['max_pokok_angsuran']['value'] * 1;
+        $valid = true;
+        
+        
+        if ($selisihTahun < 1) {
+            $max_tenor = round((($loanPolicy['max_agunan_0_1']['value'] * 1) / $min_angsur)??0 ,0);
+            $tenor = round($loan / $min_angsur, 0);
+            if($tenor > $max_tenor) $valid = false;
+            $angsuran = $loan / $tenor;
+            return [
+                'tenorIdeal' => $tenor,
+                'angsuran' => $angsuran,
+                'tenorMax' => $max_tenor,
+                'pass' => $valid
+            ];
+        } elseif ($selisihTahun < 5 && $selisihTahun > 1) {
+            $max_tenor = round((($loanPolicy['max_agunan_1_5']['value'] * 1) / $min_angsur)??0 ,0);
+            $tenor = round($loan / $min_angsur, 0);
+            if($tenor > $max_tenor) $valid = false;
+            $angsuran = $loan / $tenor;
+            return [
+                'tenorIdeal' => $tenor,
+                'angsuran' => $angsuran,
+                'tenorMax' => $max_tenor,
+                'pass' => $valid
+            ];
+        } else {
+            $max_tenor = round((($loanPolicy['max_agunan_5_0']['value'] * 1) / $min_angsur)??0 ,0);
+            $tenor = round($loan / $min_angsur, 0);
+            if($tenor > $max_tenor) $valid = false;
+            $angsuran = $loan / $tenor;
+            return [
+                'tenorIdeal' => $tenor,
+                'angsuran' => $angsuran,
+                'tenorMax' => $max_tenor,
+                'pass' => $valid
+            ];
+        }
+
+    }
+
+    public function getTotalLoan(): array
+    {
+        $loanPolicy = Policy::getLoanPolicies();
+        $YM = Carbon::now()->format('Ym');
+        $jabatan = Position::where('id', $this->position_id)->first();
+        $totalPokok = LoanPayment::where('member_id', $this->id)
+            ->whereRaw('LEFT(lp_date,6) = ?', [$YM])
+            ->sum('lp_value');
+
+        // include bunga
+        $totalBayar = LoanPayment::where('member_id', $this->id)
+            ->whereRaw('LEFT(lp_date,6) = ?', [$YM])
+            ->sum('lp_total');
+
+        // 
+        $maxBayar = 0;
+        if ($jabatan->name == "STAFF") {
+            $maxBayar = $loanPolicy['max_potong_gaji_staff']['value'];
+        } else if ($jabatan->name == "OPERATOR") {
+            $maxBayar = $loanPolicy['max_potong_gaji_operator']['value'];
+        }
+        
+        return [
+            'total_pokok' => $totalPokok,
+            'maxPokok' => $loanPolicy['max_pokok_angsuran']['value'],
+            'total_bayar' => $totalBayar,
+            'maxBayar' => $maxBayar
+        ];
     }
 
 }

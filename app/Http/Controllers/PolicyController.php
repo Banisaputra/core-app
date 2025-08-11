@@ -150,7 +150,7 @@ class PolicyController extends Controller
             $mnpa = Policy::where('doc_type', 'LOAN')
             ->where('pl_name', 'min_pokok_angsuran')->first();
             if ($mnpa) {
-                if ($minPkAngsur != '') {
+                if ($minPkAngsur > 0) {
                     DB::table('policies')->where('id', $mnpa->id)
                     ->update([
                         'pl_value' => $minPkAngsur
@@ -212,6 +212,8 @@ class PolicyController extends Controller
         $agunan01 = str_replace('.', '', $request->maxAgunan01 ?? 0);
         $agunan15 = str_replace('.', '', $request->maxAgunan15 ?? 0);
         $agunan50 = str_replace('.', '', $request->maxAgunan50 ?? 0);
+        $tenorTA = $request->maxTenorTA ?? 0;
+        $tenorDA = $request->maxTenorDA ?? 0;
         
         DB::beginTransaction();
         try {
@@ -270,6 +272,46 @@ class PolicyController extends Controller
                     'doc_type' => 'LOAN',
                     'description' => 'nilai maksimal pinjaman lebih dari 5 tahun',
                     'pl_value' => $agunan50
+                ]);
+            }
+
+            // tenor tanpa agunan
+            $tna = Policy::where('doc_type', 'LOAN')
+            ->where('pl_name', 'max_tenor_tanpa_agunan')->first();
+            if ($tna) {
+                if ($tenorTA > 0) {
+                    DB::table('policies')->where('id', $tna->id)
+                    ->update([
+                        'pl_value' => $tenorTA
+                    ]);
+                }
+            } else {
+                DB::table('policies')
+                ->insert([
+                    'pl_name' => 'max_tenor_tanpa_agunan',
+                    'doc_type' => 'LOAN',
+                    'description' => 'nilai maksimal tenor pinjaman tanpa agunan',
+                    'pl_value' => $tenorTA
+                ]);
+            }
+
+            // tenor dengan agunan
+            $tda = Policy::where('doc_type', 'LOAN')
+            ->where('pl_name', 'max_tenor_dengan_agunan')->first();
+            if ($tda) {
+                if ($tenorDA > 0) {
+                    DB::table('policies')->where('id', $tda->id)
+                    ->update([
+                        'pl_value' => $tenorDA
+                    ]);
+                }
+            } else {
+                DB::table('policies')
+                ->insert([
+                    'pl_name' => 'max_tenor_dengan_agunan',
+                    'doc_type' => 'LOAN',
+                    'description' => 'nilai maksimal tenor pinjaman dengan agunan',
+                    'pl_value' => $tenorDA
                 ]);
             }
              

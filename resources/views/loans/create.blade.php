@@ -11,7 +11,7 @@
 @section('content')
 {{-- syarat pinjaman --}}
 <div class="modal fade modal-right modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" style="display: none;" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="defaultModalLabel">Modal title</h5>
@@ -19,7 +19,17 @@
             <span aria-hidden="true">x</span>
           </button>
         </div>
-        <div class="modal-body" style="overflow-y: auto;"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dui urna, cursus mollis cursus vitae, fringilla vel augue. In vitae dui ut ex fringilla consectetur. Sed vulputate ante arcu, non vehicula mauris porttitor quis. Praesent tempor varius orci sit amet sodales. Nullam feugiat condimentum posuere. Vivamus bibendum mattis mi, vitae placerat lorem sagittis nec. Proin ac magna iaculis, faucibus odio sit amet, volutpat felis. Proin eleifend suscipit eros, quis vulputate tellus condimentum eget. Maecenas eget dui velit. Aenean in maximus est, sit amet convallis tortor. In vel bibendum mauris, id rhoncus lectus. Suspendisse ullamcorper bibendum tellus a tincidunt. Donec feugiat dolor lectus, sed ullamcorper ante rutrum non. Mauris vestibulum, metus sit amet lobortis fringilla, dui est venenatis ligula, a euismod sem augue vel lorem. Nunc feugiat eget tortor vel tristique. Mauris lobortis efficitur ligula, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dui urna, cursus mollis cursus vitae, fringilla vel augue. In vitae dui ut ex fringilla consectetur. Sed vulputate ante arcu, non vehicula mauris porttitor quis. Praesent tempor varius orci sit amet sodales. Nullam feugiat condimentum posuere. Vivamus bibendum mattis mi, vitae placerat lorem sagittis nec. Proin ac magna iaculis, faucibus odio sit amet, volutpat felis. Proin eleifend suscipit eros, quis vulputate tellus condimentum eget. Maecenas eget dui velit. Aenean in maximus est, sit amet convallis tortor. In vel bibendum mauris, id rhoncus lectus. Suspendisse ullamcorper bibendum tellus a tincidunt. Donec feugiat dolor lectus, sed ullamcorper ante rutrum non. Mauris vestibulum, metus sit amet lobortis fringilla, dui est venenatis ligula, a euismod sem augue vel lorem. Nunc feugiat eget tortor vel tristique. Mauris lobortis efficitur ligula, et consectetur lectus maximus sed.Praesent tempor varius orci sit amet sodales. Nullam feugiat condimentum posuere. Vivamus bibendum mattis mi, vitae placerat lorem sagittis nec. Proin ac magna iaculis, faucibus odio sit amet, volutpat felis. Proin eleifend suscipit eros, quis vulputate tellus condimentum eget. Maecenas eget dui velit. Aenean in maximus est, sit amet convallis tortor. In vel bibendum mauris, id rhoncus lectus. Suspendisse ullamcorper bibendum tellus a tincidunt. Donec feugiat dolor lectus, sed ullamcorper ante rutrum non. Mauris vestibulum, metus sit amet lobortis fringilla, dui est venenatis ligula, a euismod sem augue vel lorem. Nunc feugiat eget tortor vel tristique. Mauris lobortis efficitur ligula, et consectetur lectus maximus sed.nenatis ligula, a euismod sem augue vel lorem. Nunc feugiat eget tortor vel tristique. Mauris lobortis efficitur ligula, et consectetur lectus maximus sed.Praesent tempor varius orci sit amet sodales. Nullam feugiat condimentum posuere. Vivamus bibendum mattis mi, vitae placerat lorem sagittis nec. Proin ac magna iaculis, faucibus odio sit amet, volutpat felis. Proin eleifend suscipit eros, quis vulputate tellus condimentum eget. Maecenas eget dui velit. Aenean in maximus est, sit amet convallis tortor. In vel bibendum mauris, id rhoncus lectus. Suspendisse ullamcorper bibendum tellus a tincidunt. Donec feugiat dolor lectus, sed ullamcorper ante rutrum non. Mauris vestibulum, metus sit amet lobortis fringilla, dui est venenatis ligula, a euismod sem augue vel lorem. Nunc feugiat eget tortor vel tristique. Mauris lobortis efficitur ligula, et consectetur lectus maximus sed. nenatis ligula, a euismod sem augue vel lorem. Nunc feugiat eget tortor vel tristique. Mauris lobortis efficitur ligula, et consectetur lectus maximus sed.Praesent tempor varius orci sit amet sodales. Nullam feugiat condimentum posuere. Vivamus bibendum mattis mi, vitae placerat lorem sagittis nec. Proin ac magna iaculis, faucibus odio sit amet, volutpat felis. Proin eleifend suscipit eros, quis vulputate tellus condimentum eget. Maecenas eget dui velit. Aenean in maximus est, sit amet convallis tortor. In vel bibendum mauris, id rhoncus lectus. Suspendisse ullamcorper bibendum tellus a tincidunt. Donec feugiat dolor lectus, sed ullamcorper ante rutrum non. Mauris vestibulum, metus sit amet lobortis fringilla, dui est venenatis ligula, a euismod sem augue vel lorem. Nunc feugiat eget tortor vel tristique. Mauris lobortis efficitur ligula, et consectetur lectus maximus sed.</div>
+        <div class="modal-body" style="overflow-y: auto;">
+            @if ($pdfExists)
+                <div class="embed-responsive embed-responsive-16by9" style="height: 80vh;width: 100vh">
+                    <iframe src="{{ $fileUrl }}" width="100%" height="100%" frameborder="0"></iframe>
+                </div>
+            @else
+                <div class="alert alert-warning">
+                    File syarat dan ketentuan belum tersedia.
+                </div>
+            @endif
+        </div>
         <div class="modal-footer">
           <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Close</button>
         </div>
@@ -83,7 +93,7 @@
           </div>
           <div class="form-group col-md-3">
             <label for="interest_percent">Bunga Cicilan</label>
-            <input type="number" class="form-control" id="interest_percent" name="interest_percent" value="1.25" readonly>
+            <input type="number" class="form-control" id="interest_percent" name="interest_percent" value="{{ $loan_policies['bunga_pinjaman']['value'] ?? 0 }}" readonly>
           </div>
           <div class="form-group col-md-3">
             <label for="due_date">Jatuh Tempo</label>
@@ -101,11 +111,22 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label for="ln_agunan">Jaminan Pinjaman</label>
-                <input type="text" class="form-control" id="ln_agunan" name="ln_agunan" value="{{ old('ln_docDetail')}}" disabled>
+                  <select class="custom-select" name="ln_agunan" id="ln_agunan" disabled>
+                    <option value="">-- Pilih Jaminan</option>
+                    <option value="MOTOR">BPKB MOTOR</option>
+                    <option value="MOBIL">BPKB MOBIL</option>
+                    <option value="SERTIFIKAT">SERTIFIKAT</option>
+                  </select>
               </div>
-              <div class="form-group">
-                <label for="ln_docNumber">Nomor Dokumen</label>
-                <input type="text" class="form-control" id="ln_docNumber" name="ln_docNumber" value="{{ old('ln_docNumber')}}" disabled>
+              <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="ln_docYear">Tahun</label>
+                    <input type="number" class="form-control" id="ln_docYear" name="ln_docYear" value="{{ old('ln_docYear')}}" disabled>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="ln_docNumber">Nomor Dokumen</label>
+                    <input type="text" class="form-control" id="ln_docNumber" name="ln_docNumber" value="{{ old('ln_docNumber')}}" disabled>
+                  </div>
               </div>
               <div class="form-group">
                 <label for="ln_docDetail">Detail Dokumen</label>
@@ -205,15 +226,16 @@
     });
  
     $('#cbAgunan').on('click', function (e) {
-      console.log("agunan active");
       if ($(this).is(':checked')) {
         $('#ln_agunan').prop('disabled', false);
         $('#ln_docNumber').prop('disabled', false);
         $('#ln_docDetail').prop('disabled', false);
+        $('#ln_docYear').prop('disabled', false);
       } else {
         $('#ln_agunan').val('').prop('disabled', true);
         $('#ln_docNumber').val('').prop('disabled', true);
         $('#ln_docDetail').val('').prop('disabled', true);
+        $('#ln_docYear').val('').prop('disabled', true);
       }
     })
 

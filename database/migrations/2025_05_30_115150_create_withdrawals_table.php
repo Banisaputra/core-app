@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('wd_value');
             $table->tinyInteger('wd_state')->length(2)->default(1);
             $table->text('remark');
-            $table->string('proof_of_withdrawal')->comment('bukti penarikan');
+            $table->string('proof_of_withdrawal')->comment('bukti penarikan')->nullable();
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();

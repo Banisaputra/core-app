@@ -87,6 +87,14 @@
                                     <label for="maxAgunan50">Maksimal Pinjaman lebih dari 5 Tahun</label>
                                     <input type="text" id="maxAgunan50" name="maxAgunan50" class="form-control">
                                 </div>
+                                <div class="form-group mb-3">
+                                    <label for="maxTenorTA">Maksimal Tenor tanpa Agunan</label>
+                                    <input type="number" id="maxTenorTA" name="maxTenorTA" min="1" class="form-control">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="maxTenorDA">Maksimal Tenor dengan Agunan</label>
+                                    <input type="number" id="maxTenorDA" name="maxTenorDA" min="1" class="form-control">
+                                </div>
                                 
                                 <hr class="my-4">
                                 <button class="btn btn-primary" type="submit">Simpan Perubahan</button>
@@ -103,6 +111,14 @@
                                 <div class="form-group mb-3">
                                     <label for="maxAgunan50">Maksimal Pinjaman lebih dari 5 Tahun</label>
                                     <input type="text" id="maxAgunan50" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_5_0']['value']??0),2) }}" readonly>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="maxTenorTA">Maksimal Tenor tanpa Agunan (bulan)</label>
+                                    <input type="number" id="maxTenorTA" class="form-control" value="{{ (int) ($loanPolicies['max_tenor_tanpa_agunan']['value']??0) }}" readonly>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="maxTenorDA">Maksimal Tenor dengan Agunan (bulan)</label>
+                                    <input type="number" id="maxTenorDA" class="form-control" value="{{ (int) ($loanPolicies['max_tenor_dengan_agunan']['value']??0) }}" readonly>
                                 </div>
                             </div>
                         </div>

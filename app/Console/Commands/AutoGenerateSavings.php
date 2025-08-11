@@ -69,7 +69,6 @@ class AutoGenerateSavings extends Command
                 } else {
                     $this->info(" >> Skiped for member: {$member->name}");
                 }
-
             }
         }
 

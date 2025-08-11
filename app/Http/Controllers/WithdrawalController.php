@@ -15,7 +15,6 @@ class WithdrawalController extends Controller
     {
         $withdrawals = Withdrawal::with('member')->latest()->get();
         return view('withdrawals.index', compact('withdrawals'));
-        // return view('layouts.maintenance', compact('withdrawals'));
     }
 
     /**
@@ -37,7 +36,7 @@ class WithdrawalController extends Controller
             'wd_date' => 'required|date',
             'wd_value' => 'required|integer',
             'remark' => 'required|string',
-            'proof_of_withdrawal' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'proof_of_withdrawal' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $wd_code = Withdrawal::generateCode();

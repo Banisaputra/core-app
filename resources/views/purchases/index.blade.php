@@ -66,7 +66,7 @@
                       <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $purchase->pr_code }}</td>
-                        <td>{{ $purchase->supplier->name }}</td>
+                        <td>{{ $purchase->supplier->name ?? '-' }}</td>
                         <td>{{ $purchase->ref_doc }}</td>
                         <td>Rp {{ number_format($purchase->total, 0) }}</td> 
                         <td>@switch($purchase->pr_state)

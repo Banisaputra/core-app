@@ -205,12 +205,13 @@
             theme: 'bootstrap4',
             minimumInputLength: 2,
             ajax: {
-                url: '/api/members/search', // Your route
+                url: '/api/members/search',
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
                     return {
-                        q: params.term // search term
+                        q: params.term,
+                        active: 1
                     };
                 },
                 processResults: function (data) {

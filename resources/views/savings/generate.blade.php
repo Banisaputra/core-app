@@ -95,6 +95,7 @@
             data: function (params) {
                 return {
                     q: params.term
+                    active: 1
                 };
             },
             processResults: function (data) {

@@ -96,30 +96,31 @@
 <script>
   $(document).ready(function () {
     $('#memberSelect').select2({
-        placeholder: 'Search anggota...',
-        theme: 'bootstrap4',
-        minimumInputLength: 2,
-        ajax: {
-            url: '/api/members/search', // Your route
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    q: params.term // search term
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.map(function (item) {
-                        return {
-                            id: item.id,
-                            text: item.name
-                        };
-                    })
-                };
-            },
-            cache: true
-        }
+      placeholder: 'Search anggota...',
+      theme: 'bootstrap4',
+      minimumInputLength: 2,
+      ajax: {
+        url: '/api/members/search',
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term,
+            active: 0
+          };
+        },
+        processResults: function (data) {
+          return {
+            results: data.map(function (item) {
+              return {
+                id: item.id,
+                text: item.name
+              };
+            })
+          };
+        },
+        cache: true
+      }
     });
 
     $('#proof_of_withdrawal').on('change', function(event) {

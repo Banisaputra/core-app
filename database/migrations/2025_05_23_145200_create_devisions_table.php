@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code', 50);
             $table->string('name', 100);
-            $table->text('remark');
+            $table->text('remark')->nullable();
             $table->tinyInteger('is_transactional')->default(1);
             $table->timestamps();
         });

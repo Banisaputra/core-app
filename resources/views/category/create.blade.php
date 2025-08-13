@@ -52,9 +52,20 @@
         <div class="form-row"> 
           <div class="form-group col-md-6">
             <div class="custom-control custom-switch mb-2">
-               <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" checked>
-               <label class="custom-control-label" for="is_active">Status Aktifasi</label>
+               <input type="checkbox" class="custom-control-input" id="is_turunan" name="is_turunan" checked>
+               <label class="custom-control-label" for="is_turunan">Kategori Turunan</label>
             </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="ct_parent">Kategori Utama</label>
+            <select class="custom-select" name="ct_parent" id="ct_parent">
+              <option value="">-- Pilih kategori utama</option>
+              @foreach ($ct_parent as $ctp)
+              <option value="{{$ctp->id}}">{{ $ctp->name}}</option>
+              @endforeach
+            </select>
           </div>
         </div>
           
@@ -71,5 +82,15 @@
 @endsection
 
 @section('page_script')
- 
+  <script>
+    $(document).ready(function () {
+      $('#is_turunan').on('click', function () {
+        if ($('#is_turunan').is(':checked')) {
+          $('#ct_parent').prop('disabled', false)
+        } else {
+          $('#ct_parent').val('').prop('disabled', true)
+         }
+      })
+    });
+  </script>
 @endsection

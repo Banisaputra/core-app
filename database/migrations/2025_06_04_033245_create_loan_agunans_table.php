@@ -15,13 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('loan_id')->notNull()->references('id')->on('loans')->onUpdate('cascade');
             $table->string('agunan_type');
-            $table->string('doc_number');
+            $table->integer('doc_year')->length(4);
+            $table->string('doc_number')->unique();
             $table->text('doc_detail');
+            $table->tinyInteger('is_transactional')->default(1);
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

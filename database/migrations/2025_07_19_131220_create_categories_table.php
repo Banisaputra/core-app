@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('code', 50)->unique();
             $table->string('name', 100);
-            $table->tinyInteger('is_active')->default(1);
-            $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
-            $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
+            $table->integer('parent_id')->default(0);
+            $table->tinyInteger('is_parent')->length(2)->default(0);
+            $table->tinyInteger('is_active')->length(2)->default(1);
+            $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -184,9 +184,9 @@
         </table>
         <h2>Total: <span id="total">0</span>,-</h2>
         <hr class="my-2">
-        <button type="button" id="cashBtn" class="btn mb-2 btn-success btn-block"> C A S H </button>
-        <hr class="my-2">
         <button type="button" id="creditBtn" class="btn mb-2 btn-outline-warning btn-block"> KREDIT </button>
+        <hr class="my-2">
+        <button type="button" id="cashBtn" class="btn mb-2 btn-success btn-block"> C A S H </button>
     </div>
   </div>
 </div>

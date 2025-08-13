@@ -39,101 +39,103 @@
 </div>
 
 <div class="container-fluid">
-    <div class="row justify-content-center">
-      <div class="col-12">
-        <div class="col">
-            <h2 class="h3 mb-0 page-title">Daftar Kategori</h2>
-        </div>
-        <div class="row align-items-center my-4">
-            <div class="col">
-                <a href="{{ route('category.create') }}" class="btn mb-2 btn-primary">
-                    <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
-                </a>
-            </div>
-            <div class="col-auto">
-              <div class="dropdown">
-                <button class="btn btn-sm btn-success more-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown">
-                  <span class="fe fe-24 fe-download"></span>Import file
-                </button>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style="">
-                  <a class="dropdown-item" href="{{ route('category.template')}}"><small>Download Template</small></a>
-                  <button class="dropdown-item" data-toggle="modal" data-target="#importModal"><small>Upload data</small></button>
-                </div>
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <div class="col">
+          <h2 class="h3 mb-0 page-title">Daftar Kategori</h2>
+      </div>
+      <div class="row align-items-center my-4">
+          <div class="col">
+              <a href="{{ route('category.create') }}" class="btn mb-2 btn-primary">
+                  <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
+              </a>
+          </div>
+          <div class="col-auto">
+            <div class="dropdown">
+              <button class="btn btn-sm btn-success more-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+                <span class="fe fe-24 fe-download"></span>Import file
+              </button>
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style="">
+                <a class="dropdown-item" href="{{ route('category.template')}}"><small>Download Template</small></a>
+                <button class="dropdown-item" data-toggle="modal" data-target="#importModal"><small>Upload data</small></button>
               </div>
             </div>
-        </div>
-      @if ($errors->any())
+          </div>
+      </div>
+    @if ($errors->any())
+    <div class="alert alert-danger" role="alert">
+      @foreach ($errors->all() as $error)
+        <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ $error }} <br>           
+      @endforeach
+    </div>
+    @endif
+    @if (session()->has('error'))
       <div class="alert alert-danger" role="alert">
-        @foreach ($errors->all() as $error)
-          <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ $error }} <br>           
+          <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ session('error') }} <br>           
+      </div>
+    @endif
+    @if (session()->has('success'))
+      <div class="alert alert-success" role="alert">
+          <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
+      </div>
+    @endif
+    {{-- handle error import --}}
+    @if (session()->has('failed') && count(session('failed')) > 0)
+      <div class="alert alert-danger" role="alert">Kesalahan Row <br>
+        @foreach (session('failed') as $error)
+          <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ "[".$error['row']."] ".$error['errors'][0] }} <br>           
         @endforeach
       </div>
-      @endif
-      @if (session()->has('error'))
-        <div class="alert alert-danger" role="alert">
-            <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ session('error') }} <br>           
-        </div>
-      @endif
-      @if (session()->has('success'))
-        <div class="alert alert-success" role="alert">
-            <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
-        </div>
-      @endif
-      {{-- handle error import --}}
-      @if (session()->has('failed') && count(session('failed')) > 0)
-        <div class="alert alert-danger" role="alert">Kesalahan Row <br>
-          @foreach (session('failed') as $error)
-            <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ "[".$error['row']."] ".$error['errors'][0] }} <br>           
-          @endforeach
-        </div>
-      @endif
-        <div class="row my-4">
-          <!-- Small table -->
-          <div class="col-md-12">
-            <div class="card shadow">
-              <div class="card-body">
-                <!-- table -->
-                <table class="table datatables" id="category">
-                  <thead>
+    @endif
+      <div class="row my-4">
+        <!-- Small table -->
+        <div class="col-md-12">
+          <div class="card shadow">
+            <div class="card-body">
+              <!-- table -->
+              <table class="table datatables" id="category">
+                <thead>
+                  <tr>
+                    <th width="5%">No.</th>
+                    <th width="15%">Kode</th>
+                    <th>Nama</th>
+                    <th>Jenis</th>
+                    <th width="10%">Status</th>
+                    <th width="5%">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  @foreach ($category as $ctg)
                     <tr>
-                      <th width="5%">No.</th>
-                      <th width="15%">Kode</th>
-                      <th>Nama</th>
-                      <th width="10%">Status</th>
-                      <th width="5%">Action</th>
+                      <td>{{ $loop->iteration }}</td>
+                      <td>{{ $ctg->code }}</td>
+                      <td>{{ $ctg->name }}</td>
+                      <td>{{ $ctg->is_parent == 1 ? "UTAMA" : "TURUNAN" }}</td>
+                      <td>{!! $ctg->is_active == 1 ? "<span class='dot dot-lg bg-success mr-1'></span>Aktif" : "<span class='dot dot-lg bg-secondary mr-1'></span>Tidak Aktif" !!}</td>
+                      <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <span class="text-muted sr-only">Action</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="{{ route('category.edit', $ctg->id) }}">Edit</a>
+                          <form action="{{ route('category.destroy', $ctg->id) }}" method="POST" style="display: inline;" id="deleteForm">
+                              @csrf
+                              @method('DELETE')
+                              <button type="submit" id="btnDelete" class="dropdown-item">{{ $ctg->is_active==1 ? "Nonaktifkan" : "Aktifkan"}}</button>
+                          </form>
+                        </div>
+                      </td> 
                     </tr>
-                  </thead>
-                  <tbody>
-                    
-                    @foreach ($category as $ctg)
-                      <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $ctg->code }}</td>
-                        <td>{{ $ctg->name }}</td>
-                        <td>{!! $ctg->is_active == 1 ? "<span class='dot dot-lg bg-success mr-1'></span>Aktif" : "<span class='dot dot-lg bg-secondary mr-1'></span>Tidak Aktif" !!}</td>
-                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="text-muted sr-only">Action</span>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="{{ route('category.edit', $ctg->id) }}">Edit</a>
-                            <form action="{{ route('category.destroy', $ctg->id) }}" method="POST" style="display: inline;" id="deleteForm">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" id="btnDelete" class="dropdown-item">{{ $ctg->is_active==1 ? "Nonaktifkan" : "Aktifkan"}}</button>
-                            </form>
-                          </div>
-                        </td> 
-                      </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
+                  @endforeach
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 @endsection
 
 @section('page_script')

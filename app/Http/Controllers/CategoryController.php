@@ -24,7 +24,8 @@ class CategoryController extends Controller
     }
  
     public function create() {
-        return view('category.create');
+        $ct_parent = Category::where('is_parent', 1)->get();
+        return view('category.create', compact('ct_parent'));
     }
 
     public function store(Request $request)
@@ -36,10 +37,26 @@ class CategoryController extends Controller
             'code.unique' => 'Kode sudah pernah digunakan'
         ]); 
         
+        $is_parent = 1;
+        $parent = 0;
+        if (isset($request->is_turunan)) {
+            $request->validate([
+                'ct_parent' => 'required|exists:categories,id',
+            ], [
+                'ct_parent.required' => 'Kategori utama harus dipilih',
+                'ct_parent.exist' => 'Kategori utama tidak ditemukan'
+            ]);
+
+            $is_parent = 0;
+            $parent = $request->ct_parent;
+
+        }
+
         $category = Category::create([
             'code' => $request->code,
             'name' => $request->name,
-            'is_active' => isset($request->is_active) ? 1 : 0,
+            'parent_id' => $parent,
+            'is_parent' => $is_parent,
             'created_by' => auth()->id(),
             'updated_by' => auth()->id(),
         ]);
@@ -132,6 +149,7 @@ class CategoryController extends Controller
             $data = [
                 'code' => $row[0] ?? null,
                 'name' => $row[1] ?? null,
+                'is_parent' => $row[1] ?? null,
                 'is_active' => $row[2] ?? null,
             ];
 
@@ -179,7 +197,7 @@ class CategoryController extends Controller
         $sheet->setTitle('Template Master Kategori');
 
         // Judul besar
-        $sheet->mergeCells('A1:C1');
+        $sheet->mergeCells('A1:D1');
         $sheet->setCellValue('A1', 'Template Master Kategori');
         $sheet->getStyle('A1')->applyFromArray([
             'font' => ['bold' => true, 'size' => 14],
@@ -191,11 +209,11 @@ class CategoryController extends Controller
         ]);
 
         // Header
-        $headers = ['Kode', 'Nama Kategori', 'Status'];
+        $headers = ['Kode', 'Nama Kategori', 'Tipe', 'Status'];
         $sheet->fromArray($headers, null, 'A2');
 
         // Style header
-        $sheet->getStyle('A2:C2')->applyFromArray([
+        $sheet->getStyle('A2:D2')->applyFromArray([
             'font' => ['bold' => true],
             'alignment' => ['horizontal' => 'center'],
             'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
@@ -203,11 +221,11 @@ class CategoryController extends Controller
 
         // Keterangan wajib isi
         $notes = [
-            'Harus diisi', 'Harus diisi',
+            'Harus diisi', 'Harus diisi', "UTAMA = 1\nTURUNAN = 0",
             "Aktif = 1\nTidak Aktif = 0",
         ];
 
-        foreach (range('A', 'C') as $col) {
+        foreach (range('A', 'D') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 

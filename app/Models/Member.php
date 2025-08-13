@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use App\Models\Loan;
 use App\Models\LoanPayment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -101,22 +102,24 @@ class Member extends Model
     public function getTotalLoan(): array
     {
         $loanPolicy = Policy::getLoanPolicies();
-        $YM = Carbon::now()->format('Ym');
+        $YM = Carbon::now()->addMonth()->format('Ym');
         $jabatan = Position::where('id', $this->position_id)->first();
-        $totalPokok = LoanPayment::where('member_id', $this->id)
-            ->whereRaw('LEFT(lp_date,6) = ?', [$YM])
-            ->sum('lp_value');
+        $totalPokok = Loan::join('loan_payments', 'loan_payments.loan_id', '=', 'loans.id')
+            ->where('loans.member_id', $this->id)
+            ->whereRaw('LEFT(loan_payments.lp_date, 6) = ?', [$YM])
+            ->sum('loan_payments.lp_value');
 
         // include bunga
-        $totalBayar = LoanPayment::where('member_id', $this->id)
-            ->whereRaw('LEFT(lp_date,6) = ?', [$YM])
-            ->sum('lp_total');
+        $totalBayar = Loan::join('loan_payments', 'loan_payments.loan_id', '=', 'loans.id')
+            ->where('loans.member_id', $this->id)
+            ->whereRaw('LEFT(loan_payments.lp_date, 6) = ?', [$YM])
+            ->sum('loan_payments.lp_total');
 
         // 
         $maxBayar = 0;
-        if ($jabatan->name == "STAFF") {
+        if (strtoupper($jabatan->name) == "STAFF") {
             $maxBayar = $loanPolicy['max_potong_gaji_staff']['value'];
-        } else if ($jabatan->name == "OPERATOR") {
+        } else if (strtoupper($jabatan->name) == "OPERATOR") {
             $maxBayar = $loanPolicy['max_potong_gaji_operator']['value'];
         }
         

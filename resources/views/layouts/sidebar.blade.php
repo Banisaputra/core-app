@@ -170,7 +170,10 @@
                 </a>
                 <ul class="collapse list-unstyled pl-4 w-100" id="usahaReport">
                     <li class="nav-item">
-                        <a class="nav-link pl-3" target="_blank" href="{{ route('reports.deductionPdf')}}">
+                        {{-- <a class="nav-link pl-3" target="_blank" href="{{ route('reports.deductionPdf')}}">
+                            <span class="ml-1 item-text">Laba Rugi</span>
+                        </a> --}}
+                        <a class="nav-link pl-3" href="#">
                             <span class="ml-1 item-text">Laba Rugi</span>
                         </a>
                     </li>

@@ -9,6 +9,7 @@ use App\Models\Member;
 use App\Models\Policy;
 use App\Models\LoanAgunan;
 use App\Models\LoanPayment;
+use App\Models\AgunanPolicy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -76,7 +77,7 @@ class LoanController extends Controller
         $tenor = $member->tenorAmount($loan_value);
         $currentLoan = $member->getTotalLoan();
         $is_agunan = isset($request->cbAgunan) ? true : false;
-dd($currentLoan);
+// dd($currentLoan);
         // check policy max loan non agunan
         if ($loan_value > $maxLoan && $is_agunan === false)
             return redirect()->back()->with('error', 'Plafon pinjaman melebihi batas maksimal sebesar Rp ' . number_format($maxLoan, 0, ',', '.'));
@@ -98,7 +99,10 @@ dd($currentLoan);
             ]);
 
             $typeAgunan = $request->ln_agunan;
+            $agunan_policy = AgunanPolicy::getAgunanPolicy($typeAgunan, $request->ln_docYear);
             $maxTenorAgunan = 0;
+            $validAgunan = AgunanPolicy::checkAgunan($member->id, $typeAgunan, $request->ln_docNumber);
+            // dd($validAgunan);
             switch ($typeAgunan) {
                 case 'SERTIFIKAT':
                     $maxTenorAgunan = 48;
@@ -109,12 +113,26 @@ dd($currentLoan);
             }
 
             if ($request->loan_tenor > $maxTenorAgunan)
-                return redirect()->back()->with('error', 'Tenor pinjaman dengan agunan melebihi batas maksimal 36 bulan');
+                return redirect()->back()->with('error', 'Tenor pinjaman dengan agunan melebihi batas maksimal '.$maxTenorAgunan.' bulan');
+            
+            if (!$agunan_policy && $agunan_policy->agp_value > $loan_value)
+                return redirect()->back()->with('error', 'Pinjaman dengan agunan melebihi batas maksimal '.$agunan_policy->agp_value.' bulan');
+            
+            if ($validAgunan['agn_valid'] !== true) {
+                if (count($validAgunan['member_share']) > 0) {
+                    dd($validAgunan);
+                }
+                return redirect()->back()->with('error', 'Agunan sudah pernah dibuat pengajuan pinjaman');
+            }
+            
+
+
         }
 
         if ($currentLoan['total_pokok'] > $currentLoan['maxPokok'])
             return redirect()->back()->with('error', 'Angsuran Pokok melebihi batas maksimal '.(int) $currentLoan['maxPokok'].' per anggota');
-        $totalBayar = ($currentLoan['total_bayar']*1) + ($request->loan_value / $request->loan_tenor);
+        $totalBayar = ($currentLoan['total_bayar']*1) + ($loan_value / $request->loan_tenor*1);
+        // dd($currentLoan);
         if ($totalBayar > $currentLoan['maxBayar'])
             return redirect()->back()->with('error', 'Pembayaran Angsuran melebihi batas maksimal '.(int) $currentLoan['maxBayar'].'');
 

@@ -138,7 +138,7 @@
                     </div>
                 </div>
                 <hr class="my-2">
-                <small>*Kredit akan tercatat sebagain pinjaman anggota</small>
+                <small>*Kredit akan tercatat sebagai pinjaman anggota</small>
             </form>
         </div>
         <div class="modal-footer">

@@ -15,4 +15,9 @@ class MasterItem extends Model
     {
         return $this->hasMany(PurchaseDetail::class);
     }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'ct_id');
+    }
 }

@@ -10,4 +10,9 @@ class Category extends Model
     use HasFactory;
 
     protected $fillable = ['code', 'name', 'margin_percent', 'margin_price', 'parent_id', 'is_parent', 'is_active', 'created_by', 'updated_by'];
+
+    protected function items() 
+    {
+        return $this->hasMany(MasterItem::class, 'ct_id');
+    }
 }

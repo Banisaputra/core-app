@@ -47,6 +47,7 @@ class MasterItemController extends Controller
             'item_name' => 'required|string|max:255',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
+            'hpp' => 'required|integer|min:0',
             'sales_price' => 'required|integer|min:0',
             'item_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -72,6 +73,7 @@ class MasterItemController extends Controller
             "item_name" => $request->item_name,
             "ct_id" => $request->category_id,
             "stock" => $request->stock,
+            "hpp" => $request->hpp,
             "sales_price" => $request->sales_price,
             "item_image" => $photoPath,
             "created_by" => auth()->id(),
@@ -95,7 +97,8 @@ class MasterItemController extends Controller
      */
     public function edit(string $id)
     {
-        $item = MasterItem::findOrFail($id);
+        $item = MasterItem::with('category')->findOrFail($id);
+        
         return view('master_items.edit', compact('item'));
     }
 

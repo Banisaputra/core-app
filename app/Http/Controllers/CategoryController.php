@@ -147,6 +147,12 @@ class CategoryController extends Controller
         return response()->json($categories);
     }
 
+    public function getMargin(string $id)
+    {
+        $categories = Category::findOrFail($id);
+        return response()->json($categories);
+    }
+
     public function import(Request $request)
     {
         $request->validate([

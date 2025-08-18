@@ -46,18 +46,32 @@
             <input type="text" class="form-control" id="item_name" name="item_name" value="{{old('item_name')}}">
           </div>
           <div class="form-group col-md-3">
-            <label for="simple-select2">Kategori</label>
-            <select id="categorySelect" name="category_id" class="form-control"></select>
+            <label for="stock">Stok</label>
+            <input type="number" class="form-control" id="stock" name="stock" value="{{old('stock')}}">
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-3">
+          <div class="form-group col-md-4">
+            <label for="simple-select2">Kategori</label>
+            <select id="categorySelect" name="category_id" class="form-control"></select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="margin_percent">Margin (%)</label>
+            <input type="number" class="form-control" id="margin_percent" name="margin_percent" value="{{old('margin_percent')}}" readonly>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="margin_price">Margin (Rp)</label>
+            <input type="number" class="form-control" id="margin_price" name="margin_price" value="{{old('margin_price')}}" readonly>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="hpp">Harga Pokok</label>
+            <input type="number" class="form-control" id="hpp" name="hpp" value="{{old('hpp')}}">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
             <label for="sales_price">Harga Jual</label>
             <input type="number" class="form-control" id="sales_price" name="sales_price" value="{{old('sales_price')}}">
-          </div>
-          <div class="form-group col-md-3">
-            <label for="stock">Stok</label>
-            <input type="number" class="form-control" id="stock" name="stock" value="{{old('stock')}}">
           </div>
           <div class="form-group col-md-6">
             <label for="item_image">Gambar</label>
@@ -71,6 +85,7 @@
                 <img id="preview-image" src="" alt="Preview" style="max-width: 300px;" hidden>
             </div>
           </div>
+
         </div>
         <hr class="my-4">
         <div class="form-row">
@@ -108,32 +123,71 @@
                     results: data.map(function (item) {
                         return {
                             id: item.id,
-                            text: item.name
+                            text: "["+item.code+"] "+item.name,
+                            mp: 100
                         };
                     })
                 };
             },
             cache: true
         }
-    });
-
-    $('#item_image').on('change', function(event) {
-      const file = event.target.files[0];
-      const preview = $('#preview-image');
-      const fileNameDisplay = $('#label_photo');
-      fileNameDisplay.html( file ? file.name.substr(1, 70) : 'Choose file');
-      if (file) {
-        const reader = new FileReader(); 
-        reader.onload = function(e) {
-            preview.prop('src', e.target.result);
-            preview.prop('hidden', false);
-        }
-        reader.readAsDataURL(file);
+    }).on('change', function(e) {
+      var selectedId = $(this).val();
+      if (selectedId) {
+          // Lakukan request untuk mendapatkan detail margin
+          $.ajax({
+              url: '/api/category/' + selectedId + '/margin',
+              method: 'GET',
+              dataType: 'json',
+              success: function(response) {
+                  $('#margin_percent').val(response.margin_percent || '0');
+                  $('#margin_price').val(response.margin_price || '0');
+                  calculateHargaJual();
+                   
+              },
+              error: function(xhr) {
+                  console.error('Error fetching margin data:', xhr.responseText);
+                  // Set default values jika error
+                  $('#margin_percent').val('0');
+                  $('#margin_price').val('0');
+              }
+          });
       } else {
-        preview.prop('src' , '');
-        preview.prop('hidden' , true);
+          // Reset nilai jika tidak ada kategori dipilih
+          $('#margin_percent').val('0');
+          $('#margin_price').val('0');
       }
     });
+
+    $('#hpp').on('input', function() {
+      calculateHargaJual();
+    });
+
+    function calculateHargaJual() {
+      const hpp = parseFloat($('#hpp').val()) || 0;
+      const marginPercent = parseFloat($('#margin_percent').val()) || 0;
+      const marginRp = parseFloat($('#margin_price').val().replace(/\./g, '')) || 0;
+      
+      let hargaJualFinal = 0;
+      let hargaJualPercent = 0;
+      let hargaJualPrice = 0;
+      
+      if (marginRp > 0) {
+        hargaJualPrice = hpp + marginRp;
+      } 
+      if (marginPercent > 0) {
+        hargaJualPercent = hpp * (1 + (marginPercent / 100));
+      }
+      if (hargaJualPercent == 0 && hargaJualPrice == 0) {
+        hargaJualFinal = hpp;
+      } else if (hargaJualPercent >= hargaJualPrice) {
+        hargaJualFinal = hargaJualPercent;
+      } else if (hargaJualPrice >= hargaJualPercent) {
+        hargaJualFinal = hargaJualPrice;
+      }
+      
+      $('#sales_price').val(hargaJualFinal.toFixed(0));
+    }
 
 
   });

@@ -134,8 +134,10 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     Route::get('/api/members/search', [MemberController::class, 'search']);
     Route::get('/api/items/search', [MasterItemController::class, 'search']);
     Route::get('/api/category/search', [CategoryController::class, 'search']);
+    Route::get('/api/category/{id}/margin', [CategoryController::class, 'getMargin']);
     Route::get('/api/supplier/search', [SupplierController::class, 'search']);
     Route::get('/api/saving-type/search', [SavingTypeController::class, 'search']);
+
 
     //reports
     Route::get('/report', [ReportController::class, 'index'])->name('reports.index');

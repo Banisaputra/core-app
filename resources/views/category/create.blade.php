@@ -49,6 +49,16 @@
             <input type="text" class="form-control" id="name" name="name" value="{{ old('name')}}">
           </div>
         </div>
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label for="margin_percent">Margin (%)</label>
+            <input type="number" class="form-control" id="margin_percent" name="margin_percent" value="{{ old('margin_percent')}}">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="margin_price">Margin (Rp)</label>
+            <input type="number" class="form-control" id="margin_price" name="margin_price" value="{{ old('margin_price')}}">
+          </div>
+        </div>
         <div class="form-row"> 
           <div class="form-group col-md-6">
             <div class="custom-control custom-switch mb-2">

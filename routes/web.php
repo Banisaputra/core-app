@@ -12,6 +12,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SavingController;
+use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DevisionController;
 use App\Http\Controllers\EmployeeController;
@@ -116,14 +117,7 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
     Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
     Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');   
     
-    // policy
-    Route::get('/policy', [PolicyController::class, 'index'])->name('policy.index');
-    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policy.upload');
-    Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policy.loanUmum');
-    Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policy.loanKhusus');
-    Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policy.loanAgunan');
-    Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policy.agDestroy');
-
+   
    
 }); 
 
@@ -199,6 +193,15 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     Route::put('/withdrawals/{id}', [WithdrawalController::class, 'update'])->name('withdrawals.update');
     Route::delete('/withdrawals/{id}', [WithdrawalController::class, 'destroy'])->name('withdrawals.destroy');
 
+    // policy
+    Route::get('/policy', [PolicyController::class, 'index'])->name('policy.index');
+    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policy.upload');
+    Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policy.loanUmum');
+    Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policy.loanKhusus');
+    Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policy.loanAgunan');
+    Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policy.agDestroy');
+
+
 });
 
 Route::middleware([RoleMiddleware::class . ':administrator,kepala toko,admin toko'])->group(function() {
@@ -225,5 +228,9 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala toko,admin tok
     Route::get('/inventory/{id}/edit', [InventoryController::class, 'edit'])->name('inv.edit');
     Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inv.update');
     Route::delete('/inventory/{id}', [InventoryController::class, 'destroy'])->name('inv.destroy');
+
+    // setting 
+    Route::get('/business', [BusinessController::class, 'index'])->name('business.index');
+    Route::post('/business-sales', [BusinessController::class, 'sales'])->name('business.sales');
 
 });

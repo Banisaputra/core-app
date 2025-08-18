@@ -50,12 +50,33 @@
             <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $category->name ?? '')}}">
           </div>
         </div>
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label for="margin_percent">Margin (%)</label>
+            <input type="number" class="form-control" id="margin_percent" name="margin_percent" value="{{ old('margin_percent', $category->margin_percent ?? 0)}}">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="margin_price">Margin (Rp)</label>
+            <input type="number" class="form-control" id="margin_price" name="margin_price" value="{{ old('margin_price', $category->margin_price ?? 0)}}">
+          </div>
+        </div>
         <div class="form-row"> 
           <div class="form-group col-md-6">
             <div class="custom-control custom-switch mb-2">
-               <input type="checkbox" class="custom-control-input" id="is_active" name="is_active" {{ $category->is_active == 1 ? "checked" : ""}}>
-               <label class="custom-control-label" for="is_active">Status Aktifasi</label>
+               <input type="checkbox" class="custom-control-input" id="is_turunan" name="is_turunan" {{ $category->is_parent != 1 ? "checked" : ""}}>
+               <label class="custom-control-label" for="is_turunan">Kategori Turunan</label>
             </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="ct_parent">Kategori Utama</label>
+            <select class="custom-select" name="ct_parent" id="ct_parent" {{ $category->is_parent == 1 ? "disabled" : ""}}>
+              <option value="">-- Pilih kategori utama</option>
+              @foreach ($ct_parent as $ctp)
+              <option value="{{$ctp->id}}" {{$category->parent_id==$ctp->id ? "selected" : ""}}>{{ $ctp->name}}</option>
+              @endforeach
+            </select>
           </div>
         </div>
          <hr class="my-4">

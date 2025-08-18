@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code', 50)->unique();
             $table->string('name', 100);
+            $table->integer('margin')->default(0);
             $table->integer('parent_id')->default(0);
             $table->tinyInteger('is_parent')->length(2)->default(0);
             $table->tinyInteger('is_active')->length(2)->default(1);

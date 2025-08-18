@@ -152,7 +152,6 @@
                     <span class="ml-3 item-text">Pengaturan</span>
                 </a>
             </li>
-             
         </ul>
     @endif
 

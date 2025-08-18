@@ -99,7 +99,9 @@
                     <th width="5%">No.</th>
                     <th width="15%">Kode</th>
                     <th>Nama</th>
-                    <th>Jenis</th>
+                    <th>Tipe Kategori</th>
+                    <th>Margin (%)</th>
+                    <th>Margin (Rp)</th>
                     <th width="10%">Status</th>
                     <th width="5%">Action</th>
                   </tr>
@@ -112,6 +114,8 @@
                       <td>{{ $ctg->code }}</td>
                       <td>{{ $ctg->name }}</td>
                       <td>{{ $ctg->is_parent == 1 ? "UTAMA" : "TURUNAN" }}</td>
+                      <td>{{ $ctg->margin_percent }}</td>
+                      <td>{{ $ctg->margin_price }}</td>
                       <td>{!! $ctg->is_active == 1 ? "<span class='dot dot-lg bg-success mr-1'></span>Aktif" : "<span class='dot dot-lg bg-secondary mr-1'></span>Tidak Aktif" !!}</td>
                       <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                           <span class="text-muted sr-only">Action</span>

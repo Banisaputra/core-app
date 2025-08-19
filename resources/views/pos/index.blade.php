@@ -148,6 +148,53 @@
         </div>
     </div>
 </div>
+
+{{-- edit item cart modal --}}
+<div class="modal fade" id="editItem" tabindex="-1" role="dialog" aria-labelledby="editItemTitle" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="editItemTitle">Detail Item</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">x</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="itemID" value="">
+            <h4 class="mb-2" id="itemName"></h4>
+            <div class="row">
+                <p class="col-sm-3 text-right">Jumlah</p>
+                <div class="col-sm-9">
+                    <h5>: <span id="itemQty"></span></h5>
+                </div>
+            </div>
+            <div class="row">
+                <p class="col-sm-3 text-right">Harga (@)</p>
+                <div class="col-sm-9">
+                    <h5>: <span id="itemPrice"></span></h5>
+                </div>
+            </div>
+            <div class="row">
+                <p class="col-sm-3 text-right">Total</p>
+                <div class="col-sm-9">
+                    <h5>: <span id="totalBase"></span></h5>
+                </div>
+            </div> 
+            <div class="mb-3">
+                <label for="disc_price" class="form-label">Discount (Rp@)</label>
+                <input type="number" class="form-control" id="disc_price" min="0">
+            </div>
+            <div>
+                <h4><strong>Subtotal:</strong> <span id="finalTotal">0</span>,-</h4>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" id="saveChange" class="btn mb-2 btn-primary">Save changes</button>
+        </div>
+        </div>
+    </div>
+</div>
      
 <div class="container-fluid py-3">
   <div class="row">
@@ -174,10 +221,10 @@
         <table class="table cart-table table-bordered">
             <thead>
             <tr>
-                <th>Barang</th>
-                <th width="20%">Qty</th>
+                <th width="35%">Barang</th>
+                <th width="30%">Qty</th>
                 <th width="25%">Price</th>
-                <th width="10%"></th>
+                <th width="5%"></th>
             </tr>
             </thead>
             <tbody id="cartBody"></tbody>

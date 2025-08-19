@@ -68,29 +68,31 @@ creditPayment.addEventListener('click', function () {
   const tenor = parseFloat(tenorReceive.value);
   const memberId = document.getElementById('memberSelect').value *1;
   const crType = "BARANG";
-    if (isNaN(tenor)) {
-        alert('Tenor Tidak Sesuai!');
-        return;
-    }
-    if(memberId == 0){
-        alert('Pelanggan Harus Dipilih!');
-        return;
-    }
-  
-    // Collect cart data
-    var cartItems = [];
-    cartItems = Object.entries(cart).map((item) => {
-        const price = parseFloat(item[1].price ?? 0);
-        const qty = parseInt(item[1].qty ?? 1);
+   if (isNaN(tenor)) {
+      alert('Tenor Tidak Sesuai!');
+      return;
+   }
+   if(memberId == 0){
+      alert('Pelanggan Harus Dipilih!');
+      return;
+   }
 
-        return {
-            id: item[0],
-            name: item[1].name,
-            price: !isNaN(price) ? Math.max(0, price) : 0,
-            qty: !isNaN(qty) ? Math.max(1, qty) : 1,
-            subtotal: function() { return this.price * this.qty }
-        };
-    });
+   // Collect cart data
+   var cartItems = [];
+   cartItems = Object.entries(cart).map((item) => {
+      const price = parseFloat(item[1].price ?? 0);
+      const disc = parseFloat(item[1].disc ?? 0);
+      const qty = parseInt(item[1].qty ?? 1);
+
+      return {
+         id: item[0],
+         name: item[1].name,
+         price: !isNaN(price) ? Math.max(0, price) : 0,
+         disc_price: !isNaN(disc) ? Math.max(0, disc) : 0,
+         qty: !isNaN(qty) ? Math.max(1, qty) : 1,
+         subtotal: function() { return (this.price - this.disc_price) * this.qty }
+      };
+   });
 
   // Send to backend
   fetch('/submit-sale', {
@@ -153,14 +155,16 @@ cashPayment.addEventListener('click', function () {
    var cartItems = [];
    cartItems = Object.entries(cart).map((item) => {
       const price = parseFloat(item[1].price ?? 0);
+      const disc = parseFloat(item[1].disc ?? 0);
       const qty = parseInt(item[1].qty ?? 1);
 
       return {
          id: item[0],
          name: item[1].name,
          price: !isNaN(price) ? Math.max(0, price) : 0,
+         disc_price: !isNaN(disc) ? Math.max(0, disc) : 0,
          qty: !isNaN(qty) ? Math.max(1, qty) : 1,
-         subtotal: function() { return this.price * this.qty }
+         subtotal: function() { return (this.price - this.disc_price) * this.qty }
       };
    });
 
@@ -262,11 +266,11 @@ function updateCart() {
          <button class="btn btn-outline-secondary btn-sm py-1 px-2 btnQty" type="button" id="minus-${id}">-</button>
       </div>
       </td>
-      <td width="25%">${formatIDR(item.qty * item.price ,0)}</td>
-      <td width="10%"><button class="btn btn-sm btn-danger remove-item" data-id="${id}">&times;</button></td>
+      <td width="25%">${formatIDR(item.qty * (item.price - item.disc) ,0)}</td>
+      <td width="10%"><button class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#editItem"><span data-id="${id}" class="fe fe-info fe-16 edit-item"></span></button></td>
       `;
       cartBody.appendChild(row);
-      total += item.qty * item.price;
+      total += item.qty * (item.price - item.disc);
    }
    totalEl.textContent = formatIDR(total, 0);
 }
@@ -281,7 +285,7 @@ document.addEventListener("click", e => {
 
       if (stock == 0) return alert('stok barang kosong, restock barang diperlukan untuk transaksi!')
       if (!cart[id]) {
-         cart[id] = { name: name, qty: 1, price: price, stock: stock };
+         cart[id] = { name: name, qty: 1, price: price, stock: stock, disc: 0 };
       } else {
          if (cart[id].stock < (cart[id].qty + 1)) {
             return alert("stock barang tidak cukup!")
@@ -291,13 +295,20 @@ document.addEventListener("click", e => {
       updateCart();
    }
 
-   if (e.target.classList.contains("remove-item")) {
+   if (e.target.classList.contains("edit-item")) {
       const id = e.target.dataset.id;
-      delete cart[id];
-      updateCart();
+      
+      $('#editItem #itemID').val(id);
+      $('#editItem #itemName').html(cart[id]['name']);
+      $('#editItem #itemQty').html(cart[id]['qty']);
+      $('#editItem #itemPrice').html(formatIDR(cart[id]['price'], 0));
+      $('#editItem #disc_price').val(cart[id]['disc']);
+      $('#editItem #totalBase').html(formatIDR(cart[id]['qty'] * cart[id]['price'], 0));
+      $('#editItem #finalTotal').html(formatIDR(cart[id]['qty'] * (cart[id]['price']-cart[id]['disc']), 0));
    }
  
 });
+
 cartBody.addEventListener("click", e => {
     if (!e.target.classList.contains("btnQty")) return;
     
@@ -364,4 +375,31 @@ searchBox.addEventListener("input", () => {
       const query = searchBox.value.trim();
       loadProducts(query);
    }, 300);
+});
+
+$('#editItem #disc_price').on('input', function () {
+   let total = $('#totalBase').html().replace(/[^\d]/g, '');
+   let qty = $('#itemQty').html().replace(/[^\d]/g, '');
+   let disc = $(this).val()*1;
+   let final = total - (disc * qty);
+   $('#editItem #finalTotal').html(formatIDR(final, 0));
+});
+
+$('#editItem #saveChange').on('click', function() {
+   let id = $('#editItem #itemID').val();
+   let disc = $('#editItem #disc_price').val()*1;
+   cart[id]['disc'] = disc;
+   $('#editItem').modal('hide');
+   updateCart();
+});
+
+$('#editItem').on('hidden.bs.modal', function () {
+   $(this).find('#itemID').val('');
+   $(this).find('#disc_price').val('');
+   $(this).find('#itemName').html('');
+   $(this).find('#itemQty').html('');
+   $(this).find('#itemPrice').html('');
+   $(this).find('#disc_price').val('');
+   $(this).find('#totalBase').html('');
+   $(this).find('#finalTotal').html('');
 });

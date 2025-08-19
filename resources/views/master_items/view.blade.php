@@ -41,6 +41,12 @@
                         </div>
                     </div> 
                     <div class="row">
+                        <p class="col-sm-3 text-right">HPP</p>
+                        <div class="col-sm-9">
+                            <h5>Rp {{ number_format($item->hpp, 0) }},-</h5>
+                        </div>
+                    </div>
+                    <div class="row">
                         <p class="col-sm-3 text-right">Stok</p>
                         <div class="col-sm-9">
                             <h5>{{ $item->stock }}</h5>

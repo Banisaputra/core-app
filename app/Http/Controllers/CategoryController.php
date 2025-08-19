@@ -54,8 +54,8 @@ class CategoryController extends Controller
         $category = Category::create([
             'code' => $request->code,
             'name' => $request->name,
-            'margin_percent' => $request->margin_percent,
-            'margin_price' => $request->margin_price,
+            'margin_percent' => $request->margin_percent ?? 0,
+            'margin_price' => $request->margin_price ?? 0,
             'parent_id' => $parent,
             'is_parent' => $is_parent,
             'created_by' => auth()->id(),
@@ -149,8 +149,10 @@ class CategoryController extends Controller
 
     public function getMargin(string $id)
     {
-        $categories = Category::findOrFail($id);
-        return response()->json($categories);
+        $category = Category::findOrFail($id);
+        $margin = $category->getMargin();
+        return response()->json($margin);
+
     }
 
     public function import(Request $request)

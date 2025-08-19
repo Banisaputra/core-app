@@ -47,7 +47,7 @@
           </div>
           <div class="form-group col-md-3">
             <label for="stock">Stok</label>
-            <input type="number" class="form-control" id="stock" name="stock" value="{{old('stock', $item->stock)}}">
+            <input type="number" class="form-control" id="stock" name="stock" value="{{$item->stock}}" readonly>
           </div>
         </div>
         <div class="form-row">

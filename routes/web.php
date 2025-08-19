@@ -117,8 +117,6 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
     Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
     Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');   
     
-   
-   
 }); 
 
 Route::get('/', function() {

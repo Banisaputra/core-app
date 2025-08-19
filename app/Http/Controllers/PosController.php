@@ -49,12 +49,10 @@ class PosController extends Controller
                 'total' => 'required|numeric|min:0',
                 'tenor' => 'required|numeric|min:1',
                 'crInterest' => 'required|numeric|min:0',
-                'crType' => 'required|string',
             ]);
 
             $crInterest = $request->crInterest;
             $tenor = $request->tenor;
-            $crType = $request->crType;
         } 
 
         $items = $request->items;
@@ -82,7 +80,8 @@ class PosController extends Controller
                     'item_id' => $item['id'],
                     'amount' => $item['qty'],
                     'price' => $item['price'],
-                    'total' => $item['price'] * $item['qty'],
+                    'disc_price' => $item['disc_price'],
+                    'total' => ($item['price'] - $item['disc_price']) * $item['qty'],
                 ];
 
                 MasterItem::where('id', $item['id'])->decrement('stock', $item['qty']);

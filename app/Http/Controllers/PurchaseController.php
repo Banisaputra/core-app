@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Purchase;
 use App\Models\ItemStock;
 use App\Models\MasterItem;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class PurchaseController extends Controller
 {
     public function index() {
-        $purchases = Purchase::all();
+        $purchases = Purchase::orderBy('id', 'desc')->get();
         return view('purchases.index', compact('purchases'));
     }
 
@@ -199,6 +200,36 @@ class PurchaseController extends Controller
                     'ref_doc_id' => $purchase->id,
                     'ref_doc_type' => 'PURCHASE'
                 ]);
+
+                $tempItem = MasterItem::with('category')->findOrFail($item['item_id']);
+
+                $category = Category::findOrFail($tempItem->ct_id);
+                $margin = $category->getMargin();
+
+                // cek price hpp
+                if ($item['price'] > $tempItem->hpp) {
+                    $hargaJualFinal = 0;
+                    $hargaJualPercent = 0;
+                    $hargaJualPrice = 0;
+                    
+                    if ($margin['margin_price'] > 0) {
+                        $hargaJualPrice = $item['price'] + $margin['margin_price'];
+                    } 
+                    if ($margin['margin_percent'] > 0) {
+                        $hargaJualPercent = $itemp['price'] * (1 + ($margin['margin_percent'] / 100));
+                    }
+                    if ($hargaJualPercent == 0 && $hargaJualPrice == 0) {
+                        $hargaJualFinal = $itemp['price'];
+                    } else if ($hargaJualPercent >= $hargaJualPrice) {
+                        $hargaJualFinal = $hargaJualPercent;
+                    } else if ($hargaJualPrice >= $hargaJualPercent) {
+                        $hargaJualFinal = $hargaJualPrice;
+                    }
+
+                    $tempItem->hpp = $item['price'];
+                    $tempItem->sales_price = $hargaJualFinal;
+                    $tempItem->save();
+                }
 
             }
             $purchase->update([

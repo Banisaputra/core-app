@@ -26,20 +26,10 @@ return new class extends Migration
             $table->foreignId('item_id');
             $table->integer('amount');
             $table->integer('price');
+            $table->integer('disc_price')->default(0);
             $table->integer('total');
             $table->timestamps();
         }); 
-
-        // Schema::create('inventories', function (Blueprint $table) {
-        //     $table->id();
-        //     $table->string('iv_code', 50);
-        //     $table->integer('iv_date')->length(8);
-        //     $table->string('source_code', 50);
-        //     $table->integer('amount');
-        //     $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
-        //     $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
-        //     $table->timestamps();
-        // });
 
     }
 

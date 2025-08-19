@@ -45,7 +45,6 @@ class MasterItemController extends Controller
         $request->validate([
             'item_code' => 'required|alpha_num|unique:master_items,item_code',
             'item_name' => 'required|string|max:255',
-            'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'hpp' => 'required|integer|min:0',
             'sales_price' => 'required|integer|min:0',
@@ -72,7 +71,6 @@ class MasterItemController extends Controller
             "item_code" => $request->item_code,
             "item_name" => $request->item_name,
             "ct_id" => $request->category_id,
-            "stock" => $request->stock,
             "hpp" => $request->hpp,
             "sales_price" => $request->sales_price,
             "item_image" => $photoPath,
@@ -111,7 +109,8 @@ class MasterItemController extends Controller
         $request->validate([
             'item_code' => 'required|string|unique:master_items,item_code,'.$item->id,
             'item_name' => 'required|string|max:255',
-            'stock' => 'required|integer|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'hpp' => 'required|integer|min:0',
             'sales_price' => 'required|integer|min:0',
             'item_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -131,7 +130,8 @@ class MasterItemController extends Controller
         // Update data
         $item->item_code = $request->item_code;
         $item->item_name = $request->item_name;
-        $item->stock = $request->stock; 
+        $item->ct_id = $request->category_id;
+        $item->hpp = $request->hpp; 
         $item->sales_price = $request->sales_price;
         $item->updated_by = auth()->id();
         $item->save();

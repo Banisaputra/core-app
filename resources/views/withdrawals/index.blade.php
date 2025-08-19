@@ -73,11 +73,6 @@
                               <div class="dropdown-menu dropdown-menu-right">
                                 <a class="dropdown-item" href="{{ route('withdrawals.show', $withdrawal->id) }}">View</a>
                                 <a class="dropdown-item" href="{{ route('withdrawals.edit', $withdrawal->id) }}">Edit</a>
-                                <form action="{{ route('withdrawals.destroy', $withdrawal->id) }}" method="POST" style="display: inline;" id="deleteForm">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" id="btnDelete" class="dropdown-item">Delete</button>
-                                </form>
                               </div>
                             </td> 
                         </tr>

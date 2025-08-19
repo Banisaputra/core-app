@@ -41,62 +41,63 @@
         @csrf
         @method('PUT')
         <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="name">Nama</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $member->name ?? '') }}">
-          </div>
-          <div class="form-group col-md-6">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $member->user->email ?? '') }}">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-4">
-            <label for="date_of_birth">Tanggal Lahir</label>
-            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $member->date_of_birth ?? '') }}">
-          </div>
           <div class="form-group col-md-4">
             <label for="nip">NIP</label>
             <input type="text" class="form-control" id="nip" name="nip" value="{{ old('nip', $member->nip ?? '')}}">
           </div>
           <div class="form-group col-md-4">
-            <label for="employment">Pekerjaan</label>
-            <input type="text" class="form-control" id="employment" name="employment" value="{{ old('employment', $member->employment ?? '')}}">
+            <label for="name">Nama</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $member->name ?? '')}}">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $member->user->email ?? '')}}">
+          </div>
+        </div> 
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label for="telphone">No.Tlpn</label>
+            <input type="number" class="form-control" id="telphone" name="telphone" value="{{old('telphone', $member->telphone ?? '')}}">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="gender">Gender</label>
+            <select class="custom-select" name="gender" id="gender">
+              <option value="">-- Pilih gender</option>
+              <option value="PRIA" {{ $member->gender == "PRIA" ? "selected" : ""}}>Pria</option>
+              <option value="WANITA" {{ $member->gender == "WANITA" ? "selected" : ""}}>Wanita</option>
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="position">Jabatan</label>
+            <select class="custom-select" name="position" id="position">
+              <option value="">-- Pilih jabatan</option>
+              @foreach ($positions as $ps)
+              <option value="{{ $ps->id }}" {{ $ps->id == $member->position_id ? "selected" : ""}}>{{ $ps->name }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="devision">Bagian</label>
+            <select class="custom-select" name="devision" id="devision">
+              <option value="">-- Pilih bagian</option>
+              @foreach ($devisions as $dv)
+              <option value="{{ $dv->id }}" {{ $dv->id == $member->devision_id ? "selected" : ""}}>{{ $dv->name }}</option>
+              @endforeach
+            </select>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-4">
-            <label for="telphone">No.Tlpn</label>
-            <input type="text" class="form-control" id="telphone" name="telphone" value="{{old('telphone', $member->telphone ?? '')}}">
+            <label for="no_kk">No.KK</label>
+            <input type="number" class="form-control" id="no_kk" name="no_kk" value="{{old('no_kk', $member->no_kk ?? "")}}">
           </div>
           <div class="form-group col-md-4">
-            <label for="gender">Gender</label>
-            <select class="custom-select" name="gender" id="gender">
-              <option value="">-- Pilih gender</option>
-              <option value="male" {{ old('gender', $member->gender ?? '') == 'male' ? 'selected' : '' }}>Pria</option>
-              <option value="female" {{ old('gender', $member->gender ?? '') == 'female' ? 'selected' : '' }}>Wanita</option>
-            </select>
-          </div>
-          <div class="form-group col-md-4">
-            <label for="religion">Agama</label>
-            <select class="custom-select" name="religion" id="religion">
-              <option value="">-- Pilih agama</option>
-              <option value="Islam" {{ old('religion', $member->religion ?? '') == 'Islam' ? 'selected' : '' }}>Islam</option>
-              <option value="Kristen" {{ old('religion', $member->religion ?? '') == 'Kristen' ? 'selected' : '' }}>Kristen</option>
-              <option value="Katholik" {{ old('religion', $member->religion ?? '') == 'Katholik' ? 'selected' : '' }}>Katholik</option>
-              <option value="Hindu" {{ old('religion', $member->religion ?? '') == 'Hindu' ? 'selected' : '' }}>Hindu</option>
-              <option value="Budha" {{ old('religion', $member->religion ?? '') == 'Budha' ? 'selected' : '' }}>Budha</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row"> 
-          <div class="form-group col-md-4">
-            <label for="balance">Saldo Awal</label>
-            <input type="number" class="form-control" id="balance" name="balance" value="{{ old('balance', ($member->balance*1) ?? '')}}">
+            <label for="no_ktp">No.KTP</label>
+            <input type="number" class="form-control" id="no_ktp" name="no_ktp" value="{{old('no_ktp', $member->no_ktp ?? "")}}">
           </div>
           <div class="form-group col-md-4">
             <label for="date_joined">Tanggal Bergabung</label>
-            <input type="date" class="form-control" id="date_joined" name="date_joined" value="{{old('date_joined', $member->date_joined ?? '')}}">
+            <input type="date" class="form-control" id="date_joined" name="date_joined" value="{{old('date_joined', $member->date_joined)}}">
           </div>
         </div>
         <div class="form-row">

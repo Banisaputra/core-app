@@ -180,6 +180,7 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
 
     // loan_payment
     Route::get('/loanPayments/create', [LoanPaymentController::class, 'create'])->name('loanPayments.create');
+    Route::post('/loanPayments', [LoanPaymentController::class, 'settle'])->name('loanPayments.settle');
 
     // repayments
     Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index');
@@ -188,6 +189,7 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
     Route::get('/withdrawals/create', [WithdrawalController::class, 'create'])->name('withdrawals.create');
     Route::post('/withdrawals', [WithdrawalController::class, 'store'])->name('withdrawals.store');
+    Route::post('/withdrawals/confirm', [WithdrawalController::class, 'confirmation'])->name('withdrawals.confirm');
     Route::get('/withdrawals/{id}', [WithdrawalController::class, 'show'])->name('withdrawals.show');
     Route::get('/withdrawals/{id}/edit', [WithdrawalController::class, 'edit'])->name('withdrawals.edit');
     Route::put('/withdrawals/{id}', [WithdrawalController::class, 'update'])->name('withdrawals.update');

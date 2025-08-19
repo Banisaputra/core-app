@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Loan;
+use App\Models\Member;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class WithdrawalController extends Controller
@@ -46,11 +49,32 @@ class WithdrawalController extends Controller
             $photoPath = $request->file('proof_of_withdrawal')->store('proof_of_withdrawal', 'public');
         }
 
+        $member = Member::findOrFail($request->member_id);
+        $totalLoan = 0;
+        $loans = Loan::with(['member', 'payments' => function($query) {
+            $query->where('lp_state', '=', 1);
+        }])
+        ->where('member_id', $member->id)
+        ->withSum(['payments' => function($query) {
+            $query->where('lp_state', '=', 1);
+        }], 'lp_total')
+        ->get();
+
+        foreach ($loans as $key => $loan) {
+            $totalLoan += $loan->payments_sum_lp_total*1;
+        }
+
+        if ($member->balance < $totalLoan) return redirect()->back()->with('error', 'Jumlah Simpanan tidak cukup!');
+        $finalAmount = $member->balance - $totalLoan;
+
+        if ($finalAmount < $request->wd_value) return redirect()->back()->with('error', 'Sisa Simpanan tidak cukup! - sisa '.number_format($finalAmount, 0));
+
         Withdrawal::create([
             'wd_code' => $wd_code,
             'member_id' => $request->member_id,
             'wd_date' => date('Ymd', strtotime($request->wd_date)),
             'wd_value' => $request->wd_value,
+            'loan_remaining' => $totalLoan,
             'remark' => $request->remark,
             'proof_of_withdrawal' => $photoPath,
             'created_by' => auth()->id(),
@@ -124,12 +148,59 @@ class WithdrawalController extends Controller
         $withdrawal = Withdrawal::findOrFail($id);
         if($withdrawal) {
             // delete picture
-            if ($withdrawal->proof_of_withdrawal && Storage::disk('public')->exists($withdrawal->proof_of_withdrawal)) {
-                Storage::disk('public')->delete($withdrawal->proof_of_withdrawal);
-            }
-            $withdrawal->delete();
+            // if ($withdrawal->proof_of_payment && Storage::disk('public')->exists($withdrawal->proof_of_payment)) {
+            //     Storage::disk('public')->delete($withdrawal->proof_of_payment);
+            // }
+            $withdrawal->update([
+                'wd_state' => 99,
+                'updated_by' => auth()->id()
+            ]);
         }
 
-        return redirect()->back()->with('success', "Data penarikan anggota berhasil dihapus");
+        return redirect()->back()->with('success', "Data Penarikan anggota berhasil dibatalkan");
+        
+    }
+
+    public function confirmation(Request $request) 
+    {
+        $request->validate([
+            'wd_id' => 'required|exists:withdrawals,id'
+        ]);
+
+        $withdrawal = Withdrawal::with(['member'])->findOrFail($request->wd_id);
+        if ($withdrawal->wd_state != 1) return redirect()->back()->with('error', 'Dokumen Penarikan tidak valid, atau sudah pernah dikonfrimasi');
+        
+        $loan = Loan::with(['payments' => function ($query) {
+            $query->where('lp_state', 1);
+        }])
+        ->where('member_id', $withdrawal->member_id)
+        ->get();
+
+
+        foreach ($loan as $key => $pay) {
+            foreach ($pay->payments as $key => $settle) {
+                $settle->lp_state = 2;
+                $settle->remark = 'Pelunasan dari Penarikan';
+                $settle->save();
+                Member::where('id', $pay->member_id)->decrement('balance', $settle->lp_total*1);
+            }
+        }
+        $member = Member::findOrFail($withdrawal->member_id);
+        if ($member->balance < $withdrawal->wd_value) return redirect()->back()->with('error', 'Sisa Saldo Simpanan tidak cukup');
+
+        DB::beginTransaction();
+        try {
+            $withdrawal->update([
+                'wd_state' => 2,
+                'updated_by' => auth()->id()
+            ]);
+            Member::where('id', $withdrawal->member_id)->decrement('balance', $withdrawal->wd_value);
+            
+            DB::commit();
+            return redirect()->back()->with('success', 'Penarikan berhasil dikonfirmasi');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Gagal menyimpan penarikan: ' . $e->getMessage())->withInput();
+        }
     }
 }

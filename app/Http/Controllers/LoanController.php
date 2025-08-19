@@ -77,7 +77,6 @@ class LoanController extends Controller
         $tenor = $member->tenorAmount($loan_value);
         $currentLoan = $member->getTotalLoan();
         $is_agunan = isset($request->cbAgunan) ? true : false;
-// dd($currentLoan);
         // check policy max loan non agunan
         if ($loan_value > $maxLoan && $is_agunan === false)
             return redirect()->back()->with('error', 'Plafon pinjaman melebihi batas maksimal sebesar Rp ' . number_format($maxLoan, 0, ',', '.'));

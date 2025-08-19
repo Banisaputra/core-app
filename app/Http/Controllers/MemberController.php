@@ -36,24 +36,27 @@ class MemberController extends Controller
 
     public function create()
     {
-        return view('members.create');
+        $devisions = Devision::all();
+        $positions = Position::all();
+        return view('members.create', compact('devisions','positions'));
     }
 
     public function store(Request $request)
     { 
         $request->validate([
+            'nip' => 'required|integer',
+            'position' => 'required|integer|exists:positions,id',
+            'devision' => 'required|integer|exists:devisions,id',
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
-            'date_of_birth' => 'required|date',
-            'nip' => 'integer',
-            'departement' => 'string',
-            'telphone' => 'required|integer',
-            'gender' => 'required|in:female,male',
-            'religion' => 'required|in:Islam,Kristen,Katholik,Hindu,Budha',
-            'balance' => 'integer',
+            'telphone' => 'required',
+            'gender' => 'required|in:PRIA,WANITA',
+            'no_kk' => 'required',
+            'no_ktp' => 'required',
             'date_joined' => 'required|date',
             'address' => 'required',
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+ 
         ]);
 
         // image path
@@ -78,18 +81,19 @@ class MemberController extends Controller
         $member = Member::create([
             'user_id' => $user->id,
             'nip' => $request->nip,
+            'position_id' => $request->position,
+            'devision_id' => $request->devision,
             'name' => $request->name,
+            'email' => $request->email,
             'telphone' => $request->telphone,
-            'religion' => $request->religion,
             'gender' => $request->gender,
-            'date_of_birth' => $request->date_of_birth,
-            'departement' => $request->departement,
-            'address' => $request->address,
-            'image' => $photoPath,
-            'balance' => $request->balance,
+            'no_kk' => $request->no_kk,
+            'no_ktp' => $request->no_ktp,
             'date_joined' => $request->date_joined,
-            'created_by' => auth()->id(),
-            'updated_by' => auth()->id(),
+            'image' => $photoPath,
+            'address' => $request->address,
+            "created_by" => auth()->id(),
+            "updated_by" => auth()->id(),
         ]);
 
         $svn_code = Saving::generateCode();
@@ -129,7 +133,9 @@ class MemberController extends Controller
     public function edit(string $id)
     {
         $member = Member::with('user')->findOrFail($id);
-        return view('members.edit', compact('member'));
+        $devisions = Devision::all();
+        $positions = Position::all();
+        return view('members.edit', compact('member','devisions','positions'));
     }
 
     public function update(Request $request, string $id)
@@ -137,15 +143,15 @@ class MemberController extends Controller
         $member = Member::findOrFail($id);
         $user = User::findOrFail($member->user_id);
         $request->validate([
+            'nip' => 'required|integer',
+            'position' => 'required|integer|exists:positions,id',
+            'devision' => 'required|integer|exists:devisions,id',
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,'.$user->id,
-            'date_of_birth' => 'required|date',
-            'nip' => 'integer',
-            'departement' => 'string',
-            'telphone' => 'required|integer',
-            'gender' => 'required|in:female,male',
-            'religion' => 'required|in:Islam,Kristen,Katholik,Hindu,Budha',
-            'balance' => 'integer',
+            'telphone' => 'required',
+            'gender' => 'required|in:PRIA,WANITA',
+            'no_kk' => 'required',
+            'no_ktp' => 'required',
             'date_joined' => 'required|date',
             'address' => 'required',
             'profile_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -168,15 +174,15 @@ class MemberController extends Controller
         $user->email = $request->email;
 
         // Update data
-        $member->name = $request->name;
         $member->nip = $request->nip;
+        $member->position_id = $request->position;
+        $member->devision_id = $request->devision;
+        $member->name = $request->name;
         $member->telphone = $request->telphone;
-        $member->religion = $request->religion;
         $member->gender = $request->gender;
-        $member->date_of_birth = $request->date_of_birth;
-        $member->departement = $request->departement;
+        $member->no_kk = $request->no_kk;
+        $member->no_ktp = $request->no_ktp;
         $member->address = $request->address;
-        $member->balance = $request->balance;
         $member->date_joined = $request->date_joined;
         $member->updated_by = auth()->id();
         $member->save();

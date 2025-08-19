@@ -48,7 +48,8 @@
         <div class="form-row">
           <div class="form-group col-md-6">
             <label for="simple-select2">Anggota</label>
-            <select id="memberSelect" name="member_id" class="form-control" {{ $loan->loan_state>0 ? "disabled" : ''}}>
+            <input type="hidden" name="member_id" value="{{ $loan->member_id }}">
+            <select id="memberSelect" class="form-control" {{ $loan->loan_state>0 ? "disabled" : ''}}>
               <option value="{{ $loan->member_id }}" selected>
                 {{ $loan->member->name ?? 'Search anggota...' }}
               </option>
@@ -79,9 +80,9 @@
           <div class="form-group col-md-3">
             <label for="loan_state">Status Pinjaman</label>
             <select class="custom-select" name="loan_status" id="loan_status" {{ $loan->loan_state>1 ? "disabled" : ''}}>
-              <option value="1" selected>Diajukan</option>
-              <option value="2">Disetujui</option>
-              <option value="99">Ditolak</option>
+              <option value="1" {{ $loan->loan_state==1 ? "selected" : ''}}>Diajukan</option>
+              <option value="2" {{ $loan->loan_state==2 ? "selected" : ''}}>Disetujui</option>
+              <option value="99" {{ $loan->loan_state==99 ? "selected" : ''}}>Ditolak</option>
             </select>
           </div>
         </div>

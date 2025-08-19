@@ -258,10 +258,10 @@ class SavingController extends Controller
             Member::where('id', $saving->member_id)->increment('balance', $saving->sv_value);
             
             DB::commit();
-            return redirect()->back()->with('success', 'Pembelian berhasil dikonfirmasi');
+            return redirect()->back()->with('success', 'Simpanan berhasil dikonfirmasi');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pembelian: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menyimpan simpanan: ' . $e->getMessage())->withInput();
         }
     }
 

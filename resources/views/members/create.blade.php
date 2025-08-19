@@ -39,58 +39,59 @@
       <form action={{ route('members.store') }} method="POST" id="form-member" enctype="multipart/form-data">
         @csrf
         <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="name">Nama</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ old('name')}}">
-          </div>
-          <div class="form-group col-md-6">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ old('email')}}">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-4">
-            <label for="date_of_birth">Tanggal Lahir</label>
-            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth')}}">
-          </div>
           <div class="form-group col-md-4">
             <label for="nip">NIP</label>
             <input type="text" class="form-control" id="nip" name="nip" value="{{ old('nip')}}">
           </div>
           <div class="form-group col-md-4">
-            <label for="departement">Departemen</label>
-            <input type="text" class="form-control" id="departement" name="departement" value="{{ old('departement')}}">
+            <label for="name">Nama</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ old('name')}}">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ old('email')}}">
+          </div>
+        </div> 
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label for="telphone">No.Tlpn</label>
+            <input type="number" class="form-control" id="telphone" name="telphone" value="{{old('telphone')}}">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="gender">Gender</label>
+            <select class="custom-select" name="gender" id="gender">
+              <option value="">-- Pilih gender</option>
+              <option value="PRIA">Pria</option>
+              <option value="WANITA">Wanita</option>
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="position">Jabatan</label>
+            <select class="custom-select" name="position" id="position">
+              <option value="">-- Pilih jabatan</option>
+              @foreach ($positions as $ps)
+              <option value="{{ $ps->id }}">{{ $ps->name }}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="devision">Bagian</label>
+            <select class="custom-select" name="devision" id="devision">
+              <option value="">-- Pilih bagian</option>
+              @foreach ($devisions as $dv)
+              <option value="{{ $dv->id }}">{{ $dv->name }}</option>
+              @endforeach
+            </select>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group col-md-4">
-            <label for="telphone">No.Tlpn</label>
-            <input type="number" class="form-control" id="telphone" name="telphone" value="{{old('telphone')}}">
+            <label for="no_kk">No.KK</label>
+            <input type="number" class="form-control" id="no_kk" name="no_kk" value="{{old('no_kk')}}">
           </div>
           <div class="form-group col-md-4">
-            <label for="gender">Gender</label>
-            <select class="custom-select" name="gender" id="gender">
-              <option value="">-- Pilih gender</option>
-              <option value="male">Pria</option>
-              <option value="female">Wanita</option>
-            </select>
-          </div>
-          <div class="form-group col-md-4">
-            <label for="religion">Agama</label>
-            <select class="custom-select" name="religion" id="religion">
-              <option value="">-- Pilih agama</option>
-              <option value="Islam">Islam</option>
-              <option value="Kristen">Kristen</option>
-              <option value="Katholik">Katholik</option>
-              <option value="Hindu">Hindu</option>
-              <option value="Budha">Budha</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row"> 
-          <div class="form-group col-md-4">
-            <label for="balance">Saldo Awal</label>
-            <input type="number" class="form-control" id="balance" name="balance" value="{{old('balance')}}">
+            <label for="no_ktp">No.KTP</label>
+            <input type="number" class="form-control" id="no_ktp" name="no_ktp" value="{{old('no_ktp')}}">
           </div>
           <div class="form-group col-md-4">
             <label for="date_joined">Tanggal Bergabung</label>

@@ -16,8 +16,24 @@
             <h2 class="h3 mb-0 page-title">Detail Penarikan</h2>
             </div>
         </div>
-        <hr class="my-4"> 
-        
+        <hr class="my-4">
+        @if ($errors->any())
+        <div class="alert alert-danger" role="alert">
+        @foreach ($errors->all() as $error)
+            <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ $error }} <br>           
+        @endforeach
+        </div>
+        @endif
+        @if (session()->has('error'))
+        <div class="alert alert-danger" role="alert">
+            <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ session('error') }} <br>           
+        </div>
+        @endif
+        @if (session()->has('success'))
+        <div class="alert alert-success" role="alert">
+            <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
+        </div>
+        @endif
             <div class="row">
                 <div class="col-4">
                     <div class="card shadow mb-4">
@@ -72,9 +88,27 @@
                             <p>{!! $withdrawal->remark !!}</p>
                         </div>
                     </div>
+
+                    <hr class="my-4">
+                    <div class="form-inline">
+                        <div class="col-md-4 text-center">
+                            <form action="{{ route('withdrawals.confirm')}}" method="POST">
+                                @csrf
+                                <input type="hidden" value="{{ $withdrawal->id }}" name="wd_id">
+                                <button type="submit" class="btn btn-primary" {{ $withdrawal->wd_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-check-circle"></span>Konfirmasi Simpanan</button>
+                            </form>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <form action="{{ route('withdrawals.destroy', $withdrawal->id)}}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" value="{{ $withdrawal->id }}" name="wd_id">
+                                <button type="submit" class="btn btn-danger" {{ $withdrawal->wd_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-slash"></span>Batalkan Simpanan</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

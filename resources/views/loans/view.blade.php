@@ -149,7 +149,7 @@
                                     <td>Rp {{ number_format($pay->lp_total, 2) }}</td>
                                     <td>Rp {{ number_format($pay->loan_remaining, 2) }}</td>
                                     <td>
-                                    @switch($loan->loan_state)
+                                    @switch($pay->lp_state)
                                         @case(99)
                                             Ditutup
                                             @break
@@ -163,9 +163,12 @@
                                     <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <span class="text-muted sr-only">Action</span>
                                     </button>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <a class="dropdown-item" href="#">View</a>
-                                        <a class="dropdown-item" href="#">Edit</a>
+                                    <div class="dropdown-menu dropdown-menu-right"> 
+                                        <form action="{{ route('loanPayments.settle') }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            <input type="hidden" name="lp_id" value="{{$pay->id}}">
+                                            <button type="submit" id="btnSettle" class="dropdown-item">Pelunasan</button>
+                                        </form>
                                     </div>
                                     </td> 
                                 </tr>

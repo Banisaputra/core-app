@@ -123,13 +123,11 @@ class LoanController extends Controller
                 }
                 return redirect()->back()->with('error', 'Agunan sudah pernah dibuat pengajuan pinjaman');
             }
-            
-
 
         }
 
         if ($currentLoan['total_pokok'] > $currentLoan['maxPokok'])
-            return redirect()->back()->with('error', 'Angsuran Pokok melebihi batas maksimal '.(int) $currentLoan['maxPokok'].' per anggota');
+            return redirect()->back()->with('error', 'Angsuran Pokok melebihi batas maksimal '.number_format((int) $currentLoan['maxPokok'],0).' per anggota');
         $totalBayar = ($currentLoan['total_bayar']*1) + ($loan_value / $request->loan_tenor*1);
         // dd($currentLoan);
         if ($totalBayar > $currentLoan['maxBayar'])
@@ -200,8 +198,8 @@ class LoanController extends Controller
             // Rollback transaction on error
             DB::rollBack();
             
-            return redirect()->back()->withInput()->with('error', $e->getMessage());
-            // return redirect()->back()->withInput()->with('error', 'Data Pinjaman gagal ditambahkan.');
+            // return redirect()->back()->withInput()->with('error', $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Data Pinjaman gagal ditambahkan.');
         }
 
     }

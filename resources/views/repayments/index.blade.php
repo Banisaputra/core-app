@@ -11,7 +11,6 @@
         align-items: center;
         gap: 5px;
       } 
-
     </style>
 @endsection
 
@@ -25,12 +24,15 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-                <a href="#" class="btn mb-2 btn-primary">
-                    <span class="fe fe-plus fe-16 mr-1"></span> Tambah Pelunasan
-                </a>
+              <a href="{{ route('repayments.create') }}" class="btn mb-2 btn-primary mr-3">
+                <span class="fe fe-plus fe-16 mr-1"></span> Pelunasan Cepat
+              </a>
+              <a href="{{ route('repayments.generate') }}" class="btn mb-2 btn-warning">
+                <span class="fe fe-plus fe-16 mr-1"></span> Generate
+              </a>
             </div>
             <div class="col-auto">
-                <button type="button" class="btn btn-success"><span class="fe fe-16 mr-2 fe-download"></span>Import Data <small>(soon)</small></button>
+              {{-- other button --}}
             </div>
         </div>
         @if ($errors->any())
@@ -71,18 +73,12 @@
                     @foreach ($loanDetails as $loan)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $loan->loan_code }}</td>
-                            <td>{{ ucwords($loan->member->name) }}</td>
-                            <td><ul class="list-unstyled">
-                              <?php $total = 0 ?>
-                                @foreach ($loan->payments as $payment)
-                                <?php $total += $payment->lp_total ?>
-                                <li class="my-1">{{ $payment->lp_code }}</li> 
-                                @endforeach
-                            </ul></td>
-                            <td>Rp {{ number_format($total, 2) }}</td>
+                            <td>{{ $loan->loan->loan_code }}</td>
+                            <td>{{ ucwords($loan->loan->member->name) }}</td>
+                            <td>{{ $loan->lp_code }}</td>
+                            <td>Rp {{ number_format($loan->lp_total, 0) }}</td>
                             <td>
-                              @switch($loan->loan_state)
+                              @switch($loan->lp_state)
                                   @case(99)
                                       Ditutup
                                       @break
@@ -97,10 +93,10 @@
                                 <span class="text-muted sr-only">Action</span>
                               </button>
                               <div class="dropdown-menu dropdown-menu-right">
-                                <form action="#" method="POST" style="display: inline;" id="paidForm">
+                                <form action="{{ route('repayments.settle') }}" method="POST" style="display: inline;">
                                     @csrf
-                                    @method('PUT')
-                                    <button type="submit" id="btnPaid" class="dropdown-item">Lunasi</button>
+                                    <input type="hidden" name="lp_id" value="{{$loan->id}}">
+                                    <button type="submit" id="btnSettle" class="dropdown-item">Pelunasan</button>
                                 </form>
                               </div>
                             </td> 

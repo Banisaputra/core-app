@@ -181,9 +181,15 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     // loan_payment
     Route::get('/loanPayments/create', [LoanPaymentController::class, 'create'])->name('loanPayments.create');
     Route::post('/loanPayments', [LoanPaymentController::class, 'settle'])->name('loanPayments.settle');
-
+    
     // repayments
     Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index');
+    Route::get('/repayment/create', [RepaymentController::class, 'create'])->name('repayments.create');
+    Route::get('/repayment/generate', [RepaymentController::class, 'generate'])->name('repayments.generate');
+    Route::post('/repayment/generate', [RepaymentController::class, 'generated'])->name('repayments.generated');
+    Route::post('/repayment', [RepaymentController::class, 'settle'])->name('repayments.settle');
+    Route::post('/repayment/settle', [RepaymentController::class, 'getSettle'])->name('repayments.getSettle');
+    Route::post('/repayment/settle-confirm', [RepaymentController::class, 'settleConfirm'])->name('repayments.settleConfirm');
 
     // withdrawla
     Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');

@@ -100,7 +100,7 @@ class LoanController extends Controller
             $typeAgunan = $request->ln_agunan;
             $agunan_policy = AgunanPolicy::getAgunanPolicy($typeAgunan, $request->ln_docYear);
             $maxTenorAgunan = 0;
-            $validAgunan = AgunanPolicy::checkAgunan($member->id, $typeAgunan, $request->ln_docNumber);
+            $validAgunan = LoanAgunan::checkAgunan($member->id, $typeAgunan, $request->ln_docNumber);
             // dd($validAgunan);
             switch ($typeAgunan) {
                 case 'SERTIFIKAT':
@@ -118,10 +118,15 @@ class LoanController extends Controller
                 return redirect()->back()->with('error', 'Pinjaman dengan agunan melebihi batas maksimal '.$agunan_policy->agp_value.' bulan');
             
             if ($validAgunan['agn_valid'] !== true) {
-                if (count($validAgunan['member_share']) > 0) {
-                    dd($validAgunan);
+                if (isset($validAgunan['member_share'][$member->no_kk])) {
+                    $pass = false;
+                    foreach ($validAgunan['member_share'][$member->no_kk] as $key => $msh) {
+                        if ($member->id == $msh['id']) $pass = true;
+                    }
+                    if (!$pass) return redirect()->back()->with('error', 'Agunan sudah pernah dibuat pengajuan pinjaman');
+                } else {
+                    return redirect()->back()->with('error', 'Agunan sudah pernah dibuat pengajuan pinjaman');
                 }
-                return redirect()->back()->with('error', 'Agunan sudah pernah dibuat pengajuan pinjaman');
             }
 
         }
@@ -149,11 +154,12 @@ class LoanController extends Controller
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]);
-    
-            if ($loan && $request->loan_value > 3000000) {
+
+            if ($loan && $loan_value > 3000000) {
                 LoanAgunan::create([
                     'loan_id' => $loan->id,
                     'agunan_type' => $request->ln_agunan,
+                    'doc_year' => $request->ln_docYear,
                     'doc_number' => $request->ln_docNumber,
                     'doc_detail' => $request->ln_docDetail,
                     'created_by' => auth()->id(),
@@ -198,8 +204,8 @@ class LoanController extends Controller
             // Rollback transaction on error
             DB::rollBack();
             
-            // return redirect()->back()->withInput()->with('error', $e->getMessage());
-            return redirect()->back()->withInput()->with('error', 'Data Pinjaman gagal ditambahkan.');
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
+            // return redirect()->back()->withInput()->with('error', 'Data Pinjaman gagal ditambahkan.');
         }
 
     }

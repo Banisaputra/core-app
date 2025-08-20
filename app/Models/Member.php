@@ -106,12 +106,14 @@ class Member extends Model
         $jabatan = Position::where('id', $this->position_id)->first();
         $totalPokok = Loan::join('loan_payments', 'loan_payments.loan_id', '=', 'loans.id')
             ->where('loans.member_id', $this->id)
+            ->where('loans.loan_state', 2)
             ->whereRaw('LEFT(loan_payments.lp_date, 6) = ?', [$YM])
             ->sum('loan_payments.lp_value');
 
         // include bunga
         $totalBayar = Loan::join('loan_payments', 'loan_payments.loan_id', '=', 'loans.id')
             ->where('loans.member_id', $this->id)
+            ->where('loans.loan_state', 2)
             ->whereRaw('LEFT(loan_payments.lp_date, 6) = ?', [$YM])
             ->sum('loan_payments.lp_total');
 

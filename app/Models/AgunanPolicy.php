@@ -19,37 +19,4 @@ class AgunanPolicy extends Model
         ->first();
     }
 
-    public static function checkAgunan($memberID, $type, $number) 
-    {
-        $valid = true;
-        $member_share = [];
-        $exits = self::where('agunan_type', $type)
-        ->where('doc_number', $number)
-        ->first();
-
-        if ($exits) {
-            $valid = false;
-            if ($type == 'SERTIFIKAT') {
-                $member_share = Member::where('no_kk', function ($q) use ($memberID) {
-                    $q->select('no_kk')
-                    ->from('members')
-                    ->where('id', $memberID);
-                })
-                ->get(['id', 'no_kk', 'name'])
-                ->keyBy('no_kk')
-                ->map(function ($member) {
-                    return [
-                        'id'    => $member->id,
-                        'name'  => $member->name,
-                    ];
-                })
-                ->toArray();
-            }
-        }
-
-        return [
-            'agn_valid' => $valid,
-            'member_share' => $member_share
-        ];
-    }
 }

@@ -6,10 +6,12 @@ use DateTime;
 use DateInterval;
 use App\Models\POS;
 use App\Models\Loan;
+use App\Models\Sale;
 use App\Models\MasterItem;
 use App\Models\LoanPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class PosController extends Controller
 {
@@ -88,7 +90,7 @@ class PosController extends Controller
             }
 
             // Batch insert for better performance
-            DB::table('sales_detail')->insert($salesDetails);
+            DB::table('sale_detail')->insert($salesDetails);
 
             // insert loan
             if($payment_type == "CREDIT") {
@@ -148,7 +150,10 @@ class PosController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Sale recorded successfully',
-                'sa_code' => $sa_code,
+                'receipt' => [
+                    'id' => $saleId,
+                    'code' => $sa_code,
+                ]
             ]);
         } catch (\Exception $e) {
             // Rollback transaction on error
@@ -160,6 +165,18 @@ class PosController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function printReceipt($id)
+    {
+        $sale = Sale::with('saDetail.item')->findOrFail($id);
+
+        $pdf = Pdf::loadView('reports.receipt58', compact('sale'))
+                    ->setPaper([0,0,164.36,600], 'portrait'); 
+                    // ukuran thermal 80mm (226.77 point)
+                    // ukuran thermal 58mm (164.36 point)
+
+        return $pdf->stream('receipt-'.$sale->invoice_no.'.pdf');
     }
 
 }

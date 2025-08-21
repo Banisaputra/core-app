@@ -216,6 +216,7 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala toko,admin tok
     // pos
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
     Route::post('/submit-sale', [PosController::class, 'store']);
+    Route::get('/sales/{id}/print', [PosController::class, 'printReceipt'])->name('sales.print');
 
     // purchase
     Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index');

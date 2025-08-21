@@ -65,6 +65,7 @@ class SavingController extends Controller
 
         $pokok = SavingType::where('name', 'like', 'Pokok')->first();
         $wajib = SavingType::where('name', 'like', 'Wajib')->first();
+        $sht = SavingType::where('name', 'like', 'SHT')->first();
         $month = date('m', strtotime($request->sv_date));
         $year = date('Y', strtotime($request->sv_date));
 
@@ -82,10 +83,18 @@ class SavingController extends Controller
             ->where('sv_state', '<>', 99)
             ->exists();
 
+        $s_exists = Saving::where('member_id', $request->member_id)
+            ->where('sv_type_id', $sht->id)
+            ->where('sv_state', '<>', 99)
+            ->whereBetween('sv_date', [$startOfMonth, $endOfMonth])
+            ->exists();
+
         if ($w_exists && $wajib->id == $request->sv_type_id) {
-            return back()->with('error', 'Anggota sudah melakukan simpanan wajin pada bulan ini.')->withInput();
+            return back()->with('error', 'Anggota sudah melakukan simpanan wajib pada bulan ini.')->withInput();
         } else if ($p_exists && $pokok->id == $request->sv_type_id) {
-            return back()->with('error', 'Anggota sudah pernah melakukan simpanan pokok')->withInput();
+            return back()->with('error', 'Anggota sudah pernah melakukan simpanan pokok.')->withInput();
+        } else if ($s_exists && $sht->id == $request->sv_type_id) {
+            return back()->with('error', 'Anggota sudah pernah melakukan simpanan SHT pada bulan ini.')->withInput();
         }
 
         Saving::create([

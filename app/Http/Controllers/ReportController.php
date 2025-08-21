@@ -21,9 +21,8 @@ class ReportController extends Controller
     // for PDF report type
     public function deduction(Request $request) 
     {
-        $periode = 2508; // date('ym');
-        $members = Member::with('user')->get();
-
+        $periode = 2510; // date('ym');
+        $members = Member::with(['position','devision','user'])->get();
         $data = [];
 
         foreach ($members as $member) {
@@ -44,13 +43,13 @@ class ReportController extends Controller
                 ->orderBy('id')
                 ->get();
 
-            $simpananWajib = 0;
+            $simpananBulanan = 0;
             $angsuranPinjaman = 0;
             $cicilanBarang = 0;
 
             for ($i=0; $i < count($savingDetails); $i++) { 
                 $saving = $savingDetails[$i];
-                $simpananWajib += $saving->sv_value;
+                $simpananBulanan += $saving->sv_value;
             }
             for ($i=0; $i < count($loanDetails) ; $i++) { 
                 $loan = $loanDetails[$i];
@@ -60,16 +59,13 @@ class ReportController extends Controller
                     $angsuranPinjaman += $loan->payments[0]['lp_total']*1;
                 }
             }
-            
-
-
-
 
             $data[] = [
                 'name' => $member->name ?? '-',
-                'potongan_wajib' => $simpananWajib,
+                'position' => $member->position->name ?? '-',
+                'potongan_simpanan' => $simpananBulanan,
                 'potongan_pinjaman' => $angsuranPinjaman + $cicilanBarang,
-                'total' => $simpananWajib + $angsuranPinjaman + $cicilanBarang,
+                'total' => $simpananBulanan + $angsuranPinjaman + $cicilanBarang,
             ];
         }
 
@@ -92,7 +88,7 @@ class ReportController extends Controller
         $data = [];
 
         foreach ($members as $member) {
-            $simpananWajib = $member->savings()
+            $simpananBulanan = $member->savings()
                 ->where('type', 'wajib')
                 ->whereMonth('date', $month)
                 ->whereYear('date', $year)
@@ -110,9 +106,9 @@ class ReportController extends Controller
 
             $data[] = [
                 'Nama' => $member->user->name ?? '-',
-                'Potongan Wajib' => $simpananWajib,
+                'Potongan Wajib' => $simpananBulanan,
                 'Potongan Pinjaman' => $angsuranPinjaman + $cicilanBarang,
-                'Total Potongan' => $simpananWajib + $angsuranPinjaman + $cicilanBarang,
+                'Total Potongan' => $simpananBulanan + $angsuranPinjaman + $cicilanBarang,
             ];
         }
 

@@ -123,7 +123,8 @@ creditPayment.addEventListener('click', function () {
       $('#memberSelect').val(null).trigger('change');
       cart = {};
 
-      // Optional: print receipt, show invoice, etc.
+      // Optional: print receipt, show invoice
+      window.open('/sales/' + response.receipt.id + '/print', '_blank');
     } else {
       alert('Failed to submit sale.');
     }
@@ -197,7 +198,8 @@ cashPayment.addEventListener('click', function () {
       cart = {};
       cashPayment.disabled = false;
 
-      // Optional: print receipt, show invoice, etc.
+      // Optional: print receipt
+      window.open('/sales/' + response.receipt.id + '/print', '_blank');
     } else {
       alert('Failed to submit sale.');
     }

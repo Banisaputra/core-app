@@ -15,6 +15,11 @@ class MasterItem extends Model
     {
         return $this->hasMany(PurchaseDetail::class);
     }
+   
+    public function saleDetails()
+    {
+        return $this->hasMany(SaleDetail::class);
+    }
 
     public function category()
     {

@@ -17,8 +17,9 @@
             <tr>
                 <th>No</th>
                 <th>Nama Anggota</th>
-                <th>Potongan Wajib</th>
-                <th>Potongan Pinjaman</th>
+                <th>Jabatan</th>
+                <th>Potongan Simpanan<br>(Wajib + SHT)</th>
+                <th>Potongan Pinjaman<br>(Uang + Barang)</th>
                 <th>Total Potongan</th>
             </tr>
         </thead>
@@ -28,7 +29,8 @@
                 <tr>
                     <td>{{ $i + 1 }}</td>
                     <td>{{ $row['name'] }}</td>
-                    <td>{{ number_format($row['potongan_wajib'], 0, ',', '.') }}</td>
+                    <td>{{ $row['position'] }}</td>
+                    <td>{{ number_format($row['potongan_simpanan'], 0, ',', '.') }}</td>
                     <td>{{ number_format($row['potongan_pinjaman'], 0, ',', '.') }}</td>
                     <td>{{ number_format($row['total'], 0, ',', '.') }}</td>
                 </tr>

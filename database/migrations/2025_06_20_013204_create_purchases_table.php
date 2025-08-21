@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('pr_code', 50)->unique();
             $table->integer('pr_date')->length(8);
             $table->string('ref_doc', 100);
-            $table->string('supplier', 255);
+            $table->integer('supplier_id');
             $table->integer('total');
             $table->tinyInteger('pr_state')->default(1);
             $table->string('file_path', 255)->nullable();
@@ -43,7 +43,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchases');
         Schema::dropIfExists('purchase_detail');
+        Schema::dropIfExists('purchases');
     }
 };

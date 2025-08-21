@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('item_code', 50);
             $table->string('item_name', 255);
+            $table->integer('ct_id');
             $table->integer('stock')->default(0);
+            $table->integer('hpp');
             $table->integer('sales_price');
             $table->string('item_image', 255)->nullable();
             $table->tinyInteger('is_transactional')->length(2)->default(1);

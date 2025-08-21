@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
             $table->timestamps();
         });
-        Schema::create('sales_detail', function (Blueprint $table) {
+        Schema::create('sale_detail', function (Blueprint $table) {
             $table->foreignId('sa_id');
             $table->foreignId('item_id');
             $table->integer('amount');
@@ -38,7 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('sale_detail');
         Schema::dropIfExists('sales');
-        Schema::dropIfExists('sales_detail');
     }
 };

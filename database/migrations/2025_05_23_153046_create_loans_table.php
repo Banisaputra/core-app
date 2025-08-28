@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('loan_code', 50);
             $table->foreignId('member_id')->references('id')->on('members')->onDelete('cascade');
-            $table->string('loan_type', 50)->default('uang');
+            $table->string('loan_type', 50)->default('UANG');
+            $table->integer('ref_doc_id')->nullable()->default(0);
             $table->integer('loan_date')->length(8)->comment('Ymd');
             $table->integer('loan_value');
             $table->integer('loan_tenor')->length(8);

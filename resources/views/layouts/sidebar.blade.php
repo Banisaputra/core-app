@@ -161,38 +161,23 @@
             <span>Laporan</span>
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
-            {{-- koperasi --}}
-            <li class="nav-item dropdown">
-                <a href="#usahaReport" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-                    <i class="fe fe-shopping-cart fe-16"></i>
-                    <span class="ml-3 item-text">Usaha</span>
-                </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="usahaReport">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="#">
-                            <span class="ml-1 item-text">Laba Rugi</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            {{-- koperasi --}}
-            <li class="nav-item dropdown">
-                <a href="#koperasiReport" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+            <li class="nav-item w-100">
+                <a class="nav-link" target="_blank" href="{{ route('reports.deductionPdf')}}">
                     <i class="fe fe-file-text fe-16"></i>
-                    <span class="ml-3 item-text">Koperasi</span>
+                    <span class="ml-3 item-text">Potong Gaji Anggota</span>
                 </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="koperasiReport">
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" target="_blank" href="{{ route('reports.deductionPdf')}}">
-                            <span class="ml-1 item-text">Potong Gaji Anggota</span>
-                        </a>
-                    </li> 
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="{{ route('reports.index')}}">
-                            <span class="ml-1 item-text">Laporan</span>
-                        </a>
-                    </li> 
-                </ul>
+            </li> 
+            <li class="nav-item w-100">
+                <a class="nav-link" href="{{ route('reports.index')}}">
+                    <i class="fe fe-file-text fe-16"></i>
+                    <span class="ml-3 item-text">Laporan Umum</span>
+                </a>
+            </li> 
+            <li class="nav-item w-100">
+                <a class="nav-link" href="{{ route('reports.index2')}}">
+                    <i class="fe fe-file-text fe-16"></i>
+                    <span class="ml-3 item-text">Laporan Anggota</span>
+                </a>
             </li>
         </ul>
     @endif

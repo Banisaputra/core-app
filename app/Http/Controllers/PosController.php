@@ -73,6 +73,8 @@ class PosController extends Controller
                 'sub_total' => $total,
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
             // Insert sales details
             $salesDetails = [];

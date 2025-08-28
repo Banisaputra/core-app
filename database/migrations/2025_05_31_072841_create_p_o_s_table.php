@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('sa_date')->length(8);
             $table->integer('member_id')->references('id')->on('members');
             $table->integer('sub_total');
+            $table->string('payment_type')->default('KREDIT');
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade');
             $table->timestamps();

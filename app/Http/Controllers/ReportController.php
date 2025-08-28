@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Loan;
+use App\Models\Sale;
 use App\Models\Member;
 use App\Models\Saving;
+use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -16,6 +18,196 @@ class ReportController extends Controller
     public function index() 
     {
         return view('reports.index');
+    }
+
+    public function index2()
+    {
+        return view('reports.index2');
+    }
+
+    public function getReport(Request $request) 
+    {
+        $request->validate([
+            "typeReport" => "required",
+            "dateStart" => "nullable|date",
+            "dateEnd" => "nullable|date",
+        ]);
+        $type = strtoupper($request->typeReport);
+        $startDate = $request->dateStart ?? now();
+        $endDate = $request->dateEnd ?? now();
+        $data = [];
+        $file = 'reports';
+
+        switch ($type) {
+            case 'SAVING':
+                $savings = Saving::with(['member','svType'])
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->get();
+
+                foreach ($savings as $key => $sv) {
+                    $data[] = [
+                        'sv_code' => $sv->sv_code,
+                        'sv_date' => $sv->sv_date,
+                        'sv_type' => $sv->svType->name,
+                        'sv_value' => $sv->sv_value,
+                    ];
+                }
+                $file = 'reports.saving';
+                break;
+
+            case 'LOAN':
+                $loans = Loan::with(['member','payments'])
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->get();
+
+                foreach ($loans as $key => $loan) {
+                    $data[] = [
+                        'loan_code' => $loan->loan_code,
+                        'loan_date' => $loan->loan_date,
+                        'loan_type' => $loan->loan_type,
+                        'loan_value' => $loan->loan_value,
+                    ];
+                }
+                $file = 'reports.loan';
+                break;
+            case 'PURCHASE':
+                $purchases = Purchase::with(['supplier','prDetails'])
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->get();
+
+                foreach ($purchases as $key => $pr) {
+                    $data[] = [
+                        'pr_code' => $pr->pr_code,
+                        'pr_date' => $pr->pr_date,
+                        'pr_ref_doc' => $pr->ref_doc,
+                        'pr_value' => $pr->total,
+                    ];
+                }
+                $file = 'reports.purchase';
+                break;
+            
+            case 'SALES':
+                $sales = Sale::with(['saDetail'])
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->get();
+
+                foreach ($sales as $key => $sa) {
+                    $data[] = [
+                        'sa_code' => $sa->sa_code,
+                        'sa_date' => $sa->sa_date,
+                        'sa_payment' => $sa->payment_type,
+                        'sa_value' => $sa->sub_total,
+                    ];
+                }
+                $file = 'reports.sales';
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+
+        $pdf = PDF::loadView($file, [
+                'data' => $data,
+                'dateStart' => $startDate,
+                'dateEnd' => $endDate,
+            ]);
+        
+        $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
+        // dd($filename);
+        if ($request->has('preview')) {
+            return $pdf->stream($filename);
+        }
+    
+        return $pdf->download($filename);
+
+        //  $pdf = PDF::loadView($file, [
+        //         'data' => $data,
+        //         'dateStart' => $startDate,
+        //         'dateEnd' => $endDate,
+        //     ]);
+
+        // return $pdf->stream('Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf');
+
+    }
+
+    public function getReport2(Request $request) 
+    {
+        $request->validate([
+            "typeReport" => "required",
+            "activate" => "required",
+        ]);
+
+        $type = strtoupper($request->typeReport);
+        $data = [];
+        $filter = [];
+        $file = 'reports';
+
+        switch ($type) {
+            case 'member':
+                $query = "
+                    SELECT m.nip, m.name mb_name, p.name ps_name, d.name dv_name, m.is_transactional mb_active
+                    FROM members m
+                    JOIN users u ON m.user_id = u.id 
+                    JOIN positions p ON m.position_id = p.id 
+                    JOIN devisions d ON m.devision_id = d.id 
+                    WHERE 1=1
+                ";
+
+                if ($request->activate == 2) {
+                    $filter['Status'] = "SEMUA"; 
+                    $query .= " AND m.is_transactional < 2";
+                }
+                if ($request->startJoined) {
+                    $filter['Tgl. Bergabung'] = $request->startJoined;
+                    $query .= " AND m.date_joined >=".$request->startJoined."";
+                }
+                if ($request->endJoined) {
+                    $filter['Tgl. Batas Bergabung'] = $request->endJoined;
+                    $query .= " AND m.date_joined <=".$request->endJoined."";
+                }
+
+                $members = DB::select($query);
+
+                foreach ($members as $key => $mb) {
+                    $data[] = [
+                        'nip' => $mb->nip,
+                        'name' => $mb->mb_name,
+                        'position' => $mb->ps_name,
+                        'devision' => $mb->dv_name,
+                        'status' => $mb->mb_active,
+                    ];
+                }
+
+                $file = 'reports.member';
+                break;
+ 
+            default:
+                # code...
+                break;
+        }
+
+        $pdf = PDF::loadView($file, [
+                'data' => $data,
+                'filter' => $filter,
+            ]);
+        
+        $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
+        // dd($filename);
+        if ($request->has('preview')) {
+            return $pdf->stream($filename);
+        }
+    
+        return $pdf->download($filename);
+
+        //  $pdf = PDF::loadView($file, [
+        //         'data' => $data,
+        //         'dateStart' => $startDate,
+        //         'dateEnd' => $endDate,
+        //     ]);
+
+        // return $pdf->stream('Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf');
+
     }
 
     // for PDF report type

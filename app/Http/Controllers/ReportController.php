@@ -8,6 +8,7 @@ use App\Models\Member;
 use App\Models\Saving;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -131,11 +132,11 @@ class ReportController extends Controller
 
     }
 
-    public function getReport2(Request $request) 
+    public function getMemberList(Request $request) 
     {
         $request->validate([
             "typeReport" => "required",
-            "activate" => "required",
+            "activate" => "required"
         ]);
 
         $type = strtoupper($request->typeReport);
@@ -144,7 +145,7 @@ class ReportController extends Controller
         $file = 'reports';
 
         switch ($type) {
-            case 'member':
+            case 'MEMBER':
                 $query = "
                     SELECT m.nip, m.name mb_name, p.name ps_name, d.name dv_name, m.is_transactional mb_active
                     FROM members m
@@ -157,14 +158,18 @@ class ReportController extends Controller
                 if ($request->activate == 2) {
                     $filter['Status'] = "SEMUA"; 
                     $query .= " AND m.is_transactional < 2";
+                } else {
+                    $filter['Status'] = $request->activate == 1 ? "AKTIF" : "NONAKTIF"; 
+                    $query .= " AND m.is_transactional =". $request->activate ."";
                 }
+                
                 if ($request->startJoined) {
                     $filter['Tgl. Bergabung'] = $request->startJoined;
-                    $query .= " AND m.date_joined >=".$request->startJoined."";
+                    $query .= " AND m.date_joined >='".$request->startJoined."'";
                 }
                 if ($request->endJoined) {
                     $filter['Tgl. Batas Bergabung'] = $request->endJoined;
-                    $query .= " AND m.date_joined <=".$request->endJoined."";
+                    $query .= " AND m.date_joined <='".$request->endJoined."'";
                 }
 
                 $members = DB::select($query);
@@ -181,7 +186,7 @@ class ReportController extends Controller
 
                 $file = 'reports.member';
                 break;
- 
+
             default:
                 # code...
                 break;
@@ -193,20 +198,79 @@ class ReportController extends Controller
             ]);
         
         $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
-        // dd($filename);
+
         if ($request->has('preview')) {
             return $pdf->stream($filename);
         }
     
-        return $pdf->download($filename);
+        return $pdf->download($filename); 
 
-        //  $pdf = PDF::loadView($file, [
-        //         'data' => $data,
-        //         'dateStart' => $startDate,
-        //         'dateEnd' => $endDate,
-        //     ]);
+    }
 
-        // return $pdf->stream('Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf');
+    public function getMemberDetail(Request $request) 
+    {
+        $request->validate([
+            "typeReport" => "required",
+            "member_id" => "required"
+        ]);
+
+        $type = strtoupper($request->typeReport);
+        $data = [];
+        $filter = [];
+        $file = 'reports';
+
+        $member = Member::findOrFail($request->member_id);
+        $filter['Anggota'] = $member->nip . " - " . $member->name;
+
+        switch ($type) {
+            case 'DETAIL_SAVING':
+                $query = "
+                    SELECT sv_code, sv_date, svt.name svt_name, sv_value, sv_state 
+                    FROM savings sv JOIN saving_types svt ON (sv.sv_type_id=svt.id)
+                    WHERE sv.member_id=".$request->member_id."
+                ";
+
+                if ($request->startJoined) {
+                    $filter['Tgl. Simpanan'] = $request->startJoined;
+                    $query .= " AND m.date_joined >='".date('Ymd', strtotime($request->startJoined))."'";
+                }
+                if ($request->endJoined) {
+                    $filter['Tgl. Batas Simpanan'] = $request->endJoined;
+                    $query .= " AND m.date_joined <='".date('Ymd', strtotime($request->endJoined))."'";
+                }
+
+                $savings = DB::select($query);
+
+                foreach ($savings as $key => $sv) {
+                    $data[] = [
+                        'sv_code' => $sv->sv_code,
+                        'sv_date' => $sv->sv_date,
+                        'sv_type' => $sv->svt_name,
+                        'sv_value' => $sv->sv_value,
+                        'status' => $sv->sv_state,
+                    ];
+                }
+
+                $file = 'reports.member-saving';
+                break;
+
+            default:
+                # code...
+                break;
+        }
+
+        $pdf = PDF::loadView($file, [
+                'data' => $data,
+                'filter' => $filter,
+            ]);
+        
+        $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
+
+        if ($request->has('preview')) {
+            return $pdf->stream($filename);
+        }
+    
+        return $pdf->download($filename); 
 
     }
 
@@ -268,7 +332,7 @@ class ReportController extends Controller
 
         return $pdf->stream('Laporan-Potongan-Gaji-' . $periode . '.pdf');
     }
-    // -----------
+    // --------unset---
     // for excel report type
     public function deductionXlsx(Request $request)
     {

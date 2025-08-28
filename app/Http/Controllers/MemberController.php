@@ -225,6 +225,11 @@ class MemberController extends Controller
         $search = $request->q;
         $is_active = $request->active;
         // Log::debug('Request Data:', $request->all());
+        $whereAdd = "1=1";
+
+        if ($is_active < 2) {
+            $whereAdd = "is_transactional=".$is_active."";
+        }
 
         $members = Member::when($search, function($query) use ($search) {
             $query->where(function($q) use ($search) {
@@ -232,11 +237,11 @@ class MemberController extends Controller
                   ->orWhere('nip', 'like', "%$search%");
             });
         })
-        ->where('is_transactional', $is_active)
+        ->whereRAW($whereAdd)
         ->select('id', 'name')
         ->limit(10)
         ->get();
-
+        
         return response()->json($members);
     }
 

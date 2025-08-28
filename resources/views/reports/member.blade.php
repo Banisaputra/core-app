@@ -35,12 +35,12 @@
                     <td>{{ $row['name'] }}</td>
                     <td>{{ $row['position'] }}</td>
                     <td>{{ $row['devision'] }}</td>
-                    <td>{{ $row['status'] }}</td>
+                    <td>{{ $row['status'] == 1 ? "Active" : "Nonactive" }}</td>
                 </tr>
                 @endforeach
             @else
                 <tr>
-                    <td colspan=5 style="text-align: center">Tidak ada data</td>
+                    <td colspan=6 style="text-align: center">Tidak ada data</td>
                 </tr>
             @endif
         </tbody>

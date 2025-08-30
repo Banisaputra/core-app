@@ -180,10 +180,8 @@
       }
       if (hargaJualPercent == 0 && hargaJualPrice == 0) {
         hargaJualFinal = hpp;
-      } else if (hargaJualPercent >= hargaJualPrice) {
-        hargaJualFinal = hargaJualPercent;
-      } else if (hargaJualPrice >= hargaJualPercent) {
-        hargaJualFinal = hargaJualPrice;
+      } else {
+        hargaJualFinal = (hargaJualPercent + hargaJualPrice) - hpp;
       }
       
       $('#sales_price').val(hargaJualFinal.toFixed(0));

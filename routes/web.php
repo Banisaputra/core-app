@@ -27,6 +27,9 @@ use App\Http\Controllers\SavingTypeController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\LoanPaymentController;
 use App\Http\Controllers\StorageLinkController;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Response;
+
 
 // auth
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -37,7 +40,23 @@ Route::get('/logout', [AuthController::class, 'logout']);
 
 // admin access
 Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])->group(function () {
+    Route::get('/backup-db', function () {
+        // Jalankan command dan ambil path file
+        $exitCode = Artisan::call('db:backup', ['--download' => true]);
+        $result = Artisan::output();
+        $filePath = cache('last_backup_file');
 
+        // pastikan file ada
+        $filePath = trim(str_replace(["\n", "\r"], '', $filePath));
+        if (!file_exists($filePath)) {
+            return back()->with('error', 'Backup gagal dibuat.');
+        }
+
+        return Response::download($filePath);
+    });
+
+    Route::get('/backup/download', [UserController::class, 'downloadDB']);
+    
     // storage link
     Route::get('/create-storage-link', [StorageLinkController::class, 'create']);
 
@@ -117,12 +136,14 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
     Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
     Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');   
     
-}); 
+});
 
-Route::get('/', function() {
-    return view('dashboard');
-    // return view('layouts.maintenance');
-})->middleware([PermissionMiddleware::class . ':dashboard']);
+Route::get('/', [UserController::class, 'dashboard'])->middleware([PermissionMiddleware::class . ':dashboard']);
+
+// Route::get('/', function() { 
+//     return view('dashboard');
+//     // return view('layouts.maintenance');
+// })->middleware([PermissionMiddleware::class . ':dashboard']);
 
 // role general
 Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara,kepala toko,admin toko'])->group(function() {

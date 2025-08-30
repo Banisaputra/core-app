@@ -98,6 +98,7 @@
               <select id="reportSelect-2" name="typeReport" class="form-control">
                 <option value="">-- Pilih laporan </option>
                 <option value="detail_saving">Simpanan Anggota</option>
+                <option value="detail_loans">Pinjaman Anggota</option>
               </select>
           </div>
           <div class="form-group col-md-6">
@@ -105,14 +106,22 @@
             <select id="memberSelect" name="member_id" class="form-control"></select>
           </div>
           <div class="form-group mb-3 col-md-3">
-            <label for="startJoined">Tanggal Mulai Bergabung</label>
+            <label for="startJoined">Tanggal Mulai</label>
             <input class="form-control" id="startJoined" type="date" name="startJoined">
             <small>*Kosongkan untuk mengambil semua data</small>
           </div>
           <div class="form-group mb-3 col-md-3">
-            <label for="endJoined">Batas Tanggal Bergabung</label>
+            <label for="endJoined">Batas Tanggal</label>
             <input class="form-control" id="endJoined" type="date" name="endJoined">
             <small>*Kosongkan untuk mengambil semua data</small>
+          </div>
+          <div class="form-group col-md-3">
+              <label for="aktifasiSelect">Status Aktifasi</label>
+              <select id="aktifasiSelect" name="activate" class="form-control">
+                <option value="2">SEMUA</option>
+                <option value="1">Aktif</option>
+                <option value="0">Tidak Aktif</option>
+              </select>
           </div>
         </div>
 
@@ -276,11 +285,11 @@ document.querySelectorAll('.preview-btn').forEach(button => {
   });
 });
 
-document.getElementById('form-report1').addEventListener('submit', function(e) {
+document.getElementById('form-report-1').addEventListener('submit', function(e) {
     e.preventDefault();
     handleReportRequest(false, 1);
 });
-document.getElementById('form-report2').addEventListener('submit', function(e) {
+document.getElementById('form-report-2').addEventListener('submit', function(e) {
     e.preventDefault();
     handleReportRequest(false, 2);
 

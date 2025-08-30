@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\Sale;
 use App\Models\User;
+use App\Models\Purchase;
 use Illuminate\Http\Request;
+use App\Services\DatabaseBackupService;
 
 class UserController extends Controller
 {
@@ -14,6 +18,28 @@ class UserController extends Controller
     {
         //
     }
+
+    public function dashboard() 
+    {   
+
+        $startOfMonth = Carbon::now()->startOfMonth()->format('Ymd');
+        $endOfMonth = Carbon::now()->endOfMonth()->format('Ymd');
+
+        $sales = Sale::whereBetween('sa_date', [$startOfMonth, $endOfMonth])
+                    ->sum('sub_total');
+        $purchase = Purchase::whereBetween('pr_date', [$startOfMonth, $endOfMonth])
+                    ->sum('total');
+
+        return view('dashboard', compact('sales', 'purchase'));
+    }
+
+    public function downloadDB(DatabaseBackupService $backupService)
+    {
+        $filePath = $backupService->backup();
+        return response()->download($filePath)->deleteFileAfterSend(true);
+        // return $backupService->backup();
+    }
+
 
     /**
      * Show the form for creating a new resource.

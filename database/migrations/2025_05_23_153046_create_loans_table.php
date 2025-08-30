@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('loan_tenor')->length(8);
             $table->decimal('interest_percent', 5, 2);
             $table->integer('due_date')->length(8)->comment('Ymd');
-            $table->tinyInteger('loan_state')->default(1);
+            $table->tinyInteger('loan_state')->default(1)->comment('1=pengajuan; 2=disetujui; 3=selesai; 99=dibatalkan');
             $table->text('remark_approval')->nullable()->comment('for rejected only');
             $table->foreignId('created_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('updated_by')->notNull()->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');

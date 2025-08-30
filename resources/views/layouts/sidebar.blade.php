@@ -43,6 +43,12 @@
                 </ul>
                 @endif
                 <li class="nav-item w-100">
+                    <a class="nav-link" href="{{ url('/backup-db') }}">
+                        <i class="fe fe-database fe-16"></i>
+                        <span class="ml-3 item-text">Backup Database</span>
+                    </a>
+                </li>
+                <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('access.info')}}">
                         <i class="fe fe-shield fe-16"></i>
                         <span class="ml-3 item-text">Role Info</span>

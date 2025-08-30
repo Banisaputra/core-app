@@ -103,6 +103,32 @@ class ReportController extends Controller
                 $file = 'reports.sales';
                 break;
             
+            case 'PROFITNLOSE':
+                $totalPurchase = 0;
+                $totalSales = 0;
+
+                $purchases = Purchase::with(['supplier','prDetails'])
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->get();
+
+                foreach ($purchases as $key => $pr) {
+                    $totalPurchase += $pr['total'];
+                }
+
+                $sales = Sale::with(['saDetail'])
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->get();
+
+                foreach ($sales as $key => $sa) {
+                    $totalSales += $sa['sub_total'];
+                }
+
+                $data['totalPr'] = $totalPurchase;
+                $data['totalSl'] = $totalSales;
+                
+                $file = 'reports.profit-lose';
+                break;
+            
             default:
                 # code...
                 break;
@@ -230,13 +256,21 @@ class ReportController extends Controller
                     WHERE sv.member_id=".$request->member_id."
                 ";
 
+                if ($request->activate == 2) {
+                    $filter['Status'] = "SEMUA"; 
+                    $query .= " AND sv.is_transactional < 2";
+                } else {
+                    $filter['Status'] = $request->activate == 1 ? "AKTIF" : "NONAKTIF"; 
+                    $query .= " AND sv.is_transactional =". $request->activate ."";
+                }
+
                 if ($request->startJoined) {
                     $filter['Tgl. Simpanan'] = $request->startJoined;
-                    $query .= " AND m.date_joined >='".date('Ymd', strtotime($request->startJoined))."'";
+                    $query .= " AND sv.sv_date >='".date('Ymd', strtotime($request->startJoined))."'";
                 }
                 if ($request->endJoined) {
                     $filter['Tgl. Batas Simpanan'] = $request->endJoined;
-                    $query .= " AND m.date_joined <='".date('Ymd', strtotime($request->endJoined))."'";
+                    $query .= " AND sv.sv_date <='".date('Ymd', strtotime($request->endJoined))."'";
                 }
 
                 $savings = DB::select($query);
@@ -252,6 +286,46 @@ class ReportController extends Controller
                 }
 
                 $file = 'reports.member-saving';
+                break;
+            case 'DETAIL_LOANS':
+                $query = "1=1";
+
+                if ($request->activate == 2) {
+                    $filter['Status'] = "SEMUA"; 
+                    $query .= " AND loans.loan_state > 0";
+                } else { 
+                    $filter['Status'] = $request->activate < 3 ? "AKTIF" : "NONAKTIF";
+                    $query .= " AND loans.loan_state ";
+                    if ($request->activate == 1) $query .= "< 3";
+                    if ($request->activate == 0) $query .= "> 2";
+                }
+
+                if ($request->startJoined) {
+                    $filter['Tgl. Pinjaman'] = $request->startJoined;
+                    $query .= " AND loans.loan_date >='".date('Ymd', strtotime($request->startJoined))."'";
+                }
+                if ($request->endJoined) {
+                    $filter['Tgl. Batas Pinjaman'] = $request->endJoined;
+                    $query .= " AND loans.loan_date <='".date('Ymd', strtotime($request->endJoined))."'";
+                }
+
+                $loans = Loan::with(['member', 'payments'])
+                ->where('member_id', $member->id)
+                ->whereRaw($query)
+                ->get();
+
+                foreach ($loans as $key => $ln) {
+                    $data[] = [
+                        'ln_code' => $ln->loan_code,
+                        'ln_date' => $ln->loan_date,
+                        'ln_type' => $ln->loan_type,
+                        'ln_value' => $ln->loan_value,
+                        'status' => $ln->loan_state,
+                        'payments' => $ln->payments
+                    ];
+                }
+
+                $file = 'reports.member-loans';
                 break;
 
             default:

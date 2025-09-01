@@ -39,13 +39,13 @@
         @csrf
         @method('PUT')
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-9">
             <label for="code">Kode</label>
             <input type="text" class="form-control" id="code" name="code" value="{{ old('code', $category->code ?? '')}}">
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-9">
             <label for="name">Nama</label>
             <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $category->name ?? '')}}">
           </div>
@@ -59,9 +59,13 @@
             <label for="margin_price">Margin (Rp)</label>
             <input type="number" class="form-control" id="margin_price" name="margin_price" value="{{ old('margin_price', $category->margin_price ?? 0)}}">
           </div>
+          <div class="form-group col-md-3">
+            <label for="ppn_percent">PPN (%)</label>
+            <input type="number" class="form-control" id="ppn_percent" name="ppn_percent" value="{{ old('ppn_percent', $category->ppn_percent ?? 0)}}">
+          </div>
         </div>
         <div class="form-row"> 
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-9">
             <div class="custom-control custom-switch mb-2">
                <input type="checkbox" class="custom-control-input" id="is_turunan" name="is_turunan" {{ $category->is_parent != 1 ? "checked" : ""}}>
                <label class="custom-control-label" for="is_turunan">Kategori Turunan</label>
@@ -69,7 +73,7 @@
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-9">
             <label for="ct_parent">Kategori Utama</label>
             <select class="custom-select" name="ct_parent" id="ct_parent" {{ $category->is_parent == 1 ? "disabled" : ""}}>
               <option value="">-- Pilih kategori utama</option>

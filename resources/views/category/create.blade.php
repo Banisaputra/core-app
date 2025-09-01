@@ -38,13 +38,13 @@
       <form action={{ route('category.store') }} method="POST" id="form-category" enctype="multipart/form-data">
         @csrf
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-9">
             <label for="code">Kode</label>
             <input type="text" class="form-control" id="code" name="code" value="{{ old('code')}}">
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-9">
             <label for="name">Nama</label>
             <input type="text" class="form-control" id="name" name="name" value="{{ old('name')}}">
           </div>
@@ -58,9 +58,13 @@
             <label for="margin_price">Margin (Rp)</label>
             <input type="number" class="form-control" id="margin_price" name="margin_price" value="{{ old('margin_price')}}">
           </div>
+          <div class="form-group col-md-3">
+            <label for="ppn_percent">PPN (%)</label>
+            <input type="number" class="form-control" id="ppn_percent" name="ppn_percent" value="{{ old('ppn_percent')}}">
+          </div>
         </div>
         <div class="form-row"> 
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-9">
             <div class="custom-control custom-switch mb-2">
                <input type="checkbox" class="custom-control-input" id="is_turunan" name="is_turunan" checked>
                <label class="custom-control-label" for="is_turunan">Kategori Turunan</label>
@@ -68,7 +72,7 @@
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-9">
             <label for="ct_parent">Kategori Utama</label>
             <select class="custom-select" name="ct_parent" id="ct_parent">
               <option value="">-- Pilih kategori utama</option>
@@ -79,12 +83,12 @@
           </div>
         </div>
           
-         <hr class="my-4">
-         <div class="form-row">
-           <div class="col-md-6 text-left">
-             <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Simpan</button>
-           </div>
-         </div>
+        <hr class="my-4">
+        <div class="form-row">
+          <div class="col-md-6 text-left">
+            <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Simpan</button>
+          </div>
+        </div>
       </form>
     </div>
   </div>

@@ -54,6 +54,7 @@ class CategoryController extends Controller
         $category = Category::create([
             'code' => $request->code,
             'name' => $request->name,
+            'ppn_percent' => $request->ppn_percent ?? 0,
             'margin_percent' => $request->margin_percent ?? 0,
             'margin_price' => $request->margin_price ?? 0,
             'parent_id' => $parent,
@@ -103,6 +104,7 @@ class CategoryController extends Controller
 
         $category->code = $request->code;
         $category->name = $request->name;
+        $category->ppn_percent = $request->ppn_percent;
         $category->margin_percent = $request->margin_percent;
         $category->margin_price = $request->margin_price;
         $category->is_parent = $is_parent;

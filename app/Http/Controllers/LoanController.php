@@ -101,7 +101,7 @@ class LoanController extends Controller
             $agunan_policy = AgunanPolicy::getAgunanPolicy($typeAgunan, $request->ln_docYear);
             $maxTenorAgunan = 0;
             $validAgunan = LoanAgunan::checkAgunan($member->id, $typeAgunan, $request->ln_docNumber);
-            // dd($validAgunan);
+            
             switch ($typeAgunan) {
                 case 'SERTIFIKAT':
                     $maxTenorAgunan = 48;
@@ -121,7 +121,12 @@ class LoanController extends Controller
                 if (isset($validAgunan['member_share'][$member->no_kk])) {
                     $pass = false;
                     foreach ($validAgunan['member_share'][$member->no_kk] as $key => $msh) {
-                        if ($member->id == $msh['id']) $pass = true;
+                        if ($member->id == $msh['id']) {
+                            if (!$validAgunan['exists_on_member']) {
+                                $pass = true;
+                                break;
+                            }
+                        }
                     }
                     if (!$pass) return redirect()->back()->with('error', 'Agunan sudah pernah dibuat pengajuan pinjaman');
                 } else {
@@ -134,7 +139,7 @@ class LoanController extends Controller
         if ($currentLoan['total_pokok'] > $currentLoan['maxPokok'])
             return redirect()->back()->with('error', 'Angsuran Pokok melebihi batas maksimal '.number_format((int) $currentLoan['maxPokok'],0).' per anggota');
         $totalBayar = ($currentLoan['total_bayar']*1) + ($loan_value / $request->loan_tenor*1);
-        // dd($currentLoan);
+
         if ($totalBayar > $currentLoan['maxBayar'])
             return redirect()->back()->with('error', 'Pembayaran Angsuran melebihi batas maksimal '.(int) $currentLoan['maxBayar'].'');
 

@@ -120,7 +120,7 @@
               <select id="aktifasiSelect" name="activate" class="form-control">
                 <option value="2">SEMUA</option>
                 <option value="1">Aktif</option>
-                <option value="0">Tidak Aktif</option>
+                <option value="99">Tidak Aktif</option>
               </select>
           </div>
         </div>

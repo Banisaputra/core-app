@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Loan;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -20,13 +21,30 @@ class LoanAgunan extends Model
     {
         $valid = true;
         $member_share = [];
-        $exits = self::with(['loan'])
+        $exists = self::with(['loan'])
         ->where('agunan_type', $type)
         ->where('doc_number', $number)
+        ->where('is_transactional', 1)
         ->first();
+        
+        $agn_list = self::where('agunan_type', $type)
+        ->where('doc_number', $number)
+        ->where('is_transactional', 1)
+        ->get();
 
-        if ($exits) {
-            $mID = $exits->loan->member_id;
+        $loan_member = Loan::where('member_id', $memberID)
+        ->pluck('member_id','id');
+
+        $exists_with_same = false;
+        foreach ($agn_list as $key => $loan_agn) {
+            if (isset($loan_member[$loan_agn->loan_id])) {
+                $exists_with_same = true;
+                break;
+            }
+        }
+
+        if ($exists) {
+            $mID = $exists->loan->member_id;
             $valid = false;
             if ($type == 'SERTIFIKAT') {
                $member_share = Member::where('no_kk', function ($q) use ($mID) {
@@ -50,6 +68,7 @@ class LoanAgunan extends Model
 
         return [
             'agn_valid' => $valid,
+            'exists_on_member' => $exists_with_same,
             'member_share' => $member_share
         ];
     }

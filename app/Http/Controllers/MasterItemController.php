@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\MasterItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -164,11 +165,33 @@ class MasterItemController extends Controller
     {
         $search = $request->q;
  
-        $items = MasterItem::where('item_name', 'like', "%$search%")
-            ->orwhere('item_code', 'like', "%$search%")
-            ->limit(50)
-            ->orderBy('id', 'DESC')
-            ->get();
+        // $items = MasterItem::where('item_name', 'like', "%$search%")
+        //     ->orwhere('item_code', 'like', "%$search%")
+        //     ->limit(50)
+        //     ->orderBy('id', 'DESC')
+        //     ->get();
+        $items = DB::table('master_items as p')
+        ->leftJoin('categories as c', 'p.ct_id', '=', 'c.id')
+        ->leftJoin('categories as cp', 'c.parent_id', '=', 'cp.id')
+        ->where('item_name', 'like', "%$search%")
+        ->orwhere('item_code', 'like', "%$search%")
+        ->limit(50)
+        ->orderBy('id', 'DESC')
+        ->select(
+            'p.*',
+            DB::raw('
+                CASE
+                    WHEN c.ppn_percent > 0 THEN c.ppn_percent
+                    WHEN c.ppn_percent = 0 AND cp.ppn_percent > 0 THEN cp.ppn_percent
+                    ELSE 0
+                END as effective_ppn
+            ')
+        )
+        ->get()
+        ->map(function ($row) {
+            $row->hpp_with_ppn = $row->hpp + ($row->hpp * $row->effective_ppn / 100);
+            return $row;
+        });
 
         return response()->json($items);
     }

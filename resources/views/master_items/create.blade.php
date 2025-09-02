@@ -173,15 +173,15 @@
       let hargaJualPrice = 0;
       
       if (marginRp > 0) {
-        hargaJualPrice = hpp + marginRp;
+        hargaJualPrice = marginRp;
       } 
       if (marginPercent > 0) {
-        hargaJualPercent = hpp * (1 + (marginPercent / 100));
+        hargaJualPercent = hpp * ((marginPercent / 100));
       }
       if (hargaJualPercent == 0 && hargaJualPrice == 0) {
         hargaJualFinal = hpp;
       } else {
-        hargaJualFinal = (hargaJualPercent + hargaJualPrice) - hpp;
+        hargaJualFinal = hpp + (hargaJualPercent + hargaJualPrice);
       }
       
       $('#sales_price').val(hargaJualFinal.toFixed(0));

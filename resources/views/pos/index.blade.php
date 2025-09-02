@@ -163,21 +163,33 @@
             <input type="hidden" id="itemID" value="">
             <h4 class="mb-2" id="itemName"></h4>
             <div class="row">
-                <p class="col-sm-3 text-right">Jumlah</p>
-                <div class="col-sm-9">
-                    <h5>: <span id="itemQty"></span></h5>
-                </div>
-            </div>
-            <div class="row">
                 <p class="col-sm-3 text-right">Harga (@)</p>
                 <div class="col-sm-9">
                     <h5>: <span id="itemPrice"></span></h5>
                 </div>
             </div>
             <div class="row">
-                <p class="col-sm-3 text-right">Total</p>
+                <p class="col-sm-3 text-right">Jumlah</p>
+                <div class="col-sm-9">
+                    <h5>: <span id="itemQty"></span></h5>
+                </div>
+            </div>
+            <div class="row">
+                <p class="col-sm-3 text-right">Subtotal</p>
                 <div class="col-sm-9">
                     <h5>: <span id="totalBase"></span></h5>
+                </div>
+            </div> 
+            <div class="row">
+                <p class="col-sm-3 text-right">PPN (%)</p>
+                <div class="col-sm-9">
+                    <h5>: <span id="ppn"></span></h5>
+                </div>
+            </div> 
+            <div class="row">
+                <p class="col-sm-3 text-right">Total</p>
+                <div class="col-sm-9">
+                    <h5>: <span id="totalFinal"></span></h5>
                 </div>
             </div> 
             <div class="mb-3">

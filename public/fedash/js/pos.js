@@ -235,10 +235,12 @@ function renderProducts(products) {
    }
 
    products.forEach(product => {
+      
+
       const col = document.createElement("div");
       col.className = "col-md-3 mb-3";
       col.innerHTML = `
-      <div class="p-3 text-center product-card" data-id="${product.id}" data-stock="${product.stock}" data-name="${product.item_name}" data-price="${product.sales_price}">
+      <div class="p-3 text-center product-card" data-id="${product.id}" data-stock="${product.stock}" data-name="${product.item_name}" data-price="${product.sales_price}" data-ppn="${product.effective_ppn}">
          <img src="/storage/${product.item_image}" class="mb-3"
             onerror="this.onerror=null; this.src='/images/default.jpg'" 
             alt="item_picture" width="150px" height="150px">
@@ -284,10 +286,11 @@ document.addEventListener("click", e => {
       const name = card.dataset.name;
       const price = parseFloat(card.dataset.price);
       const stock = card.dataset.stock;
+      const ppn = card.dataset.ppn;
 
       if (stock == 0) return alert('stok barang kosong, restock barang diperlukan untuk transaksi!')
       if (!cart[id]) {
-         cart[id] = { name: name, qty: 1, price: price, stock: stock, disc: 0 };
+         cart[id] = { name: name, qty: 1, price: price, stock: stock, disc: 0, ppn: ppn};
       } else {
          if (cart[id].stock < (cart[id].qty + 1)) {
             return alert("stock barang tidak cukup!")
@@ -299,13 +302,18 @@ document.addEventListener("click", e => {
 
    if (e.target.classList.contains("edit-item")) {
       const id = e.target.dataset.id;
-      
+      var subTotal = cart[id]['price'] * cart[id]['qty'];
+      var ppn_val = (subTotal * (cart[id]['ppn']*1 / 100))
+      var total_with_ppn = subTotal + ppn_val; 
+
       $('#editItem #itemID').val(id);
       $('#editItem #itemName').html(cart[id]['name']);
       $('#editItem #itemQty').html(cart[id]['qty']);
       $('#editItem #itemPrice').html(formatIDR(cart[id]['price'], 0));
       $('#editItem #disc_price').val(cart[id]['disc']);
-      $('#editItem #totalBase').html(formatIDR(cart[id]['qty'] * cart[id]['price'], 0));
+      $('#editItem #ppn').html(cart[id]['ppn'])
+      $('#editItem #totalBase').html(formatIDR(subTotal, 0));
+      $('#editItem #totalFinal').html(formatIDR(total_with_ppn, 0));
       $('#editItem #finalTotal').html(formatIDR(cart[id]['qty'] * (cart[id]['price']-cart[id]['disc']), 0));
    }
  

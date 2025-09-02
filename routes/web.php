@@ -140,13 +140,8 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
 
 Route::get('/', [UserController::class, 'dashboard'])->middleware([PermissionMiddleware::class . ':dashboard']);
 
-// Route::get('/', function() { 
-//     return view('dashboard');
-//     // return view('layouts.maintenance');
-// })->middleware([PermissionMiddleware::class . ':dashboard']);
-
 // role general
-Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara,kepala toko,admin toko'])->group(function() {
+Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara,kepala toko,admin toko,badan pengawas'])->group(function() {
     // search
     Route::get('/api/users/search', [UserController::class, 'search']);
     Route::get('/api/roles/search', [RoleController::class, 'search']);
@@ -157,6 +152,8 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     Route::get('/api/supplier/search', [SupplierController::class, 'search']);
     Route::get('/api/saving-type/search', [SavingTypeController::class, 'search']);
 
+    // profile
+    Route::get('/setting/profile', [UserController::class, 'profile'])->name('setting.profile');
 
     //reports
     Route::get('/report', [ReportController::class, 'index'])->name('reports.index');

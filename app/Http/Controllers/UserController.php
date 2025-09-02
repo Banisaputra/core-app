@@ -7,6 +7,7 @@ use App\Models\Sale;
 use App\Models\User;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Services\DatabaseBackupService;
 
 class UserController extends Controller
@@ -40,6 +41,14 @@ class UserController extends Controller
         // return $backupService->backup();
     }
 
+    public function profile() 
+    {
+        $user = User::with(['roles', 'member'])
+        ->where('id', auth()->id())
+        ->first();
+        // dd($user);
+        return view('profiles.index', compact('user'));
+    }
 
     /**
      * Show the form for creating a new resource.

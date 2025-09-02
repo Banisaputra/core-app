@@ -31,10 +31,30 @@ class AuthController extends Controller
         ]);
 
         $credentials = $request->only('email', 'password');
-    
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/');
+        $is_valid = Auth::attempt($credentials);
+
+        if ($is_valid) {
+            $user = Auth::user();
+            
+            if ($user->is_transactional == 1) {
+                $request->session()->regenerate();
+                return redirect()->intended('/');
+            } else {
+                // Logout user karena status tidak aktif
+                Auth::logout();
+                
+                return redirect()->back()
+                    ->withErrors([
+                        'credentials' => 'Account belum teraktivasi, hubungi administrator.'
+                    ])
+                    ->onlyInput('email');
+            }
+        } else {
+            return redirect()->back()
+                ->withErrors([
+                    'credentials' => 'Email atau password salah.'
+                ])
+                ->onlyInput('email');
         }
 
         return back()->withErrors([

@@ -235,8 +235,6 @@ function renderProducts(products) {
    }
 
    products.forEach(product => {
-      
-
       const col = document.createElement("div");
       col.className = "col-md-3 mb-3";
       col.innerHTML = `
@@ -262,20 +260,24 @@ function updateCart() {
    for (const [id, item] of Object.entries(cart)) {
       const row = document.createElement("tr");
       row.innerHTML = `
-      <td>${item.name}</td>
-      <td width="30%">
-      <div class="quantity-control" style="justify-content:center;">
-         <button class="btn btn-outline-primary btn-sm py-1 px-2 btnQty" type="button" id="plus-${id}">+</button>
-         <input type="number" id="qty-input-${id}" class="form-control qty-input px-1 mx-2" data-name="${item.name}" data-id="${id}" min="1" value="${item.qty}">
-         <button class="btn btn-outline-secondary btn-sm py-1 px-2 btnQty" type="button" id="minus-${id}">-</button>
+      <td>
+      <div class="mb-2 col-12">${item.name}</div>
+      <div class="detail-item">
+         <div class="quantity-control col-9" style="justify-content:center;">
+            <button class="btn btn-outline-primary btn-sm py-1 px-2 btnQty" type="button" id="plus-${id}"><i id="plus-${id}" class="fe fe-plus btnQty"></i></button>
+            <input type="number" id="qty-input-${id}" class="form-control qty-input px-1 mx-2" data-name="${item.name}" data-id="${id}" min="1" value="${item.qty}">
+            <button class="btn btn-outline-secondary btn-sm py-1 px-2 btnQty" type="button" id="minus-${id}"><i id="minus-${id}" class="fe fe-minus btnQty"></i></button>
+         </div>
+      
+         <div class="total-control col-3">${formatIDR(item.qty * (item.price - item.disc) ,0)}</div>
+         <div class="edit-control col-3"><button class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#editItem"><span data-id="${id}" class="fe fe-info fe-16 edit-item"></span></button></div>
       </div>
       </td>
-      <td width="25%">${formatIDR(item.qty * (item.price - item.disc) ,0)}</td>
-      <td width="10%"><button class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#editItem"><span data-id="${id}" class="fe fe-info fe-16 edit-item"></span></button></td>
       `;
       cartBody.appendChild(row);
       total += item.qty * (item.price - item.disc);
    }
+   
    totalEl.textContent = formatIDR(total, 0);
 }
 

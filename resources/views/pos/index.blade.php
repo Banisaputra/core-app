@@ -8,9 +8,7 @@
     .product-card {
       cursor: pointer;
     }
-    .cart-table td, .cart-table th {
-      vertical-align: middle;
-    }
+
     /* Scrollable product list */
     
     #productList {
@@ -39,6 +37,10 @@
     .cart-table {
         display: block;
     }
+    .cart-table td, .cart-table th {
+        vertical-align: middle;
+        width: 100%;
+    }
 
     .cart-table thead,
     .cart-table tbody {
@@ -52,21 +54,21 @@
         overflow-y: auto;
     }
 
-    .cart-table thead tr {
-        display: table;
-        width: 100%;
-        table-layout: fixed;
-    }
-
+    .cart-table thead tr, 
     .cart-table tbody tr {
-        display: table;
+        display: block;
         width: 100%;
-        table-layout: fixed;
     }
+ 
     .quantity-control {
         display: flex;
         align-items: center;
     }
+    .detail-item {
+        display: flex;
+        width: 100%;
+    }
+    
 
   </style>
   <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -234,9 +236,6 @@
             <thead>
             <tr>
                 <th width="35%">Barang</th>
-                <th width="35%">Qty</th>
-                <th width="25%">Price</th>
-                <th width="5%"></th>
             </tr>
             </thead>
             <tbody id="cartBody"></tbody>

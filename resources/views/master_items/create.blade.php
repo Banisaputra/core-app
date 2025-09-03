@@ -104,6 +104,31 @@
 
 @section('page_script')
 <script>
+   document.getElementById('item_image').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      const preview = document.getElementById('preview-image');
+      const fileNameDisplay = document.getElementById('label_photo');
+      
+      // Tampilkan nama file
+      fileNameDisplay.textContent = file ? file.name.substr(1, 70) : 'Choose file';
+    
+      // Tampilkan preview gambar
+      if (file) {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+              preview.src = e.target.result;
+              preview.hidden = false;
+          }
+          
+          reader.readAsDataURL(file);
+      } else {
+          preview.src = '';
+          preview.hidden = true;
+      }
+    });
+</script>
+<script>
   $(document).ready(function () { 
     $('#categorySelect').select2({
         placeholder: 'Search category...',

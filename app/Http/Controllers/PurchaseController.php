@@ -41,7 +41,7 @@ class PurchaseController extends Controller
         // image path
         $photoPath = '';
         if ($request->hasFile('invoice_file')) {
-            $photoPath = $request->file('invoice_file')->store('invoice_images', 'public');
+            $photoPath = $request->file('invoice_file')->store('invoice_images', 'public_direct');
         }
 
         DB::beginTransaction();
@@ -120,7 +120,7 @@ class PurchaseController extends Controller
             // image path
             $photoPath = null;
             if ($request->hasFile('invoice_file')) {
-                $photoPath = $request->file('invoice_file')->store('invoice_image', 'public');
+                $photoPath = $request->file('invoice_file')->store('invoice_image', 'public_direct');
             }
 
             $total = collect($request['items'])->sum(function ($item) {

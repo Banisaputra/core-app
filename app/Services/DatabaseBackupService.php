@@ -41,7 +41,7 @@ class DatabaseBackupService
             $sqlScript .= "\n\n";
         }
         $fileName = "backup_". $database ."_" . date('Ymd_His') . ".sql";
-      Storage::disk('public')->put("backups/$fileName", $sqlScript);
-     return storage_path("backups/".$fileName );
+        Storage::disk('public')->put("backups/".$fileName, $sqlScript);
+        return storage_path("app/public/backups/".$fileName );
    }
 }

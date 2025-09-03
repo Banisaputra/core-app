@@ -55,10 +55,10 @@ class MasterItemController extends Controller
         // image path
         $photoPath = null;
         if ($request->hasFile('item_image')) {
-            $photoPath = $request->file('item_image')->store('item_images', 'public');
+            $photoPath = $request->file('item_image')->store('item_images', 'public_direct');
         }
 
-        // jika symlink tidak tersedia
+        // jika symlink tidak tersedia, gunakan public_direct (filesystem)
         // // start
         // $sourcePath = storage_path('app/public/' . $photoPath);
         // $destinationPath = public_path('storage/' . $photoPath);
@@ -124,7 +124,7 @@ class MasterItemController extends Controller
             }
 
             // Simpan foto baru
-            $newPhoto = $request->file('item_image')->store('item_images', 'public');
+            $newPhoto = $request->file('item_image')->store('item_images', 'public_direct');
             $item->item_image = $newPhoto;
         }
 

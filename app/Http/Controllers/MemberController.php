@@ -62,7 +62,7 @@ class MemberController extends Controller
         // image path
         $photoPath = null;
         if ($request->hasFile('profile_photo')) {
-            $photoPath = $request->file('profile_photo')->store('profile_photos', 'public');
+            $photoPath = $request->file('profile_photo')->store('profile_photos', 'public_direct'); // public, if symlink not support use public_direct
         }
         // check generate account
         $password = Hash::make(Str::random(8));
@@ -165,7 +165,7 @@ class MemberController extends Controller
             }
 
             // Simpan foto baru
-            $newPhoto = $request->file('profile_photo')->store('profile_photos', 'public');
+            $newPhoto = $request->file('profile_photo')->store('profile_photos', 'public_direct');
             $member->image = $newPhoto;
         }
 

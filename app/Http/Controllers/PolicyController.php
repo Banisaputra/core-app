@@ -67,7 +67,7 @@ class PolicyController extends Controller
         // Simpan file ke storage
         $photoPath = '';
         if ($request->hasFile('fileTerms')) {
-            $photoPath = $request->file('fileTerms')->store('terms', 'public');
+            $photoPath = $request->file('fileTerms')->store('terms', 'public_direct');
         }
         DB::beginTransaction();
         try {
@@ -76,7 +76,7 @@ class PolicyController extends Controller
 
             if ($policy) {
                 if ($policy->pl_value != '') {
-                    Storage::disk('public')->delete($policy->pl_value);
+                    Storage::disk('public_direct')->delete($policy->pl_value);
                 }
                $policy->pl_value = $photoPath;
                $policy->save();

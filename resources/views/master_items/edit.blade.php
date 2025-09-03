@@ -86,7 +86,7 @@
             </div>
             <!-- Preview container -->
             <div class="mt-2">
-                <img id="preview-image" src="" alt="Preview" style="max-width: 300px;" hidden>
+                <img id="preview-image" src="{{ asset('storage/'. $item->item_image)}}" alt="preview" style="max-width: 300px;" {{ $item->item_image != '' && file_exists(public_path('storage/'.$item->item_image)) ? "" : "hidden"}}>
             </div>
           </div>
 
@@ -107,6 +107,31 @@
 @endsection
 
 @section('page_script')
+<script>
+   document.getElementById('item_image').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      const preview = document.getElementById('preview-image');
+      const fileNameDisplay = document.getElementById('label_photo');
+      
+      // Tampilkan nama file
+      fileNameDisplay.textContent = file ? file.name.substr(1, 70) : 'Choose file';
+    
+      // Tampilkan preview gambar
+      if (file) {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+              preview.src = e.target.result;
+              preview.hidden = false;
+          }
+          
+          reader.readAsDataURL(file);
+      } else {
+          preview.src = '';
+          preview.hidden = true;
+      }
+    });
+</script>
 <script>
   $(document).ready(function () { 
     $('#categorySelect').select2({

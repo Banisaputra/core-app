@@ -112,7 +112,7 @@
               <label class="custom-file-label" for="profile_photo" id="label_photo">Choose file</label>
             </div>
             <div class="text-center mt-4">
-                <img id="preview-image" src="{{ asset('storage/'. $member->image)}}" alt="..." width="300px">
+                <img id="preview-image" src="{{ asset('storage/'. $member->image)}}" alt="preview" width="300px">
             </div>
           </div>
         </div>

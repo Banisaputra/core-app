@@ -46,7 +46,7 @@ class WithdrawalController extends Controller
 
         $photoPath = null;
         if($request->hasFile('proof_of_withdrawal')) {
-            $photoPath = $request->file('proof_of_withdrawal')->store('proof_of_withdrawal', 'public');
+            $photoPath = $request->file('proof_of_withdrawal')->store('proof_of_withdrawal', 'public_direct');
         }
 
         $member = Member::findOrFail($request->member_id);
@@ -125,7 +125,7 @@ class WithdrawalController extends Controller
             }
 
             // Simpan foto baru
-            $newPhoto = $request->file('proof_of_withdrawal')->store('proof_of_withdrawal', 'public');
+            $newPhoto = $request->file('proof_of_withdrawal')->store('proof_of_withdrawal', 'public_direct');
             $withdrawal->proof_of_withdrawal = $newPhoto;
         } 
 

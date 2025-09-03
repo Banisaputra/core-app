@@ -50,7 +50,7 @@ class SavingController extends Controller
         // image path
         $photoPath = null;
         if ($request->hasFile('proof_of_payment')) {
-            $photoPath = $request->file('proof_of_payment')->store('proof_of_payment', 'public');
+            $photoPath = $request->file('proof_of_payment')->store('proof_of_payment', 'public_direct');
             // jika symlink tidak tersedia
             // // start
             $sourcePath = storage_path('app/public/' . $photoPath);
@@ -202,17 +202,17 @@ class SavingController extends Controller
                 File::delete(public_path('storage/' . $saving->proof_of_payment));
             }
             
-            $newPhoto = $request->file('proof_of_payment')->store('proof_of_payment', 'public');
+            $newPhoto = $request->file('proof_of_payment')->store('proof_of_payment', 'public_direct');
             $saving->proof_of_payment = $newPhoto;
             
             // jika symlink tidak tersedia
             // // start
-            $sourcePath = storage_path('app/public/' . $newPhoto);
-            $destinationPath = public_path('storage/' . $newPhoto);
+            // $sourcePath = storage_path('app/public/' . $newPhoto);
+            // $destinationPath = public_path('storage/' . $newPhoto);
             
-            File::ensureDirectoryExists(dirname($destinationPath));
+            // File::ensureDirectoryExists(dirname($destinationPath));
             
-            File::copy($sourcePath, $destinationPath);
+            // File::copy($sourcePath, $destinationPath);
             // // end
         } 
 

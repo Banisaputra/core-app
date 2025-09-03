@@ -38,7 +38,6 @@ class UserController extends Controller
     {
         $filePath = $backupService->backup();
         return response()->download($filePath)->deleteFileAfterSend(true);
-        // return $backupService->backup();
     }
 
     public function profile() 
@@ -46,7 +45,6 @@ class UserController extends Controller
         $user = User::with(['roles', 'member'])
         ->where('id', auth()->id())
         ->first();
-        // dd($user);
         return view('profiles.index', compact('user'));
     }
 

@@ -136,9 +136,11 @@ class LoanController extends Controller
 
         }
 
+        $monthlySaving = SavingType::getMonthlySaving();
+        $totalBayar = ($currentLoan['total_bayar']*1) + ($loan_value / $request->loan_tenor*1) + ($monthlySaving);
+
         if ($currentLoan['total_pokok'] > $currentLoan['maxPokok'])
             return redirect()->back()->with('error', 'Angsuran Pokok melebihi batas maksimal '.number_format((int) $currentLoan['maxPokok'],0).' per anggota');
-        $totalBayar = ($currentLoan['total_bayar']*1) + ($loan_value / $request->loan_tenor*1);
 
         if ($totalBayar > $currentLoan['maxBayar'])
             return redirect()->back()->with('error', 'Pembayaran Angsuran melebihi batas maksimal '.(int) $currentLoan['maxBayar'].'');

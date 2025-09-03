@@ -15,4 +15,9 @@ class SavingType extends Model
     {
         return $this->hasMany(Saving::class);
     }
+
+    public static function getMonthlySaving() {
+        return self::where('is_auto', 1)->sum('value');
+        
+    }
 }

@@ -9,6 +9,7 @@ use App\Models\Loan;
 use App\Models\Sale;
 use App\Models\Member;
 use App\Models\MasterItem;
+use App\Models\SavingType;
 use App\Models\LoanPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -99,8 +100,9 @@ class PosController extends Controller
             if($payment_type == "CREDIT") {
                 // cek limit
                 $member = Member::findOrFail($request->member_id);
+                $monthlySaving = SavingType::getMonthlySaving();
                 $currentLoan = $member->getTotalLoan();
-                $totalBayar = ($currentLoan['total_bayar']*1) + ($total / $request->tenor*1);
+                $totalBayar = ($currentLoan['total_bayar']*1) + ($total / $request->tenor*1) + ($monthlySaving*1);
 
                 if ($totalBayar > $currentLoan['maxBayar']) {
                     return response()->json([

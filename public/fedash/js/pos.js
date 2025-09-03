@@ -124,9 +124,10 @@ creditPayment.addEventListener('click', function () {
       cart = {};
 
       // Optional: print receipt, show invoice
+      window.location.reload()
       window.open('/sales/' + response.receipt.id + '/print', '_blank');
     } else {
-      alert('Failed to submit sale.');
+      alert('Failed to submit sale.\nNote: '+ response.message);
     }
   })
   .catch(error => {

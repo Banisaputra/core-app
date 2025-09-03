@@ -7,6 +7,7 @@ use DateInterval;
 use App\Models\POS;
 use App\Models\Loan;
 use App\Models\Sale;
+use App\Models\Member;
 use App\Models\MasterItem;
 use App\Models\LoanPayment;
 use Illuminate\Http\Request;
@@ -96,6 +97,27 @@ class PosController extends Controller
 
             // insert loan
             if($payment_type == "CREDIT") {
+                // cek limit
+                $member = Member::findOrFail($request->member_id);
+                $currentLoan = $member->getTotalLoan();
+                $totalBayar = ($currentLoan['total_bayar']*1) + ($total / $request->tenor*1);
+
+                if ($totalBayar > $currentLoan['maxBayar']) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Pembayaran Angsuran melebihi batas maksimal '.number_format((int) $currentLoan['maxBayar'],0).'',
+                        'receipt' => []
+                    ]);
+                }
+
+                if ($currentLoan['total_pokok'] > $currentLoan['maxPokok']) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Angsuran Pokok melebihi batas maksimal '.number_format((int) $currentLoan['maxPokok'],0).' per anggota',
+                        'receipt' => []
+                    ]);
+                }
+
                 $loan_code = Loan::generateCode();
                 $date = new DateTime(now());
                 $date->add(new DateInterval('P' . $request->tenor . 'M'));
@@ -110,7 +132,7 @@ class PosController extends Controller
                     'loan_value' => $total,
                     'interest_percent' => 0,
                     'due_date' => $dueDate,
-                    'loan_state' => 1,
+                    'loan_state' => 2,
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);

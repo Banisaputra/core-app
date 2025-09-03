@@ -216,10 +216,10 @@ class PurchaseController extends Controller
                         $hargaJualPrice = $item['price'] + $margin['margin_price'];
                     } 
                     if ($margin['margin_percent'] > 0) {
-                        $hargaJualPercent = $itemp['price'] * (1 + ($margin['margin_percent'] / 100));
+                        $hargaJualPercent = $item['price'] * (1 + ($margin['margin_percent'] / 100));
                     }
                     if ($hargaJualPercent == 0 && $hargaJualPrice == 0) {
-                        $hargaJualFinal = $itemp['price'];
+                        $hargaJualFinal = $item['price'];
                     } else if ($hargaJualPercent >= $hargaJualPrice) {
                         $hargaJualFinal = $hargaJualPercent;
                     } else if ($hargaJualPrice >= $hargaJualPercent) {

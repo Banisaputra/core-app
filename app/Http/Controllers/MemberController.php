@@ -160,13 +160,13 @@ class MemberController extends Controller
         // Jika ada file baru
         if ($request->hasFile('profile_photo')) {
             // Hapus foto lama jika ada
-            if ($member->profile_photo && Storage::disk('public')->exists($member->profile_photo)) {
-                Storage::disk('public')->delete($member->profile_photo);
+            if ($member->image && Storage::disk('public')->exists($member->image)) {
+                Storage::disk('public')->delete($member->image);
             }
 
             // Simpan foto baru
             $newPhoto = $request->file('profile_photo')->store('profile_photos', 'public');
-            $member->profile_photo = $newPhoto;
+            $member->image = $newPhoto;
         }
 
         // update user

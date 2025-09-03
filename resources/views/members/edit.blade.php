@@ -109,10 +109,10 @@
             <label for="profile_photo">Profile Photo</label>
             <div class="custom-file">
               <input type="file" class="custom-file-input" id="profile_photo" name="profile_photo">
-              <label class="custom-file-label" for="profile_photo">Choose file</label>
+              <label class="custom-file-label" for="profile_photo" id="label_photo">Choose file</label>
             </div>
             <div class="text-center mt-4">
-                <img src="{{ asset('storage/'. $member->image)}}" alt="..." width="300px">
+                <img id="preview-image" src="{{ asset('storage/'. $member->image)}}" alt="..." width="300px">
             </div>
           </div>
         </div>
@@ -129,4 +129,32 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('page_script')
+    <script>
+  document.getElementById('profile_photo').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    const preview = document.getElementById('preview-image');
+    const fileNameDisplay = document.getElementById('label_photo');
+    
+    // Tampilkan nama file
+    fileNameDisplay.textContent = file ? file.name.substr(1, 70) : 'Choose file';
+
+    // Tampilkan preview gambar
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.hidden = false;
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        preview.src = '';
+        preview.hidden = true;
+    }
+  });
+</script>
 @endsection

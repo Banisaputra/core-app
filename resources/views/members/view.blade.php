@@ -30,6 +30,7 @@
                         <label for="role" class="col-form-label">Role</label>
                         <select class="custom-select" name="role" id="role">
                             <option value="">-- Pilih Role</option>
+                            <option value="0">-- Hapus Role</option>
                             @foreach ($roles as $role)
                                 <option value="{{ $role->id}}">{{ $role->name}}</option>
                             @endforeach
@@ -40,7 +41,7 @@
                         <input type="password" class="form-control" name="password">
                     </div>
                     <div class="custom-control custom-switch mb-2">
-                        <input type="checkbox" class="custom-control-input" id="accountActive" name="accountActive">
+                        <input type="checkbox" class="custom-control-input" id="accountActive" name="accountActive" {{ $member->user->is_transactional == 1 ? "checked" : ""}}>
                         <label class="custom-control-label" for="accountActive">Aktifasi Account</label>
                     </div>
                 </div>

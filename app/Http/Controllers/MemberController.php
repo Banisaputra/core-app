@@ -127,6 +127,7 @@ class MemberController extends Controller
             "roles" => Role::all(),
             "userRole" => Role::getUserRole($member->user_id)
         ];
+
         return view('members.view', $data);
     }
 
@@ -435,8 +436,7 @@ class MemberController extends Controller
         $request->validate([
             'member_id' => 'required|exists:members,id',
             'email' => 'required|exists:users,email',
-            'role' => 'required|exists:roles,id',
-            'password' => 'required|min:8'
+            'password' => 'nullable|min:8'
         ]);
         
         DB::beginTransaction();
@@ -445,10 +445,22 @@ class MemberController extends Controller
             $user = User::where('email', $request->email)
             ->where('id', $member->user_id)
             ->first();
-            $user->update(['password' => Hash::make($request->password)]);
+
+            if (isset($request->password) && $request->password != "") {
+                $user->update(['password' => Hash::make($request->password)]);
+            }
+
             $user->update(['is_transactional' => isset($request->accountActive) ? 1 : 0]);
-            $newRole = Role::findOrFail($request->role);
-            $newRole->asignRole($user->id);
+            
+            if (isset($request->role) && $request->role != "") {
+                if ($request->role > 0) {
+                    $newRole = Role::findOrFail($request->role);
+                    $newRole->asignRole($user->id);
+                } else {
+                    DB::table('role_user')->where('user_id', $user->id)
+                    ->delete();
+                }
+            }
 
             DB::commit();
             return redirect()->back()->with('success', 'Data Account berhasil diperbarui');

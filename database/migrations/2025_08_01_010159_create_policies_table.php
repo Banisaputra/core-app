@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('policies', function (Blueprint $table) {
             $table->id();
             $table->string('pl_name', 100);
-            $table->enum('doc_type', ['TERMS','SAVING','LOAN']);
+            $table->enum('doc_type', ['TERMS','SAVING','LOAN','GENERAL']);
             $table->text('description');
             $table->text('pl_value');
             $table->tinyInteger('is_transactional')->default(1);

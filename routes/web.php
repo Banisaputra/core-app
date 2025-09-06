@@ -227,6 +227,7 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policy.loanUmum');
     Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policy.loanKhusus');
     Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policy.loanAgunan');
+    Route::post('/policy-general', [PolicyController::class, 'general'])->name('policy.general');
     Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policy.agDestroy');
 
 

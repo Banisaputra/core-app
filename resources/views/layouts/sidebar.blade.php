@@ -90,7 +90,12 @@
                         <span class="ml-3 item-text">Barang</span>
                     </a>
                 </li>
-                
+                <li class="nav-item w-100">
+                    <a class="nav-link" href="{{ route('policy.index')}}">
+                        <i class="fe fe-settings fe-16"></i>
+                        <span class="ml-3 item-text">Pengaturan</span>
+                    </a>
+                </li>
             </li>
         </ul>
     @endif
@@ -150,12 +155,6 @@
                 <a class="nav-link" href="{{ route('repayments.index')}}">
                     <i class="fe fe-credit-card fe-16"></i>
                     <span class="ml-3 item-text">Pelunasan</span>
-                </a>
-            </li>
-            <li class="nav-item w-100">
-                <a class="nav-link" href="{{ route('policy.index')}}">
-                    <i class="fe fe-settings fe-16"></i>
-                    <span class="ml-3 item-text">Pengaturan</span>
                 </a>
             </li>
         </ul>

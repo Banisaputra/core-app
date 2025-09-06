@@ -53,6 +53,21 @@ class PolicyController extends Controller
         $data['agunans'] = [];
         if ($agunans) $data['agunans'] = $agunans;
         
+        // general cut off
+        $generalPolicies = Policy::where('doc_type', 'GENERAL')->get()
+        ->mapWithKeys(function ($policy) {
+            return [
+                $policy->pl_name => [
+                    'id' => $policy->id,
+                    'name' => $policy->pl_name,
+                    'value' => $policy->pl_value,
+                ]
+            ];
+        })
+        ->all();
+        $data['generalPolicies'] = [];
+        if ($generalPolicies) $data['generalPolicies'] = $generalPolicies;
+
 
         return view("policies.index", $data);
     }
@@ -441,6 +456,37 @@ class PolicyController extends Controller
 
         return redirect()->back()->with('success', "Syarat Agunan berhasil dihapus");
         
+    }
+
+    public function general(Request $request) {
+        $cutOff =  $request->cut_off;
+        
+        DB::beginTransaction();
+        try { 
+            $gnco = Policy::where('doc_type', 'GENERAL')
+            ->where('pl_name', 'cut_off_bulanan')->first();
+            if ($gnco) {
+                if ($cutOff >= 1) {
+                    $gnco->pl_value = $cutOff;
+                    $gnco->save();
+                }
+            } else {
+                Policy::create([
+                    'pl_name' => 'cut_off_bulanan',
+                    'doc_type' => 'GENERAL',
+                    'description' => 'batas transaksi yang tercatat disetiap periode.',
+                    'pl_value' => $cutOff
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('policy.index')->with('success', 'Syarat Ketentuan Periode Cut Off berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator.')->withInput();
+        }
+
+
     }
 
 }

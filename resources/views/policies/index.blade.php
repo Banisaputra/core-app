@@ -35,6 +35,7 @@
                     <div class="col-2">
                         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                             <a class="nav-link active" id="v-pills-terms-tab" data-toggle="pill" href="#v-pills-terms" role="tab" aria-controls="v-pills-terms" aria-selected="true">Syarat Ketentuan</a>
+                            <a class="nav-link" id="v-pills-general-tab" data-toggle="pill" href="#v-pills-general" role="tab" aria-controls="v-pills-general" aria-selected="true">General</a>
                             <a class="nav-link" id="v-pills-saving-tab" data-toggle="pill" href="#v-pills-saving" role="tab" aria-controls="v-pills-saving" aria-selected="false">Simpanan</a>
                             <a class="nav-link" id="v-pills-loan-tab" data-toggle="pill" href="#v-pills-loan" role="tab" aria-controls="v-pills-loan" aria-selected="false">Pinjaman</a>
                         </div>
@@ -66,6 +67,9 @@
                                         File syarat dan ketentuan belum tersedia.
                                     </div>
                                 @endif
+                            </div>
+                            <div class="tab-pane fade mb-4" id="v-pills-general" role="tabpanel" aria-labelledby="v-pills-general-tab">
+                                @include('policies.general')
                             </div>
                             <div class="tab-pane fade mb-4" id="v-pills-saving" role="tabpanel" aria-labelledby="v-pills-saving-tab">
                                 @include('policies.saving')

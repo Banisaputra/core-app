@@ -8,6 +8,7 @@ use App\Models\Loan;
 use App\Models\Member;
 use App\Models\Policy;
 use App\Models\LoanAgunan;
+use App\Models\SavingType;
 use App\Models\LoanPayment;
 use App\Models\AgunanPolicy;
 use Illuminate\Http\Request;

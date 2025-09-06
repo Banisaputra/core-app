@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -35,9 +36,11 @@ class AuthController extends Controller
 
         if ($is_valid) {
             $user = Auth::user();
-            
+            $member = Member::where('user_id', $user->id)->first();
+
             if ($user->is_transactional == 1) {
                 $request->session()->regenerate();
+                session()->put('user_image', $member->image ?? "profile_photos/profile-default.png");
                 return redirect()->intended('/');
             } else {
                 // Logout user karena status tidak aktif

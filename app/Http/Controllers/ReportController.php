@@ -351,7 +351,8 @@ class ReportController extends Controller
     // for PDF report type
     public function deduction(Request $request) 
     {
-        $periode = 2510; // date('ym');
+        // $periode = 2510;
+        $periode = date('ym');
         $members = Member::with(['position','devision','user'])->get();
         $data = [];
 

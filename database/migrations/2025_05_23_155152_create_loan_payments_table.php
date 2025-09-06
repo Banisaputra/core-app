@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('lp_total');
             $table->integer('tenor_month')->length(8);
             $table->tinyInteger('lp_state')->length(2);
+            $table->integer('lp_approved')->length(8)->nullable()->comment('untuk konfirmasi pelunasan');
             $table->text('remark')->nullable();
             $table->string('proof_of_payment')->nullable()->comment('url payment');
             $table->integer('lp_forfeit')->comment('denda keterlambatan');

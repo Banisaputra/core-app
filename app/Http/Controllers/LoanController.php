@@ -33,8 +33,10 @@ class LoanController extends Controller
     {
         $data = [
             "loan_policies" => Policy::getLoanPolicies(),
-            "loan_code" => Loan::generateCode()
+            "loan_code" => Loan::generateCode(),
+            "cut_off_day" => Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value')
         ];
+
         // get file terms pdf
         $policy = Policy::where('doc_type', 'TERMS')
         ->where('pl_name', 'policy_information')->first();
@@ -67,8 +69,14 @@ class LoanController extends Controller
         $loan_code = Loan::generateCode();
         $loan_value = Loan::formatIdrToNumeric($request->loan_value);
 
+        // cek cut off
+        $cutOff = Policy::where('doc_type', 'GENERAL')
+        ->where('pl_name', 'cut_off_bulanan')->first();
+
+        $firstAngsuran = Loan::hitungAngsuranPertama($request->loan_date, $cutOff->pl_value)->format('Ymd');
+
         // check due date
-        $date = new DateTime($request->loan_date);
+        $date = new DateTime($firstAngsuran);
         $date->add(new DateInterval('P' . $request->loan_tenor . 'M'));
         $dueDate = $date->format('Ymd');
 
@@ -177,7 +185,7 @@ class LoanController extends Controller
     
             // insert loan payment
             $loan_total = $loan->loan_value;
-            $ln_date = $loan->loan_date;
+            $ln_date = $firstAngsuran;
             for ($i=1; $i <= $request->loan_tenor ; $i++) { 
                 $lp_val = round($loan->loan_value / $loan->loan_tenor, 0);
                 $lp_intr = round(($lp_val*$loan->interest_percent)/100, 0);

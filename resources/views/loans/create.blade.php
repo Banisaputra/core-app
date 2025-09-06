@@ -176,6 +176,29 @@
 
 @section('page_script')
 <script>
+  const cut_off_day = {{ $cut_off_day }};
+
+  function hitungTanggalAngsuranPertama(tanggalPinjam, cutoffDay = 1) {
+    const tanggal = new Date(tanggalPinjam);
+    const hariPinjam = tanggal.getDate();
+    
+    // Buat salinan tanggal untuk dihitung
+    const angsuranPertama = new Date(tanggal);
+    
+    if (hariPinjam <= cutoffDay) {
+        // Angsuran pertama 1 bulan depan
+        angsuranPertama.setMonth(angsuranPertama.getMonth() + 0);
+    } else {
+        // Angsuran pertama 2 bulan depan
+        angsuranPertama.setMonth(angsuranPertama.getMonth() + 1);
+    }
+    
+    // Set selalu tanggal 2
+    angsuranPertama.setDate(2);
+    
+    return angsuranPertama.toISOString().split('T')[0]; // Format YYYY-MM-DD
+  }
+
   $(document).ready(function () {
     $('#memberSelect').select2({
         placeholder: 'Search anggota...',
@@ -210,7 +233,10 @@
       const loanTenor = parseInt($(this).val()) || 0;
       const dueDate = $('#due_date');
       if (loanDate && loanTenor > 0) { 
-        const date = new Date(loanDate);
+        var firstAngsuran = hitungTanggalAngsuranPertama(loanDate, cut_off_day);
+        console.log(firstAngsuran);
+        
+        const date = new Date(firstAngsuran);
         date.setMonth(date.getMonth() + loanTenor);
         
         // Format to YYYY-MM-DD (HTML date input format)

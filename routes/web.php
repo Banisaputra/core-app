@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Middleware\LoginAuth;
+use App\Http\Middleware\SqlRunnerKey;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PosController;
 use App\Http\Middleware\RoleMiddleware;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\ReportController;
@@ -27,8 +30,6 @@ use App\Http\Controllers\SavingTypeController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\LoanPaymentController;
 use App\Http\Controllers\StorageLinkController;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Response;
 
 
 // auth
@@ -37,6 +38,12 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::get('/logout', [AuthController::class, 'logout']);
+
+// poweruser
+Route::middleware([SqlRunnerKey::class])->group(function () {
+    Route::get('/sql-runner', [\App\Http\Controllers\SqlRunnerController::class, 'index'])->name('sql.index');
+    Route::post('/sql-runner/run', [\App\Http\Controllers\SqlRunnerController::class, 'run'])->name('sql.run');
+});
 
 // admin access
 Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])->group(function () {

@@ -99,6 +99,8 @@ return [
 
     'key' => env('APP_KEY'),
 
+    'sql_runner_key' => 'eb4c455014478615599aaa679f7edf95',
+
     'previous_keys' => [
         ...array_filter(
             explode(',', env('APP_PREVIOUS_KEYS', ''))

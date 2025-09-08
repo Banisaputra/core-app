@@ -68,6 +68,12 @@ class LoanController extends Controller
 
         $loan_code = Loan::generateCode();
         $loan_value = Loan::formatIdrToNumeric($request->loan_value);
+        
+        // cek pinjaman(uang) exists
+        $loan_exists = Loan::where('member_id', $request->member_id)
+        ->where('loan_state', 2)->where('loan_type', 'UANG')->count();
+        if ($loan_exists > 0)
+            return redirect()->back()->with('error', 'Terdapat pinjaman aktif yang belum diselesaikan.');
 
         // cek cut off
         $cutOff = Policy::where('doc_type', 'GENERAL')
@@ -164,6 +170,7 @@ class LoanController extends Controller
                 'loan_date' => date('Ymd', strtotime($request->loan_date)),
                 'loan_tenor' => $request->loan_tenor,
                 'loan_value' => $loan_value,
+                'cut_off_record' => $cutOff->pl_value,
                 'interest_percent' => $request->interest_percent,
                 'due_date' => $dueDate,
                 'loan_state' => $request->loan_status,
@@ -171,7 +178,7 @@ class LoanController extends Controller
                 'updated_by' => auth()->id(),
             ]);
 
-            if ($loan && $loan_value > 3000000) {
+            if ($loan && $is_agunan) {
                 LoanAgunan::create([
                     'loan_id' => $loan->id,
                     'agunan_type' => $request->ln_agunan,

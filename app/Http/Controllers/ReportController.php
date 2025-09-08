@@ -371,23 +371,28 @@ class ReportController extends Controller
         foreach ($members as $member) {
             $m_id = $member->id;
             $loanDetails = Loan::with(['member', 'payments' => function($query) use ($periode_start, $periode_end) {
-                $query->whereRaw("DATE_FORMAT(lp_date, '%y%m%d') BETWEEN ? AND ?", 
+                $query->whereRaw("DATE_FORMAT(lp_date, '%Y%m%d') BETWEEN ? AND ?", 
                            [$periode_start->format('Ymd'), $periode_end->format('Ymd')]);
                 }])
                 ->where('member_id', $m_id)
                 ->whereHas('payments', function($query) use ($periode_start, $periode_end) {
-                    $query->whereRaw("DATE_FORMAT(lp_date, '%y%m%d') BETWEEN ? AND ?", 
+                    $query->whereRaw("DATE_FORMAT(lp_date, '%Y%m%d') BETWEEN ? AND ?", 
                            [$periode_start->format('Ymd'), $periode_end->format('Ymd')]);
                 })
                 ->orderBy('id')
                 ->get();
 
             $savingDetails = Saving::with(['member', 'svType'])
-                ->whereRaw("DATE_FORMAT(sv_date, '%y%m%d') BETWEEN ? AND ?", 
-                           [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
+                ->whereBetween("sv_date", [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
                 ->where('member_id', $m_id)
                 ->orderBy('id')
                 ->get();
+
+                // $sql = $loanDetails->toSql();
+                // $bindings = $loanDetails->getBindings();
+                // // Format query dengan binding
+                // $fullQuery = vsprintf(str_replace('?', "'%s'", $sql), $bindings);
+                // dd($fullQuery);
 
             $simpananBulanan = 0;
             $angsuranPinjaman = 0;
@@ -405,7 +410,7 @@ class ReportController extends Controller
                     $angsuranPinjaman += $loan->payments[0]['lp_total']*1;
                 }
             }
-
+// dd($angsuranPinjaman);
             $data[] = [
                 'name' => $member->name ?? '-',
                 'position' => $member->position->name ?? '-',

@@ -21,9 +21,9 @@ class SqlRunnerController extends Controller
         $sql = trim($request->get('query'));
 
         try {
-            if (stripos($sql, 'select') === 0) {
+            if (stripos($sql, 'SELECT') === 0 || stripos($sql, 'SHOW') === 0) {
                 $results = DB::select($sql);
-                return back()->with('results', $results)->with('query', $sql);
+                return back()->with('result_return', true)->with('results', $results)->with('query', $sql);
             } else {
                 $affected = DB::affectingStatement($sql);
                 return back()->with('message', "Query berhasil dieksekusi. $affected baris terpengaruh.")->with('query', $sql);

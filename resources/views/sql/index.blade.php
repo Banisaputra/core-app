@@ -22,29 +22,31 @@
         <button type="submit" class="btn btn-primary">Run Query</button>
     </form>
 
-    @if(!empty(session('results')) && count(session('results')) > 0)
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    @foreach(array_keys((array) session('results')[0]) as $col)
-                        <th>{{ $col }}</th>
-                    @endforeach
-                </tr>
-            </thead>
-            <tbody>
-                @foreach(session('results') as $row)
+    @if(session('result_return'))
+        @if(count(session('results')) > 0)
+            <table class="table table-striped mt-3">
+                <thead>
                     <tr>
-                        @foreach((array) $row as $value)
-                            <td>{{ $value }}</td>
+                        @foreach(array_keys((array) session('results')[0]) as $col)
+                            <th>{{ $col }}</th>
                         @endforeach
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @else
-        <div class="alert alert-warning mt-3">
-            Tidak ada data ditemukan.
-        </div>
+                </thead>
+                <tbody>
+                    @foreach(session('results') as $row)
+                        <tr>
+                            @foreach((array) $row as $value)
+                                <td>{{ $value }}</td>
+                            @endforeach
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="alert alert-warning mt-3">
+                Tidak ada data ditemukan.
+            </div>
+        @endif
     @endif
 </div>
 @endsection

@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
+use DateInterval;
 use App\Models\Loan;
 use App\Models\Sale;
 use App\Models\Member;
+use App\Models\Policy;
 use App\Models\Saving;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
@@ -352,24 +355,36 @@ class ReportController extends Controller
     public function deduction(Request $request) 
     {
         // $periode = 2510;
-        $periode = date('ym');
+        $cut_off_day = Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value');
+        $today = new DateTime();
+        $current_day = (int)$today->format('d');
+        $current_month = (int)$today->format('m');
+        $current_year = (int)$today->format('Y');
+
+        $periode_start = new DateTime("$current_year-$current_month-".($cut_off_day + 1)."");
+        $periode_start->modify("-1 month");
+        $periode_end = new DateTime("$current_year-$current_month-$cut_off_day");
+
         $members = Member::with(['position','devision','user'])->get();
         $data = [];
 
         foreach ($members as $member) {
             $m_id = $member->id;
-            $loanDetails = Loan::with(['member', 'payments' => function($query) use ($periode) {
-                $query->whereRaw("DATE_FORMAT(lp_date, '%y%m') = ?", [$periode]);
+            $loanDetails = Loan::with(['member', 'payments' => function($query) use ($periode_start, $periode_end) {
+                $query->whereRaw("DATE_FORMAT(lp_date, '%y%m%d') BETWEEN ? AND ?", 
+                           [$periode_start->format('Ymd'), $periode_end->format('Ymd')]);
                 }])
                 ->where('member_id', $m_id)
-                ->whereHas('payments', function($query) use ($periode) {
-                    $query->whereRaw("DATE_FORMAT(lp_date, '%y%m') = ?", [$periode]);
+                ->whereHas('payments', function($query) use ($periode_start, $periode_end) {
+                    $query->whereRaw("DATE_FORMAT(lp_date, '%y%m%d') BETWEEN ? AND ?", 
+                           [$periode_start->format('Ymd'), $periode_end->format('Ymd')]);
                 })
                 ->orderBy('id')
                 ->get();
 
             $savingDetails = Saving::with(['member', 'svType'])
-                ->whereRaw("DATE_FORMAT(sv_date, '%y%m') = ?", [$periode])
+                ->whereRaw("DATE_FORMAT(sv_date, '%y%m%d') BETWEEN ? AND ?", 
+                           [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
                 ->where('member_id', $m_id)
                 ->orderBy('id')
                 ->get();
@@ -402,10 +417,11 @@ class ReportController extends Controller
 
         $pdf = PDF::loadView('reports.deduction-salary', [
             'data' => $data,
-            'periode' => $periode
+            'periode_start' => $periode_start->format('Ymd'),
+            'periode_end' => $periode_end->format('Ymd'),
         ]);
 
-        return $pdf->stream('Laporan-Potongan-Gaji-' . $periode . '.pdf');
+        return $pdf->stream('Laporan-Potongan-Gaji-' . $periode_start->format('Ymd') . "-" . $periode_end->format('Ymd') . '.pdf');
     }
     // --------unset---
     // for excel report type

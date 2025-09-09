@@ -48,6 +48,7 @@
                     <option value="purchase">Pembelian</option>
                     <option value="sales">Penjualan</option>
                     <option value="profitNlose">Laba Rugi</option>
+                    <option value="inventory">Adjustment Stock</option>
                 </select>
             </div>
             <div class="form-group mb-3 col-md-3">

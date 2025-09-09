@@ -10,6 +10,7 @@ use App\Models\Member;
 use App\Models\Policy;
 use App\Models\Saving;
 use App\Models\Purchase;
+use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
@@ -130,6 +131,23 @@ class ReportController extends Controller
                 $data['totalSl'] = $totalSales;
                 
                 $file = 'reports.profit-lose';
+                break;
+            
+            case 'INVENTORY':
+                $inventories = Inventory::with(['invDetails'])
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->get();
+
+                foreach ($inventories as $key => $inv) {
+                    $data[] = [
+                        'inv_code' => $inv->code,
+                        'inv_date' => $inv->inv_date,
+                        'inv_type' => $inv->type,
+                        'inv_remark' => $inv->remark,
+                        'inv_state' => $inv->inv_state,
+                    ];
+                }
+                $file = 'reports.inventories';
                 break;
             
             default:
@@ -410,7 +428,7 @@ class ReportController extends Controller
                     $angsuranPinjaman += $loan->payments[0]['lp_total']*1;
                 }
             }
-// dd($angsuranPinjaman);
+
             $data[] = [
                 'name' => $member->name ?? '-',
                 'position' => $member->position->name ?? '-',

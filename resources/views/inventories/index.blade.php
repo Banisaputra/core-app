@@ -56,7 +56,6 @@
                       <th width="15%">Tanggal</th>
                       <th width="15%">Jenis</th>
                       <th>Keterangan</th>
-                      <th width="15%">Jumlah</th>
                       <th width="15%">Status</th>
                       <th width="5%">Action</th>
                     </tr>
@@ -70,7 +69,6 @@
                             <td>{{ date('d M Y', strtotime($inv->inv_date)) }}</td>
                             <td>{{ $inv->type }}</td>
                             <td>{!! $inv->remark !!}</td>
-                            <td>{{ $inv->amount }}</td>
                             <td>@switch($inv->inv_state)
                                   @case(99)
                                     <span class="text-danger">Dibatalkan</span>

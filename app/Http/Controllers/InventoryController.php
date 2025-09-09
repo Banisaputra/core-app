@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class InventoryController extends Controller
 {
     public function index() {
-        $inventories = Inventory::all();
+        $inventories = Inventory::orderby('id', 'DESC')->get();
         return view('inventories.index', compact('inventories')); 
     }
 

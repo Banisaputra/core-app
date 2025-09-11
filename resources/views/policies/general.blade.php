@@ -25,7 +25,7 @@
                             <div class="col-md-6">
                               <div class="form-group mb-3">
                                   <label for="simpleinputlabel">Tanggal Cut Off Periode</label>
-                                  <input type="number" id="cut_off" class="form-control" value="{{ $generalPolicies['cut_off_bulanan']['value'] ?? 0 }}" readonly>
+                                  <input type="number" id="cut_off" class="form-control" value="{{ $generalPolicies['cut_off_bulanan']['value'] ?? 1 }}" readonly>
                               </div>
                             </div>
                         </div>

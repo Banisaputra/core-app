@@ -381,7 +381,7 @@ class ReportController extends Controller
 
         $periode_start = new DateTime("$current_year-$current_month-".($cut_off_day + 1)."");
         $periode_start->modify("-1 month");
-        $periode_end = new DateTime("$current_year-$current_month-$cut_off_day");
+        $periode_end = new DateTime("$current_year-$current_month-($cut_off_day ?? 0)");
 
         $members = Member::with(['position','devision','user'])->get();
         $data = [];

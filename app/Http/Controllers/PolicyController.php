@@ -483,7 +483,7 @@ class PolicyController extends Controller
             return redirect()->route('policy.index')->with('success', 'Syarat Ketentuan Periode Cut Off berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator.')->withInput();
+            return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator.'. $e->message())->withInput();
         }
 
 

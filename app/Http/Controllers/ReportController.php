@@ -372,7 +372,6 @@ class ReportController extends Controller
     // for PDF report type
     public function deduction(Request $request) 
     {
-        // $periode = 2510;
         $cut_off_day = Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value');
         $today = new DateTime();
         $current_day = (int)$today->format('d');
@@ -381,7 +380,7 @@ class ReportController extends Controller
 
         $periode_start = new DateTime("$current_year-$current_month-".($cut_off_day + 1)."");
         $periode_start->modify("-1 month");
-        $periode_end = new DateTime("$current_year-$current_month-($cut_off_day ?? 0)");
+        $periode_end = new DateTime("$current_year-$current_month-".($cut_off_day ?? 0)."");
 
         $members = Member::with(['position','devision','user'])->get();
         $data = [];

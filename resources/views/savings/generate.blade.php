@@ -32,7 +32,7 @@
         </div>
       @endif
       <h5 class="mb-2 mt-4"> Anggota</h5>
-      <p class="mb-4">Kosongkan jika tidak ada Anggota yang ter blacklist, atau isikan nama Anggota sesuai daftar blacklist</p>
+      <p class="mb-4">Kosongkan jika tidak ada Anggota yang ter kecuali, atau isikan nama Anggota jika dikecualikan.</p>
        
       <form action={{ route('savings.generated') }} method="POST" id="form-member" enctype="multipart/form-data">
         @csrf
@@ -51,8 +51,8 @@
               </select>
             </div>
             <div class="form-group col-md-6">
-                <label for="simple-select2">Anggota</label>
-                <select id="memberSelect" name="member_id[]" class="form-control"></select>
+              <label for="simple-select2">Anggota</label>
+              <select id="memberSelect" name="member_id[]" class="form-control"></select>
             </div>
         </div>
          
@@ -75,41 +75,33 @@
 <script src="{{ asset('fedash/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('fedash/js/dataTables.bootstrap4.min.js') }}"></script>
 <script>
-    $('#roleUser').DataTable(
-    {
-      autoWidth: true,
-      "lengthMenu": [
-        [10, 25, 50, -1],
-        [10, 25, 50, "All"]
-      ]
-    });
     $('#memberSelect').select2({
-        placeholder: 'Search member...',
-        theme: 'bootstrap4',
-        minimumInputLength: 2,
-        multiple: true,
-        ajax: {
-            url: '/api/members/search',
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    q: params.term
-                    active: 1
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.map(function (item) {
-                        return {
-                            id: item.id,
-                            text: item.name
-                        };
-                    })
-                };
-            },
-            cache: true
-        }
+      placeholder: 'Search member...',
+      theme: 'bootstrap4',
+      minimumInputLength: 2,
+      multiple: true,
+      ajax: {
+        url: '/api/members/search',
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+            return {
+                q: params.term,
+                active: 1
+            };
+        },
+        processResults: function (data) {
+            return {
+                results: data.map(function (item) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    };
+                })
+            };
+        },
+        cache: true
+      }
     });
    
 </script>

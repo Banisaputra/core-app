@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Loan;
 use App\Models\Member;
+use App\Models\Policy;
 use App\Models\Saving;
 use App\Models\SavingType;
 use Illuminate\Http\Request;
@@ -128,6 +130,19 @@ class SavingController extends Controller
 
         $startOfMonth = (int) ($year . str_pad($month, 2, '0', STR_PAD_LEFT) . '01');
         $endOfMonth = (int) ($year . str_pad($month, 2, '0', STR_PAD_LEFT) . '31');
+
+        // cek cut off
+        $cutOff = Policy::where('doc_type', 'GENERAL')
+        ->where('pl_name', 'cut_off_bulanan')->value('pl_value');
+
+        $tglSaving = Loan::hitungAngsuranPertama(date('Y-m-d', strtotime($startOfMonth)), $cutOff)->format('Ymd');
+
+        dd($tglSaving);
+        $periode_start = new DateTime("$year-$month-".($cutOff + 1)."");
+        $periode_start->modify("-1 month");
+        $periode_end = new DateTime("$year-$month-".($cutOff ?? 0)."");
+
+
 
         foreach ($members as $key => $id) {
             if (!in_array($id, $request->member_id ?? [])) {

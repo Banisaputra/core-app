@@ -39,7 +39,7 @@
                            </span>
                         </div>
                         <div class="col pr-0">
-                           <p class="small text-muted mb-0">Orders</p>
+                           <p class="small text-muted mb-0">Purchase</p>
                            <span class="h3 mb-0">{{ number_format($purchase,0,',','.')}}</span>
                         </div>
                         </div>
@@ -47,11 +47,81 @@
                   </div>
                </div> 
             </div>
+            <div class="row">
+               <div class="col-md-6 mb-4">
+                  <div class="card shadow">
+                     <div class="card-header">
+                        <strong class="card-title mb-0">Sales & Purchase Chart</strong>
+                       
+                     </div>
+                     <div class="card-body">
+                        <canvas id="spChart" width="400" height="300"></canvas>
+                     </div> 
+                  </div> 
+                </div>
+            </div>
          </div>
       </div>
    </div>
 @endsection
 
 @section('page_script')
-    
+    <script>
+      var ChartData = { 
+         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 
+         datasets: [
+            { 
+               label: "Sales", 
+               barThickness: 10, 
+               backgroundColor: "rgba(51, 161, 81, 1)", 
+               borderColor: "rgba(51, 161, 81, 1)", 
+               pointRadius: !1, 
+               pointColor: "#0dc516ff", 
+               pointStrokeColor: "rgba(51, 161, 81, 1)", 
+               pointHighlightFill: "#fff", 
+               pointHighlightStroke: "rgba(51, 161, 81, 1)", 
+               data: [28, 48, 40, 19, 64, 27, 90, 85, 92, 56, 75, 40], 
+               fill: "",
+               borderWidth: 2,
+               lineTension: .1 
+            }, 
+            {
+               label: "Purchase", 
+               barThickness: 10, 
+               backgroundColor: "rgba(210, 214, 222, 1)",
+               borderColor: "rgba(210, 214, 222, 1)", 
+               pointRadius: !1, 
+               pointColor: "rgba(210, 214, 222, 1)", 
+               pointStrokeColor: "#c1c7d1", 
+               pointHighlightFill: "#fff", 
+               pointHighlightStroke: "rgba(220,220,220,1)", 
+               data: [65, 59, 80, 42, 43, 55, 40, 36, 68, 34, 77, 80], 
+               fill: "", 
+               borderWidth: 2, 
+               lineTension: .1 
+            },
+         ] 
+      }
+      var ChartOptions = { 
+         maintainAspectRatio: !1, 
+         responsive: !0, 
+         legend: { display: !1 }, 
+         scales: { 
+            xAxes: [{ 
+               gridLines: { 
+                  display: !1 
+               } 
+            }], 
+            yAxes: [{ 
+               gridLines: { 
+                  display: !1, 
+                  color: colors.borderColor, 
+                  zeroLineColor: colors.borderColor 
+               } 
+            }] 
+         } 
+      }
+      spChart=document.getElementById("spChart");
+      spChart&&new Chart(spChart,{type:"bar",data:ChartData,options:ChartOptions});
+    </script>
 @endsection

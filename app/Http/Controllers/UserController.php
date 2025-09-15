@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
 use Carbon\Carbon;
 use App\Models\Sale;
 use App\Models\User;
+use App\Models\Policy;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,14 +24,21 @@ class UserController extends Controller
 
     public function dashboard() 
     {   
+        $cut_off_day = Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value');
+        $today = new DateTime();
+        $current_day = (int)$today->format('d');
+        $current_month = (int)$today->format('m');
+        $current_year = (int)$today->format('Y');
 
-        $startOfMonth = Carbon::now()->startOfMonth()->format('Ymd');
-        $endOfMonth = Carbon::now()->endOfMonth()->format('Ymd');
+        $periode_start = new DateTime("$current_year-$current_month-".($cut_off_day + 1)."");
+        $periode_start->modify("-1 month");
+        $periode_end = new DateTime("$current_year-$current_month-".($cut_off_day ?? 0)."");
 
-        $sales = Sale::whereBetween('sa_date', [$startOfMonth, $endOfMonth])
+        $sales = Sale::whereBetween('sa_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
                     ->sum('sub_total');
-        $purchase = Purchase::whereBetween('pr_date', [$startOfMonth, $endOfMonth])
+        $purchase = Purchase::whereBetween('pr_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
                     ->sum('total');
+
 
         return view('dashboard', compact('sales', 'purchase'));
     }

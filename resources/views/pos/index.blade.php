@@ -213,7 +213,7 @@
 <div class="container-fluid py-3">
   <div class="row">
     <!-- Product List -->
-    <div class="col-sm-6 col-md-8">
+    <div class="col-6">
         <h4>Products</h4>
         <input type="text" class="form-control" id="item_search" name="item_search" placeholder="Search item...">
         <hr class="my-4">
@@ -223,12 +223,12 @@
             </div>
         </div>
       <div class="row" id="productList">
-
+        
       </div>
     </div>
 
     <!-- Cart -->
-    <div class="col-sm-6 col-md-4">
+    <div class="col-6">
         <h4>Cart Pelanggan</h4>
         <select id="memberSelect" name="member_id" class="form-control"></select>
 

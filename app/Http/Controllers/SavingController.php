@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
 use App\Models\Loan;
 use App\Models\Member;
 use App\Models\Policy;
@@ -137,19 +138,16 @@ class SavingController extends Controller
 
         $tglSaving = Loan::hitungAngsuranPertama(date('Y-m-d', strtotime($startOfMonth)), $cutOff)->format('Ymd');
 
-        dd($tglSaving);
         $periode_start = new DateTime("$year-$month-".($cutOff + 1)."");
         $periode_start->modify("-1 month");
         $periode_end = new DateTime("$year-$month-".($cutOff ?? 0)."");
-
-
 
         foreach ($members as $key => $id) {
             if (!in_array($id, $request->member_id ?? [])) {
                 if ($wajib->id == $request->sv_type_id) {
                     $exists = Saving::where('member_id', $id)
                         ->where('sv_type_id', $wajib->id)
-                        ->whereBetween('sv_date', [$startOfMonth, $endOfMonth])
+                        ->whereBetween('sv_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
                         ->exists();
     
                     if ($exists) {

@@ -237,17 +237,17 @@ function renderProducts(products) {
 
    products.forEach(product => {
       const col = document.createElement("div");
-      col.className = "col-md-3 mb-3";
+      col.className = "col-4 mb-3";
       col.innerHTML = `
-      <div class="p-3 text-center product-card" data-id="${product.id}" data-stock="${product.stock}" data-name="${product.item_name}" data-price="${product.sales_price}" data-ppn="${product.effective_ppn}">
-         <img src="/storage/${product.item_image}" class="mb-3"
-            onerror="this.onerror=null; this.src='/images/default.jpg'" 
-            alt="item_picture" width="150px" height="150px">
-         <h6>${product.item_name.length > 20 ? product.item_name.substring(0, 20) + '...' : product.item_name}</h6>
-         <span>${formatIDR(parseFloat(product.sales_price), 0)}</span><br>
-         <span class="text-muted">Stock: ${product.stock}</span>
-         <button class="btn btn-sm btn-primary btn-block add-to-cart">Add</button>
-      </div>
+         <div class="p-3 text-center product-card" data-id="${product.id}" data-stock="${product.stock}" data-name="${product.item_name}" data-price="${product.sales_price}" data-ppn="${product.effective_ppn}">
+            <img src="/storage/${product.item_image}" class="mb-3"
+               onerror="this.onerror=null; this.src='/images/default.jpg'" 
+               alt="item_picture" width="150px" height="150px">
+            <h6>${product.item_name.length > 20 ? product.item_name.substring(0, 20) + '...' : product.item_name}</h6>
+            <span>${formatIDR(parseFloat(product.sales_price), 0)}</span><br>
+            <span class="text-muted">Stock: ${product.stock}</span>
+            <button class="btn btn-sm btn-primary btn-block add-to-cart">Add</button>
+         </div>
       `;
       productList.appendChild(col);
       searchBox.value = "";

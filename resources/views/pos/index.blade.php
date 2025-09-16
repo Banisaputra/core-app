@@ -223,16 +223,18 @@
             </div>
         </div>
       <div class="row" id="productList">
-        
+
       </div>
     </div>
 
     <!-- Cart -->
     <div class="col-6">
         <h4>Cart Pelanggan</h4>
-        <select id="memberSelect" name="member_id" class="form-control"></select>
+        <div class="col-12">
+            <select id="memberSelect" name="member_id" class="form-control"></select>
+        </div>
 
-        <table class="table cart-table table-bordered">
+        <table class="table cart-table table-bordered col-12">
             <thead>
             <tr>
                 <th width="35%">Barang</th>

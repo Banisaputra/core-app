@@ -41,7 +41,7 @@
                         <div class="card-body text-center">
                             <img src="{{ $purchase->file_path != '' && file_exists(public_path('storage/'.$purchase->file_path)) 
                             ? asset('storage/'.$purchase->file_path) 
-                            : asset('images/default.png') }}" alt="profile" width="300px">
+                            : asset('images/default.png') }}" alt="profile" style="width: -webkit-fill-available;">
                         </div>
                     </div>
                 </div>

@@ -260,6 +260,7 @@ function updateCart() {
 
    for (const [id, item] of Object.entries(cart)) {
       const row = document.createElement("div");
+      row.className = 'mb-2';
       row.innerHTML = `
       <div class="detail-item">
          <div class="col-4">${item.name}</div>

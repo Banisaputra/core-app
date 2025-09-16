@@ -242,7 +242,7 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
 
 Route::middleware([RoleMiddleware::class . ':administrator,kepala toko,admin toko'])->group(function() {
     // pos
-    Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
+    Route::get('/pos', [PosController::class, 'index2'])->name('pos.index');
     Route::post('/submit-sale', [PosController::class, 'store']);
     Route::get('/sales/{id}/print', [PosController::class, 'printReceipt'])->name('sales.print');
 

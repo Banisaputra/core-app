@@ -46,7 +46,7 @@
                 </div>
                 <div class="col-8">
                     <div class="row">
-                        <p for="nip" class="col-sm-3 text-right">NIP</p>
+                        <p class="col-sm-3 text-right">NIK</p>
                         <div class="col-sm-9">
                             <h5>{{ $saving->member->nip }}</h5>
                         </div>

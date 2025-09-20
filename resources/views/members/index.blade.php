@@ -100,7 +100,7 @@
                   <thead>
                     <tr>
                       <th width="5%">No.</th>
-                      <th width="13%">NIP</th>
+                      <th width="13%">NIK</th>
                       <th>Nama</th>
                       <th width="15%">Jabatan</th>
                       <th width="15%">Bagian</th>

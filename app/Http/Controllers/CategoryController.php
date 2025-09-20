@@ -104,9 +104,9 @@ class CategoryController extends Controller
 
         $category->code = $request->code;
         $category->name = $request->name;
-        $category->ppn_percent = $request->ppn_percent;
-        $category->margin_percent = $request->margin_percent;
-        $category->margin_price = $request->margin_price;
+        $category->ppn_percent = $request->ppn_percent ?? 0;
+        $category->margin_percent = $request->margin_percent ?? 0;
+        $category->margin_price = $request->margin_price ?? 0;
         $category->is_parent = $is_parent;
         $category->parent_id = $parent;
         $category->updated_by = auth()->id();

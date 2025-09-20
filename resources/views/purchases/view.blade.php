@@ -47,7 +47,7 @@
                 </div>
                 <div class="col-8">
                     <div class="row">
-                        <p for="nip" class="col-sm-3 text-right">Kode</p>
+                        <p class="col-sm-3 text-right">Kode</p>
                         <div class="col-sm-9">
                             <h5>{{ $purchase->pr_code }}</h5>
                         </div>

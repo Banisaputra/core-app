@@ -237,17 +237,29 @@ function renderProducts(products) {
 
    products.forEach(product => {
       const col = document.createElement("div");
-      col.className = "col-4 mb-3";
+      col.className = "col-12 mb-3";
+      // col.innerHTML = `
+      //    <div class="text-center product-card" data-id="${product.id}" data-stock="${product.stock}" data-name="${product.item_name}" data-price="${product.sales_price}" data-ppn="${product.effective_ppn}">
+      //       <img src="/storage/${product.item_image}" class="mb-3"
+      //          onerror="this.onerror=null; this.src='/images/default.jpg'" 
+      //          alt="item_picture" width="150px" height="150px">
+      //       <h6>${product.item_name.length > 20 ? product.item_name.substring(0, 20) + '...' : product.item_name}</h6>
+      //       <span>${formatIDR(parseFloat(product.sales_price), 0)}</span><br>
+      //       <span class="text-muted">Stock: ${product.stock}</span>
+      //       <button class="btn btn-sm btn-primary btn-block add-to-cart">Add</button>
+      //    </div>
+      // `;
       col.innerHTML = `
-         <div class="text-center product-card" data-id="${product.id}" data-stock="${product.stock}" data-name="${product.item_name}" data-price="${product.sales_price}" data-ppn="${product.effective_ppn}">
-            <img src="/storage/${product.item_image}" class="mb-3"
-               onerror="this.onerror=null; this.src='/images/default.jpg'" 
-               alt="item_picture" width="150px" height="150px">
-            <h6>${product.item_name.length > 20 ? product.item_name.substring(0, 20) + '...' : product.item_name}</h6>
-            <span>${formatIDR(parseFloat(product.sales_price), 0)}</span><br>
-            <span class="text-muted">Stock: ${product.stock}</span>
-            <button class="btn btn-sm btn-primary btn-block add-to-cart">Add</button>
-         </div>
+         <div class="product-card product-item row" data-id="${product.id}" data-stock="${product.stock}" data-name="${product.item_name}" data-price="${product.sales_price}" data-ppn="${product.effective_ppn}">
+            <div class="product-info col-12">
+               <div class="product-name col-5">${product.item_name}</div>
+               <div class="product-price col-3">${formatIDR(parseFloat(product.sales_price), 0)}</div>
+               <div class="product-stock col-2">Stok: ${product.stock}</div>
+               <div class="col-2">
+                  <button class="btn btn-sm btn-primary btn-block add-to-cart"><i class="fas fa-cart-plus me-1"></i> Beli</button>
+               </div>
+            </div>
+         </div> 
       `;
       productList.appendChild(col);
       searchBox.value = "";
@@ -271,7 +283,7 @@ function updateCart() {
          </div>
    
          <div class="total-control col-3">${formatIDR(item.qty * (item.price - item.disc) ,0)}</div>
-         <div class="edit-control"><button class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#editItem"><span data-id="${id}" class="fe fe-info fe-16 edit-item"></span></button></div>
+         <div class="edit-control"><button class="btn btn-sm btn-outline-info btn-edit-item" data-id="${id}" data-toggle="modal" data-target="#editItem"><span data-id="${id}" class="fe fe-info fe-16 edit-item"></span></button></div>
       </div>
       `;
       cartBody.appendChild(row);
@@ -302,7 +314,7 @@ document.addEventListener("click", e => {
       updateCart();
    }
 
-   if (e.target.classList.contains("edit-item")) {
+   if (e.target.classList.contains("edit-item") || e.target.classList.contains("btn-edit-item")) {
       const id = e.target.dataset.id;
       var subTotal = cart[id]['price'] * cart[id]['qty'];
       var ppn_val = (subTotal * (cart[id]['ppn']*1 / 100))
@@ -386,7 +398,7 @@ searchBox.addEventListener("input", () => {
    searchTimer = setTimeout(() => {
       const query = searchBox.value.trim();
       loadProducts(query);
-   }, 300);
+   }, 500);
 });
 
 $('#editItem #disc_price').on('input', function () {
@@ -406,12 +418,12 @@ $('#editItem #saveChange').on('click', function() {
 });
 
 $('#editItem').on('hidden.bs.modal', function () {
-   $(this).find('#itemID').val('');
-   $(this).find('#disc_price').val('');
-   $(this).find('#itemName').html('');
-   $(this).find('#itemQty').html('');
-   $(this).find('#itemPrice').html('');
-   $(this).find('#disc_price').val('');
-   $(this).find('#totalBase').html('');
-   $(this).find('#finalTotal').html('');
+   $('#itemID').val('');
+   $('#disc_price').val('');
+   $('#itemName').html('');
+   $('#itemQty').html('');
+   $('#itemPrice').html('');
+   $('#disc_price').val('');
+   $('#totalBase').html('');
+   $('#finalTotal').html('');
 });

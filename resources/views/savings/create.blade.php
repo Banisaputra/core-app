@@ -118,7 +118,7 @@
                     results: data.map(function (item) {
                         return {
                             id: item.id,
-                            text: item.name
+                            text: "["+ item.nip +"] " + item.name
                         };
                     })
                 };

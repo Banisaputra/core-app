@@ -239,7 +239,7 @@ class MemberController extends Controller
             });
         })
         ->whereRAW($whereAdd)
-        ->select('id', 'name')
+        ->select('id', 'name', 'nip')
         ->limit(10)
         ->get();
         

@@ -44,10 +44,21 @@
                             : asset('images/default.png') }}" alt="profile" width="300px">
                         </div>
                     </div>
+                    <div>
+                        <a href="#" class="btn mb-2 btn-primary">
+                            <span class="fe fe-plus fe-16 mr-1"></span> Cetak Info
+                        </a>
+                    </div>
                 </div>
                 <div class="col-8">
                     <div class="row">
-                        <p for="nip" class="col-sm-3 text-right">NIP</p>
+                        <p class="col-sm-3 text-right">Kode</p>
+                        <div class="col-sm-9">
+                            <h5>{{ $loan->loan_code }}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p class="col-sm-3 text-right">NIK</p>
                         <div class="col-sm-9">
                             <h5>{{ $loan->member->nip }}</h5>
                         </div>
@@ -93,6 +104,12 @@
                         <p class="col-sm-3 text-right">Tenor Pinjaman</p>
                         <div class="col-sm-9">
                             <h5>{{ $loan->loan_tenor }} Bulan</h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p class="col-sm-3 text-right">Angsuran Perbulan</p>
+                        <div class="col-sm-9">
+                            <h5>Rp {{ number_format($loan->payments[0]->lp_total, 0) }},-</h5>
                         </div>
                     </div>
                     <div class="row">

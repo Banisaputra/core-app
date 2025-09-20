@@ -42,7 +42,7 @@
         @method('PUT')
         <div class="form-row">
           <div class="form-group col-md-4">
-            <label for="nip">NIP</label>
+            <label for="nip">NIK</label>
             <input type="text" class="form-control" id="nip" name="nip" value="{{ old('nip', $member->nip ?? '')}}">
           </div>
           <div class="form-group col-md-4">

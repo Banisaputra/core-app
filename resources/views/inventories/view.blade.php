@@ -38,7 +38,7 @@
             <div class="row"> 
                 <div class="col-12">
                     <div class="row">
-                        <p for="nip" class="col-sm-3 text-right">Kode</p>
+                        <p class="col-sm-3 text-right">Kode</p>
                         <div class="col-sm-9">
                             <h5>{{ $inventory->code }}</h5>
                         </div>

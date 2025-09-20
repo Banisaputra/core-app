@@ -28,8 +28,8 @@
                 </div>
                 @endif
                 <div class="form-group">
-                    <label for="inputEmail" class="sr-only">Email address</label>
-                    <input type="email" id="inputEmail" name="email" class="form-control form-control-lg" tabindex='1' placeholder="Email address" required="" autofocus="">
+                    <label for="inputEmail" class="sr-only">Username</label>
+                    <input type="text" id="inputEmail" name="email" class="form-control form-control-lg" tabindex='1' placeholder="Email/NIK" required="" autofocus="">
                 </div>
                 <div class="custom-control custom-checkbox text-left mb-3">
                     <input type="checkbox" class="custom-control-input" id="showPassword">

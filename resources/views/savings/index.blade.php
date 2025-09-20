@@ -56,6 +56,7 @@
                     <tr>
                       <th width="5%">No.</th>
                       <th width="15%">Kode</th>
+                      <th width="">NIK</th>
                       <th width="">Anggota</th>
                       <th width="15%">Tanggal</th>
                       <th width="10%">Jenis</th>
@@ -70,6 +71,7 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $saving->sv_code }}</td>
+                            <td>{{ $saving->member->nip }}</td>
                             <td>{{ ucwords($saving->member->name) }}</td>
                             <td>{{ date('d M Y', strtotime($saving->sv_date)) }}</td>
                             <td>{{ $saving->svType->name }}</td>

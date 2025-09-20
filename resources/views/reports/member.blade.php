@@ -19,7 +19,7 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>NIP</th>
+                <th>NIK</th>
                 <th>Nama</th>
                 <th>Jabatan</th>
                 <th>Bagian</th>

@@ -24,6 +24,7 @@ class UserController extends Controller
 
     public function dashboard() 
     {   
+        $role = strtoupper(auth()->user()->roles[0]['name']);
         $cut_off_day = Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value');
         $today = new DateTime();
         $current_day = (int)$today->format('d');
@@ -34,12 +35,16 @@ class UserController extends Controller
         $periode_start->modify("-1 month");
         $periode_end = new DateTime("$current_year-$current_month-".($cut_off_day ?? 0)."");
 
+        // data member
+        $userID = auth()->id();
+
+        // data all
         $sales = Sale::whereBetween('sa_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
                     ->sum('sub_total');
         $purchase = Purchase::whereBetween('pr_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
                     ->sum('total');
 
-
+        if ($role === "MEMBER") return view('dashboard-member');
         return view('dashboard', compact('sales', 'purchase'));
     }
 

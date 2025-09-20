@@ -8,9 +8,36 @@
     .product-card {
       cursor: pointer;
     }
+    .product-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+        transition: background-color 0.2s;
+    }
+    .product-item:last-child {
+        border-bottom: none;
+    }
+    .product-item:hover {
+        background-color: rgba(156, 156, 156, 0.381);
+    }
+    .product-info {
+        /* flex-grow: 1; */
+        display: flex;
+    }
+    .product-name {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .product-price {
+        color: #28a745;
+        font-weight: 600;
+    }
+    .product-stock {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
 
-    /* Scrollable product list */
-    
     #productList {
       max-height: 80vh;
       overflow-y: auto;
@@ -256,7 +283,7 @@
                         results: data.map(function (item) {
                             return {
                                 id: item.id,
-                                text: item.name
+                                text: "["+ item.nip +"] " + item.name
                             };
                         })
                     };

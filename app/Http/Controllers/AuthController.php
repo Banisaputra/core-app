@@ -23,7 +23,7 @@ class AuthController extends Controller
     public function login(Request $request) 
     {
         $request->validate([
-            'email' => 'required|email',
+            'email' => 'required',
             'password' => 'required|min:8'
         ], [
             'email.required' => 'Email wajib diisi.',
@@ -31,7 +31,17 @@ class AuthController extends Controller
             'password.min' => 'Password minimal 8 karakter.'
         ]);
 
-        $credentials = $request->only('email', 'password');
+        $email = $request->email;
+        $nip = Member::where('nip', $request->email)->first();
+        if ($nip) {
+            $email = User::where('id', $nip->user_id)->value('email');
+        }
+
+        // $credentials = $request->only('email', 'password');
+        $credentials = [
+            "email" => $email,
+            "password" => $request->password
+        ];
         $is_valid = Auth::attempt($credentials);
 
         if ($is_valid) {

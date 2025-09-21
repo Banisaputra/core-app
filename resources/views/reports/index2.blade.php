@@ -116,7 +116,7 @@
             <small>*Kosongkan untuk mengambil semua data</small>
           </div>
           <div class="form-group col-md-3">
-              <label for="aktifasiSelect">Status Aktifasi</label>
+              <label for="aktifasiSelect">Status Dokumen</label>
               <select id="aktifasiSelect" name="activate" class="form-control">
                 <option value="2">SEMUA</option>
                 <option value="1">Aktif</option>

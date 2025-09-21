@@ -55,7 +55,7 @@
         <div class="form-row">
           <div class="form-group col-md-3">
             <label for="telphone">No.Tlpn</label>
-            <input type="number" class="form-control" id="telphone" name="telphone" value="{{old('telphone')}}">
+            <input type="text" class="form-control" id="telphone" name="telphone" value="{{old('telphone')}}">
           </div>
           <div class="form-group col-md-3">
             <label for="gender">Gender</label>

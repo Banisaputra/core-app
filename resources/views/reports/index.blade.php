@@ -39,26 +39,36 @@
       <form action={{ route('reports.getReport') }} method="POST" id="form-report" enctype="multipart/form-data">
         @csrf
         <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="reportSelect">Jenis Laporan</label>
-                <select id="reportSelect" name="typeReport" class="form-control">
-                    <option value="">-- Pilih laporan </option>
-                    <option value="saving">Simpanan</option>
-                    <option value="loan">Pinjaman</option>
-                    <option value="purchase">Pembelian</option>
-                    <option value="sales">Penjualan</option>
-                    <option value="profitNlose">Laba Rugi</option>
-                    <option value="inventory">Adjustment Stock</option>
-                </select>
-            </div>
-            <div class="form-group mb-3 col-md-3">
-               <label for="dateStart">Mulai</label>
-               <input class="form-control" id="dateStart" type="date" name="dateStart">
-            </div>
-            <div class="form-group mb-3 col-md-3">
-               <label for="dateEnd">Sampai</label>
-               <input class="form-control" id="dateEnd" type="date" name="dateEnd">
-            </div>
+          <div class="form-group col-md-6">
+              <label for="reportSelect">Jenis Laporan</label>
+              <select id="reportSelect" name="typeReport" class="form-control">
+                <option value="">-- Pilih laporan </option>
+                <option value="saving">Simpanan</option>
+                <option value="loan">Pinjaman</option>
+                <option value="purchase">Pembelian</option>
+                <option value="sales">Penjualan</option>
+                <option value="profitNlose">Laba Rugi</option>
+                <option value="inventory">Adjustment Stock</option>
+              </select>
+          </div>
+          <div class="form-group mb-3 col-md-3">
+              <label for="dateStart">Mulai</label>
+              <input class="form-control" id="dateStart" type="date" name="dateStart">
+          </div>
+          <div class="form-group mb-3 col-md-3">
+              <label for="dateEnd">Sampai</label>
+              <input class="form-control" id="dateEnd" type="date" name="dateEnd">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label for="typeSales">Jenis Transaksi</label>
+            <select id="typeSales" name="typeSales" class="form-control" disabled>
+              <option value="all">SEMUA</option>
+              <option value="cash">Cash</option>
+              <option value="kredit">Kredit</option>
+            </select>
+          </div>
         </div>
 
         <hr class="my-4">
@@ -68,16 +78,15 @@
            </div>
            <div class="col-md-6 text-right">
             <button type="button" id="preview-btn" class="btn btn-info mr-2">
-             <span class="fe fe-16 mr-2 fe-eye"></span>
-             <span id="preview-text">Preview</span>
-             <span id="preview-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
-         </button>
-         <button type="submit" id="submit-btn" class="btn btn-primary">
-             <span class="fe fe-16 mr-2 fe-download"></span>
-             <span id="submit-text">Download</span>
-             <span id="download-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
-         </button>
-             {{-- <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button> --}}
+              <span class="fe fe-16 mr-2 fe-eye"></span>
+              <span id="preview-text">Preview</span>
+              <span id="preview-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+            </button>
+            <button type="submit" id="submit-btn" class="btn btn-primary">
+              <span class="fe fe-16 mr-2 fe-download"></span>
+              <span id="submit-text">Download</span>
+              <span id="download-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+            </button>
            </div>
          </div>
       </form>
@@ -87,6 +96,23 @@
 @endsection
 
 @section('page_script')
+<script>
+  $(document).ready(function() {
+    $('#reportSelect').on("change", function () {
+      let type = $(this).val().toUpperCase();
+      console.log(type);
+      switch (type) {
+        case "SALES":
+          $('#typeSales').prop('disabled', false);
+          break;
+      
+        default:
+          break;
+      }
+      
+    })
+  })
+</script>
 <script>
 // Function untuk handle AJAX request
 function handleReportRequest(isPreview = false) {

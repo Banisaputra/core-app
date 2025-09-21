@@ -165,11 +165,12 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     //reports
     Route::get('/report', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/report2', [ReportController::class, 'index2'])->name('reports.index2');
+    Route::get('/report/pdf-deduction', [ReportController::class, 'deduction'])->name('reports.deductionPdf');
+    Route::get('/report/xlsx-deduction', [ReportController::class, 'exportPotonganGajiExcel'])->name('reports.deductionXlsx');
     Route::post('/report/get', [ReportController::class, 'getReport'])->name('reports.getReport');
     Route::post('/report/get2', [ReportController::class, 'getMemberList'])->name('reports.getMemberList');
     Route::post('/report/get3', [ReportController::class, 'getMemberDetail'])->name('reports.getMemberDetail');
-    Route::get('/report/pdf-deduction', [ReportController::class, 'deduction'])->name('reports.deductionPdf');
-    Route::get('/report/xlsx-deduction', [ReportController::class, 'exportPotonganGajiExcel'])->name('reports.deductionXlsx');
+    Route::post('/report/pdf-loanInfo', [ReportController::class, 'loanInfo'])->name('reports.loanInfo');
 
 });
 

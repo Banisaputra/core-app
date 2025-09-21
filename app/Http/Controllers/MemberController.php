@@ -78,6 +78,7 @@ class MemberController extends Controller
             'password' => $password,
             'email_verified_at' => $email_verify
         ]);
+        $telphone = preg_replace('/[^0-9]/', '', $request->telphone);
         $member = Member::create([
             'user_id' => $user->id,
             'nip' => $request->nip,
@@ -85,7 +86,7 @@ class MemberController extends Controller
             'devision_id' => $request->devision,
             'name' => $request->name,
             'email' => $request->email,
-            'telphone' => $request->telphone,
+            'telphone' => $telphone,
             'gender' => $request->gender,
             'no_kk' => $request->no_kk,
             'no_ktp' => $request->no_ktp,
@@ -174,12 +175,14 @@ class MemberController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
 
+        $telphone = preg_replace('/[^0-9]/', '', $request->telphone);
+
         // Update data
         $member->nip = $request->nip;
         $member->position_id = $request->position;
         $member->devision_id = $request->devision;
         $member->name = $request->name;
-        $member->telphone = $request->telphone;
+        $member->telphone = $telphone;
         $member->gender = $request->gender;
         $member->no_kk = $request->no_kk;
         $member->no_ktp = $request->no_ktp;

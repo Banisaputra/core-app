@@ -44,10 +44,14 @@
                             : asset('images/default.png') }}" alt="profile" width="300px">
                         </div>
                     </div>
-                    <div>
-                        <a href="#" class="btn mb-2 btn-primary">
-                            <span class="fe fe-plus fe-16 mr-1"></span> Cetak Info
-                        </a>
+                    <div class="text-center">
+                        <form action={{ route('reports.loanInfo') }} method="POST" id="form-report" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="loan_id" value="{{$loan->id}}">
+                            <button type="submit" class="btn mb-2 btn-primary">
+                                <span class="fe fe-plus fe-16 mr-1"></span> Cetak Info
+                            </button>
+                        </form>
                     </div>
                 </div>
                 <div class="col-8">

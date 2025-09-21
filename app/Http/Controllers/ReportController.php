@@ -41,8 +41,12 @@ class ReportController extends Controller
         $startDate = $request->dateStart ?? now();
         $endDate = $request->dateEnd ?? now();
         $data = [];
+        $filter = [];
         $file = 'reports';
 
+        $filter['Tgl. Mulai'] = date('d-m-Y', strtotime($request->dateStart));
+        $filter['Tgl. Batas'] = date('d-m-Y', strtotime($request->dateEnd));
+        
         switch ($type) {
             case 'SAVING':
                 $savings = Saving::with(['member','svType'])
@@ -92,8 +96,14 @@ class ReportController extends Controller
                 break;
             
             case 'SALES':
+                $pay_type = $request->typeSales ?? "all";
+                $where = "1=1";
+                if ($pay_type != "all") {
+                    $where = "payment_type='".strtoupper($pay_type)."'";
+                }
                 $sales = Sale::with(['saDetail'])
                 ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereRaw($where)
                 ->get();
 
                 foreach ($sales as $key => $sa) {
@@ -157,8 +167,7 @@ class ReportController extends Controller
 
         $pdf = PDF::loadView($file, [
                 'data' => $data,
-                'dateStart' => $startDate,
-                'dateEnd' => $endDate,
+                'filter' => $filter,
             ]);
         
         $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
@@ -169,6 +178,7 @@ class ReportController extends Controller
     
         return $pdf->download($filename);
 
+        // old
         //  $pdf = PDF::loadView($file, [
         //         'data' => $data,
         //         'dateStart' => $startDate,
@@ -286,11 +296,11 @@ class ReportController extends Controller
                 }
 
                 if ($request->startJoined) {
-                    $filter['Tgl. Simpanan'] = $request->startJoined;
+                    $filter['Tgl. Simpanan'] = date('d-m-Y', strtotime($request->startJoined));
                     $query .= " AND sv.sv_date >='".date('Ymd', strtotime($request->startJoined))."'";
                 }
                 if ($request->endJoined) {
-                    $filter['Tgl. Batas Simpanan'] = $request->endJoined;
+                    $filter['Tgl. Batas Simpanan'] = date('d-m-Y', strtotime($request->endJoined));
                     $query .= " AND sv.sv_date <='".date('Ymd', strtotime($request->endJoined))."'";
                 }
 
@@ -313,20 +323,20 @@ class ReportController extends Controller
 
                 if ($request->activate == 2) {
                     $filter['Status'] = "SEMUA"; 
-                    $query .= " AND loans.loan_state > 0";
+                    $query .= " AND loans.loan_state <> 0";
                 } else { 
-                    $filter['Status'] = $request->activate < 3 ? "AKTIF" : "NONAKTIF";
+                    $filter['Status'] = $request->activate == 1 ? "AKTIF" : "NONAKTIF";
                     $query .= " AND loans.loan_state ";
                     if ($request->activate == 1) $query .= "< 3";
-                    if ($request->activate == 0) $query .= "> 2";
+                    if ($request->activate == 99) $query .= "> 2";
                 }
 
                 if ($request->startJoined) {
-                    $filter['Tgl. Pinjaman'] = $request->startJoined;
+                    $filter['Tgl. Pinjaman'] = date('d-m-Y', strtotime($request->startJoined));
                     $query .= " AND loans.loan_date >='".date('Ymd', strtotime($request->startJoined))."'";
                 }
                 if ($request->endJoined) {
-                    $filter['Tgl. Batas Pinjaman'] = $request->endJoined;
+                    $filter['Tgl. Batas Pinjaman'] = date('d-m-Y', strtotime($request->endJoined));
                     $query .= " AND loans.loan_date <='".date('Ymd', strtotime($request->endJoined))."'";
                 }
 
@@ -367,6 +377,17 @@ class ReportController extends Controller
     
         return $pdf->download($filename); 
 
+    }
+
+    public function loanInfo(Request $request) 
+    {
+        $loan = Loan::with('member','payments')->findOrFail($request->loan_id);
+
+        $pdf = PDF::loadView('reports.loan-info', [
+            'loan' => $loan,
+        ])->setPaper([0,0,164.36,600], 'portrait');
+
+        return $pdf->stream('Bukti-stuk-pinjaman-'. date('dmY', strtotime($loan->created_at)).'.pdf');
     }
 
     // for PDF report type

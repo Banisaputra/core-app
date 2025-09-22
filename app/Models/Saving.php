@@ -18,7 +18,7 @@ class Saving extends Model
 
     public function svType() 
     {
-        return $this->belongsTo(SavingType::class);
+        return $this->belongsTo(SavingType::class, 'sv_type_id');
     }
 
     public static function generateCode($periode = null)

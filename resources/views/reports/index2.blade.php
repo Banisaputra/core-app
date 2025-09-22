@@ -182,8 +182,8 @@
   });
 </script>
 <script>
-// Function untuk handle AJAX request
-function handleReportRequest(isPreview = false, id = 0) {
+  // Function untuk handle AJAX request
+  function handleReportRequest(isPreview = false, id = 0) {
     const form = document.getElementById('form-report-'+id);
     const previewBtn = document.getElementById('preview-btn-'+id);
     const previewText = document.getElementById('preview-text-'+id);
@@ -274,26 +274,26 @@ function handleReportRequest(isPreview = false, id = 0) {
         downloadSpinner.classList.add('d-none');
       }
     })
-}
+  }
 
-// Event listeners
-document.querySelectorAll('.preview-btn').forEach(button => {
-  button.addEventListener('click', function() {
-    const ID = this.getAttribute('id').split('-')[2];
-    handleReportRequest(true, ID);
+  // Event listeners
+  document.querySelectorAll('.preview-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      const ID = this.getAttribute('id').split('-')[2];
+      handleReportRequest(true, ID);
+
+    });
+  });
+
+  document.getElementById('form-report-1').addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleReportRequest(false, 1);
+  });
+  document.getElementById('form-report-2').addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleReportRequest(false, 2);
 
   });
-});
-
-document.getElementById('form-report-1').addEventListener('submit', function(e) {
-    e.preventDefault();
-    handleReportRequest(false, 1);
-});
-document.getElementById('form-report-2').addEventListener('submit', function(e) {
-    e.preventDefault();
-    handleReportRequest(false, 2);
-
-});
 </script>
  
 @endsection

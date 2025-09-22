@@ -148,7 +148,7 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
 Route::get('/', [UserController::class, 'dashboard'])->middleware([PermissionMiddleware::class . ':dashboard']);
 
 // role general
-Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara,kepala toko,admin toko,badan pengawas'])->group(function() {
+Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara,kepala toko,admin toko,badan pengawas,member'])->group(function() {
     // search
     Route::get('/api/users/search', [UserController::class, 'search']);
     Route::get('/api/roles/search', [RoleController::class, 'search']);

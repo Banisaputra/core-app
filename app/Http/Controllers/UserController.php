@@ -11,15 +11,18 @@ use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\DatabaseBackupService;
+use App\Repositories\PenjualanRepository;
+use App\Repositories\PembelianRepository;
 
 class UserController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+{ 
+    protected $penjualanRepository;
+    protected $pembelianRepository;
+
+    public function __construct(PenjualanRepository $penjualanRepository, PembelianRepository $pembelianRepository)
     {
-        //
+        $this->penjualanRepository = $penjualanRepository;
+        $this->pembelianRepository = $pembelianRepository;
     }
 
     public function dashboard() 
@@ -33,10 +36,13 @@ class UserController extends Controller
 
         $periode_start = new DateTime("$current_year-$current_month-".($cut_off_day + 1)."");
         $periode_start->modify("-1 month");
-        $periode_end = new DateTime("$current_year-$current_month-".($cut_off_day ?? 0)."");
+        $periode_end = new DateTime("$current_year-$current_month-".($cut_off_day ?? 1)."");
 
         // data member
         $userID = auth()->id();
+        
+        $saleOfYear = $this->penjualanRepository->getPenjualanPerPeriode($current_year, $cut_off_day);
+        $purchaseOfYear = $this->pembelianRepository->getPembelianPerPeriode($current_year, $cut_off_day);
 
         // data all
         $sales = Sale::whereBetween('sa_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
@@ -44,8 +50,14 @@ class UserController extends Controller
         $purchase = Purchase::whereBetween('pr_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
                     ->sum('total');
 
+        $data = [
+            "sales" => $sales,
+            "purchase" => $purchase,
+            "saleOfYear" => $saleOfYear,
+            "purchaseOfYear" => $purchaseOfYear,
+        ];
         if ($role === "MEMBER") return view('dashboard-member');
-        return view('dashboard', compact('sales', 'purchase'));
+        return view('dashboard', $data);
     }
 
     public function downloadDB(DatabaseBackupService $backupService)

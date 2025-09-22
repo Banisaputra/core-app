@@ -66,6 +66,20 @@
 @endsection
 
 @section('page_script')
+   <script>
+      const saleOfYear = @json($saleOfYear);
+      const purchaseOfYear = @json($purchaseOfYear);
+
+      var dataSale = [];
+      var dataPurchase = [];
+      saleOfYear.forEach(sale => {
+         dataSale.push(sale['total_transaksi']);
+      });
+      purchaseOfYear.forEach(purchase => {
+         dataPurchase.push(purchase['total_transaksi']);
+      });
+      
+   </script>
     <script>
       var ChartData = { 
          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 
@@ -80,7 +94,7 @@
                pointStrokeColor: "rgba(51, 161, 81, 1)", 
                pointHighlightFill: "#fff", 
                pointHighlightStroke: "rgba(51, 161, 81, 1)", 
-               data: [28, 48, 40, 19, 64, 27, 90, 85, 92, 56, 75, 40], 
+               data: dataSale, 
                fill: "",
                borderWidth: 2,
                lineTension: .1 
@@ -95,7 +109,7 @@
                pointStrokeColor: "#c1c7d1", 
                pointHighlightFill: "#fff", 
                pointHighlightStroke: "rgba(220,220,220,1)", 
-               data: [65, 59, 80, 42, 43, 55, 40, 36, 68, 34, 77, 80], 
+               data: dataPurchase, 
                fill: "", 
                borderWidth: 2, 
                lineTension: .1 

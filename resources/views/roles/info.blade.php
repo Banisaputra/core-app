@@ -27,13 +27,74 @@
                         <tbody>
                           <tr>
                             <td>1.</td>
-                            <td>Admin</td>
+                            <td>Administrator</td>
                             <td><ul>
-                                <li>Dashboard</li>
-                                <li>Master & Pengaturan</li>
-                                <li>Usaha</li>
-                                <li>Koperasi</li>
-                                <li>Laporan</li>
+                              <li>Dashboard</li>
+                              <li>Master & Pengaturan</li>
+                              <li>Usaha</li>
+                              <li>Koperasi</li>
+                              <li>Laporan</li>
+                            </ul></td>
+                            <td><span class="badge badge-pill badge-success">active</span></td>
+                          </tr>
+                          <tr>
+                            <td>2.</td>
+                            <td>Kepala Toko</td>
+                            <td><ul>
+                              <li>Dashboard</li>
+                              <li>Master & Pengaturan</li>
+                              <li>Usaha</li>
+                              <li>Laporan</li>
+                            </ul></td>
+                            <td><span class="badge badge-pill badge-success">active</span></td>
+                          </tr>
+                          <tr>
+                            <td>3.</td>
+                            <td>Kepala Koperasi</td>
+                            <td><ul>
+                              <li>Dashboard</li>
+                              <li>Master & Pengaturan</li>
+                              <li>Koperasi</li>
+                              <li>Laporan</li>
+                            </ul></td>
+                            <td><span class="badge badge-pill badge-success">active</span></td>
+                          </tr>
+                          <tr>
+                            <td>4.</td>
+                            <td>Admin Toko</td>
+                            <td><ul>
+                              <li>Dashboard</li>
+                              <li>Usaha</li>
+                              <li>Laporan</li>
+                            </ul></td>
+                            <td><span class="badge badge-pill badge-success">active</span></td>
+                          </tr>
+                          <tr>
+                            <td>5.</td>
+                            <td>Bendahara</td>
+                            <td><ul>
+                              <li>Dashboard</li>
+                              <li>Usaha</li>
+                              <li>Koperasi</li>
+                              <li>Laporan</li>
+                            </ul></td>
+                            <td><span class="badge badge-pill badge-success">active</span></td>
+                          </tr>
+                          <tr>
+                            <td>6.</td>
+                            <td>Badan Pengawas</td>
+                            <td><ul>
+                              <li>Dashboard</li>
+                              <li>Laporan</li>
+                            </ul></td>
+                            <td><span class="badge badge-pill badge-success">active</span></td>
+                          </tr>
+                          <tr>
+                            <td>7.</td>
+                            <td>Member</td>
+                            <td><ul>
+                              <li>Dashboard</li>
+                              <li>Laporan</li>
                             </ul></td>
                             <td><span class="badge badge-pill badge-success">active</span></td>
                           </tr>

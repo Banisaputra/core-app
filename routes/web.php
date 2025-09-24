@@ -30,6 +30,10 @@ use App\Http\Controllers\SavingTypeController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\LoanPaymentController;
 use App\Http\Controllers\StorageLinkController;
+use App\Http\Controllers\Admin\PermissionController as AdminPermissionController;
+use App\Http\Controllers\Admin\RoleController as AdminRoleController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\MenuController as AdminMenuController;
 
 
 // auth
@@ -45,8 +49,8 @@ Route::middleware([SqlRunnerKey::class])->group(function () {
     Route::post('/sql-runner/run', [\App\Http\Controllers\SqlRunnerController::class, 'run'])->name('sql.run');
 });
 
-// admin access
-Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])->group(function () {
+// auth access
+Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/backup-db', function () {
         // Jalankan command dan ambil path file
         $exitCode = Artisan::call('db:backup', ['--download' => true]);
@@ -67,15 +71,53 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
     // storage link
     Route::get('/create-storage-link', [StorageLinkController::class, 'create']);
 
+    // access_management
+    // users
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/asign', [AdminUserController::class, 'asign'])->name('users.asign');
+    Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+    Route::post('/users/asign', [AdminUserController::class, 'updateusers'])->name('users.asigned');
+    Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    
     // role
-    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
-    Route::get('/roles/asign', [RoleController::class, 'asign'])->name('roles.asign');
-    Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
-    Route::post('/roles/asign', [RoleController::class, 'updateRoles'])->name('roles.asigned');
-    Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('roles.edit');
-    Route::put('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
-    Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
+    Route::get('/roles', [AdminRoleController::class, 'index'])->name('roles.index')->middleware('can:role_show');
+    Route::get('/roles/asign', [AdminRoleController::class, 'asign'])->name('roles.asign')->middleware('can:role_management_access');
+    Route::post('/roles', [AdminRoleController::class, 'store'])->name('roles.store');
+    Route::post('/roles/asign', [AdminRoleController::class, 'updateRoles'])->name('roles.asigned');
+    Route::get('/roles/{id}/edit', [AdminRoleController::class, 'edit'])->name('roles.edit');
+    Route::put('/roles/{id}', [AdminRoleController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{id}', [AdminRoleController::class, 'destroy'])->name('roles.destroy');
+   
+    // permission
+    Route::get('/permissions', [AdminPermissionController::class, 'index'])->name('permissions.index');
+    Route::get('/permissions/asign', [AdminPermissionController::class, 'asign'])->name('permissions.asign');
+    Route::post('/permissions', [AdminPermissionController::class, 'store'])->name('permissions.store');
+    Route::post('/permissions/asign', [AdminPermissionController::class, 'updatepermissions'])->name('permissions.asigned');
+    Route::get('/permissions/{id}/edit', [AdminPermissionController::class, 'edit'])->name('permissions.edit');
+    Route::put('/permissions/{id}', [AdminPermissionController::class, 'update'])->name('permissions.update');
+    Route::delete('/permissions/{id}', [AdminPermissionController::class, 'destroy'])->name('permissions.destroy');
+   
+    // menus
+    Route::get('/menus', [AdminMenuController::class, 'index'])->name('menus.index');
+    Route::get('/menus/asign', [AdminMenuController::class, 'asign'])->name('menus.asign');
+    Route::post('/menus', [AdminMenuController::class, 'store'])->name('menus.store');
+    Route::post('/menus/asign', [AdminMenuController::class, 'updatemenus'])->name('menus.asigned');
+    Route::get('/menus/{id}/edit', [AdminMenuController::class, 'edit'])->name('menus.edit');
+    Route::put('/menus/{id}', [AdminMenuController::class, 'update'])->name('menus.update');
+    Route::delete('/menus/{id}', [AdminMenuController::class, 'destroy'])->name('menus.destroy');
 
+// old route
+    // role
+    // Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+    // Route::get('/roles/asign', [RoleController::class, 'asign'])->name('roles.asign');
+    // Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+    // Route::post('/roles/asign', [RoleController::class, 'updateRoles'])->name('roles.asigned');
+    // Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+    // Route::put('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
+    // Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
+   
     // info
     Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
 
@@ -145,10 +187,9 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
     
 });
 
-Route::get('/', [UserController::class, 'dashboard'])->middleware([PermissionMiddleware::class . ':dashboard']);
+Route::get('/', [UserController::class, 'dashboard'])->name('dashboard');
 
 // role general
-Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara,kepala toko,admin toko,badan pengawas,member'])->group(function() {
     // search
     Route::get('/api/users/search', [UserController::class, 'search']);
     Route::get('/api/roles/search', [RoleController::class, 'search']);
@@ -172,9 +213,7 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     Route::post('/report/get3', [ReportController::class, 'getMemberDetail'])->name('reports.getMemberDetail');
     Route::post('/report/pdf-loanInfo', [ReportController::class, 'loanInfo'])->name('reports.loanInfo');
 
-});
-
-Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara'])->group(function() {
+ 
     // loans
     Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
     Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
@@ -238,10 +277,7 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     Route::post('/policy-general', [PolicyController::class, 'general'])->name('policy.general');
     Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policy.agDestroy');
 
-
-});
-
-Route::middleware([RoleMiddleware::class . ':administrator,kepala toko,admin toko'])->group(function() {
+  
     // pos
     Route::get('/pos', [PosController::class, 'index2'])->name('pos.index');
     Route::post('/submit-sale', [PosController::class, 'store']);
@@ -270,5 +306,4 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala toko,admin tok
     // setting 
     Route::get('/business', [BusinessController::class, 'index'])->name('business.index');
     Route::post('/business-sales', [BusinessController::class, 'sales'])->name('business.sales');
-
-});
+ 

@@ -101,8 +101,13 @@ class RoleController extends Controller
         $user = User::findOrFail($request->user_id);
 
         // Sync roles (removes existing and replaces with new)
-        $user->roles()->sync($request->role_id);
+        // $user->roles()->sync($request->role_id);
 
+        $roles = Role::whereIn('id', $request->role_id)->pluck('id','name');
+        foreach ($roles as $id => $roleName) {
+            $user->assignRole($roleName);
+        }
+        
         return back()->with('success', 'Roles updated successfully!');
         
     }

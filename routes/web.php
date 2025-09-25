@@ -66,7 +66,7 @@ Route::middleware([LoginAuth::class])->group(function () {
         return Response::download($filePath);
     });
 
-    Route::get('/backup/download', [UserController::class, 'downloadDB']);
+    Route::get('/backup/download', [UserController::class, 'downloadDB'])->name('backup.database');
     
     // storage link
     Route::get('/create-storage-link', [StorageLinkController::class, 'create']);
@@ -84,11 +84,11 @@ Route::middleware([LoginAuth::class])->group(function () {
     // role
     Route::get('/roles', [AdminRoleController::class, 'index'])->name('roles.index')->middleware('can:role_show');
     Route::get('/roles/asign', [AdminRoleController::class, 'asign'])->name('roles.asign')->middleware('can:role_management_access');
-    Route::post('/roles', [AdminRoleController::class, 'store'])->name('roles.store');
-    Route::post('/roles/asign', [AdminRoleController::class, 'updateRoles'])->name('roles.asigned');
-    Route::get('/roles/{id}/edit', [AdminRoleController::class, 'edit'])->name('roles.edit');
-    Route::put('/roles/{id}', [AdminRoleController::class, 'update'])->name('roles.update');
-    Route::delete('/roles/{id}', [AdminRoleController::class, 'destroy'])->name('roles.destroy');
+    Route::post('/roles', [AdminRoleController::class, 'store'])->name('roles.store')->middleware('can:role_create');
+    Route::post('/roles/asign', [AdminRoleController::class, 'updateRoles'])->name('roles.asigned')->middleware('can:role_management_access');
+    Route::get('/roles/{id}/edit', [AdminRoleController::class, 'edit'])->name('roles.edit')->middleware('can:role_edit');
+    Route::put('/roles/{id}', [AdminRoleController::class, 'update'])->name('roles.update')->middleware('can:role_edit');
+    Route::delete('/roles/{id}', [AdminRoleController::class, 'destroy'])->name('roles.destroy')->middleware('can:role_delete');
    
     // permission
     Route::get('/permissions', [AdminPermissionController::class, 'index'])->name('permissions.index');

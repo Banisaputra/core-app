@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 
 class RoleController extends Controller
 {
     public function index () 
     {
-        $roles = Role::latest()->paginate();
+        $roles = Role::latest()->get();
         return view('roles.index', compact('roles'));
     }
 
@@ -27,7 +27,7 @@ class RoleController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Role created successfully',
+            'message' => 'Peran baru berhasil disimpan.',
             'data' => $role
         ]);
     }
@@ -55,20 +55,20 @@ class RoleController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Role updated successfully',
+            'message' => 'Peran berhasil diupdate.',
             'data' => $role
         ]);
     }
 
     public function destroy(string $id)
     {
-        $role = role::findOrFail($id);
+        $role = Role::findOrFail($id);
         if($role) {
             // delete
             $role->delete();
         }
 
-        return redirect()->back()->with('success', "Data dan akun anggota berhasil dihapus");
+        return redirect()->back()->with('success', "Data peran berhasil dihapus.");
         
     }
 
@@ -98,17 +98,13 @@ class RoleController extends Controller
             'role_id.*' => 'exists:roles,id',
         ]);
 
-        $user = User::findOrFail($request->user_id);
-
-        // Sync roles (removes existing and replaces with new)
-        // $user->roles()->sync($request->role_id);
-
-        $roles = Role::whereIn('id', $request->role_id)->pluck('id','name');
-        foreach ($roles as $id => $roleName) {
-            $user->assignRole($roleName);
-        }
+        $roles = Role::whereIn('id', $request->role_id)->pluck('name')->toArray();
+        $user = User::findOrFail($request->user_id); 
         
-        return back()->with('success', 'Roles updated successfully!');
+        // $rolesString = implode("','", $roles);
+        // sprintf("\$user->syncRoles('%s');", $rolesString);
+        $user->syncRoles($roles);
+        return back()->with('success', 'Peran user berhasil disimpan.');
         
     }
 

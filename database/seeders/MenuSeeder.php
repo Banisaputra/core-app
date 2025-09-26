@@ -36,7 +36,7 @@ class MenuSeeder extends Seeder
             ],
             [
                 'name' => 'Menus', 'route' => 'menus.index', 'icon' => 'fe-list',
-                'order' => 3, 'permission' => 'manage_menus', 'parent_id' => null
+                'order' => 4, 'permission' => 'manage_menus', 'parent_id' => 2
             ],
         ];
 

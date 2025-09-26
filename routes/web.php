@@ -66,20 +66,20 @@ Route::middleware([LoginAuth::class])->group(function () {
         return Response::download($filePath);
     });
 
-    Route::get('/backup/download', [UserController::class, 'downloadDB'])->name('backup.database');
+    Route::get('/backup/download', [UserController::class, 'downloadDB'])->name('databases.backup');
     
     // storage link
     Route::get('/create-storage-link', [StorageLinkController::class, 'create']);
 
     // access_management
     // users
-    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
-    Route::get('/users/asign', [AdminUserController::class, 'asign'])->name('users.asign');
-    Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
-    Route::post('/users/asign', [AdminUserController::class, 'updateusers'])->name('users.asigned');
-    Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
-    Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index')->middleware('can:user_show');
+    Route::get('/users/asign', [AdminUserController::class, 'asign'])->name('users.asign')->middleware('can:user_management_access');
+    Route::post('/users', [AdminUserController::class, 'store'])->name('users.store')->middleware('can:user_create');
+    Route::post('/users/asign', [AdminUserController::class, 'updateusers'])->name('users.asigned')->middleware('can:user_management_access');
+    Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('users.edit')->middleware('can:user_edit');
+    Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update')->middleware('can:user_edit');
+    Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy')->middleware('can:user_delete');
     
     // role
     Route::get('/roles', [AdminRoleController::class, 'index'])->name('roles.index')->middleware('can:role_show');
@@ -91,13 +91,13 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::delete('/roles/{id}', [AdminRoleController::class, 'destroy'])->name('roles.destroy')->middleware('can:role_delete');
    
     // permission
-    Route::get('/permissions', [AdminPermissionController::class, 'index'])->name('permissions.index');
-    Route::get('/permissions/asign', [AdminPermissionController::class, 'asign'])->name('permissions.asign');
-    Route::post('/permissions', [AdminPermissionController::class, 'store'])->name('permissions.store');
-    Route::post('/permissions/asign', [AdminPermissionController::class, 'updatepermissions'])->name('permissions.asigned');
-    Route::get('/permissions/{id}/edit', [AdminPermissionController::class, 'edit'])->name('permissions.edit');
-    Route::put('/permissions/{id}', [AdminPermissionController::class, 'update'])->name('permissions.update');
-    Route::delete('/permissions/{id}', [AdminPermissionController::class, 'destroy'])->name('permissions.destroy');
+    Route::get('/permissions', [AdminPermissionController::class, 'index'])->name('permissions.index')->middleware('can:permission_show');
+    Route::get('/permissions/asign', [AdminPermissionController::class, 'asign'])->name('permissions.asign')->middleware('can:permission_management_access');
+    Route::post('/permissions', [AdminPermissionController::class, 'store'])->name('permissions.store')->middleware('can:permission_create');
+    Route::post('/permissions/asign', [AdminPermissionController::class, 'updatepermissions'])->name('permissions.asigned')->middleware('can:permission_management_access');
+    Route::get('/permissions/{id}/edit', [AdminPermissionController::class, 'edit'])->name('permissions.edit')->middleware('can:permission_edit');
+    Route::put('/permissions/{id}', [AdminPermissionController::class, 'update'])->name('permissions.update')->middleware('can:permission_edit');
+    Route::delete('/permissions/{id}', [AdminPermissionController::class, 'destroy'])->name('permissions.destroy')->middleware('can:permission_delete');
    
     // menus
     Route::get('/menus', [AdminMenuController::class, 'index'])->name('menus.index');
@@ -108,59 +108,49 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::put('/menus/{id}', [AdminMenuController::class, 'update'])->name('menus.update');
     Route::delete('/menus/{id}', [AdminMenuController::class, 'destroy'])->name('menus.destroy');
 
-// old route
-    // role
-    // Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
-    // Route::get('/roles/asign', [RoleController::class, 'asign'])->name('roles.asign');
-    // Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
-    // Route::post('/roles/asign', [RoleController::class, 'updateRoles'])->name('roles.asigned');
-    // Route::get('/roles/{id}/edit', [RoleController::class, 'edit'])->name('roles.edit');
-    // Route::put('/roles/{id}', [RoleController::class, 'update'])->name('roles.update');
-    // Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('roles.destroy');
-   
     // info
     Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
 
     // supplier
-    Route::get('/supplier', [SupplierController::class, 'index'])->name('supplier.index');
-    Route::get('/supplier/create', [SupplierController::class, 'create'])->name('supplier.create');
-    Route::get('/supplier/import', [SupplierController::class, 'downloadTemplate'])->name('supplier.template');
-    Route::post('/supplier/import', [SupplierController::class, 'import'])->name('supplier.import');
-    Route::post('/supplier', [SupplierController::class, 'store'])->name('supplier.store');
-    Route::get('/supplier/{id}', [SupplierController::class, 'show'])->name('supplier.show');
-    Route::get('/supplier/{id}/edit', [SupplierController::class, 'edit'])->name('supplier.edit');
-    Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('supplier.update');
-    Route::delete('/supplier/{id}', [SupplierController::class, 'destroy'])->name('supplier.destroy');
+    Route::get('/supplier', [SupplierController::class, 'index'])->name('suppliers.index');
+    Route::get('/supplier/create', [SupplierController::class, 'create'])->name('suppliers.create');
+    Route::get('/supplier/import', [SupplierController::class, 'downloadTemplate'])->name('suppliers.template');
+    Route::post('/supplier/import', [SupplierController::class, 'import'])->name('suppliers.import');
+    Route::post('/supplier', [SupplierController::class, 'store'])->name('suppliers.store');
+    Route::get('/supplier/{id}', [SupplierController::class, 'show'])->name('suppliers.show');
+    Route::get('/supplier/{id}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
+    Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('suppliers.update');
+    Route::delete('/supplier/{id}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
     
     // categories
-    Route::get('/category', [CategoryController::class, 'index'])->name('category.index');
-    Route::get('/category/create', [CategoryController::class, 'create'])->name('category.create');
-    Route::get('/category/import', [CategoryController::class, 'downloadTemplate'])->name('category.template');
-    Route::post('/category/import', [CategoryController::class, 'import'])->name('category.import');
-    Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
-    Route::get('/category/{id}/edit', [CategoryController::class, 'edit'])->name('category.edit');
-    Route::put('/category/{id}', [CategoryController::class, 'update'])->name('category.update');
-    Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('category.destroy');
+    Route::get('/category', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/category/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::get('/category/import', [CategoryController::class, 'downloadTemplate'])->name('categories.template');
+    Route::post('/category/import', [CategoryController::class, 'import'])->name('categories.import');
+    Route::post('/category', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/category/{id}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/category/{id}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     
     // devisions
-    Route::get('/devision', [DevisionController::class, 'index'])->name('devision.index');
-    Route::get('/devision/create', [DevisionController::class, 'create'])->name('devision.create');
-    Route::get('/devision/import', [DevisionController::class, 'downloadTemplate'])->name('devision.template');
-    Route::post('/devision/import', [DevisionController::class, 'import'])->name('devision.import');
-    Route::post('/devision', [DevisionController::class, 'store'])->name('devision.store');
-    Route::get('/devision/{id}/edit', [DevisionController::class, 'edit'])->name('devision.edit');
-    Route::put('/devision/{id}', [DevisionController::class, 'update'])->name('devision.update');
-    Route::delete('/devision/{id}', [DevisionController::class, 'destroy'])->name('devision.destroy');
+    Route::get('/devision', [DevisionController::class, 'index'])->name('devisions.index');
+    Route::get('/devision/create', [DevisionController::class, 'create'])->name('devisions.create');
+    Route::get('/devision/import', [DevisionController::class, 'downloadTemplate'])->name('devisions.template');
+    Route::post('/devision/import', [DevisionController::class, 'import'])->name('devisions.import');
+    Route::post('/devision', [DevisionController::class, 'store'])->name('devisions.store');
+    Route::get('/devision/{id}/edit', [DevisionController::class, 'edit'])->name('devisions.edit');
+    Route::put('/devision/{id}', [DevisionController::class, 'update'])->name('devisions.update');
+    Route::delete('/devision/{id}', [DevisionController::class, 'destroy'])->name('devisions.destroy');
     
     // positions
-    Route::get('/position', [PositionController::class, 'index'])->name('position.index');
-    Route::get('/position/create', [PositionController::class, 'create'])->name('position.create');
-    Route::get('/position/import', [PositionController::class, 'downloadTemplate'])->name('position.template');
-    Route::post('/position/import', [PositionController::class, 'import'])->name('position.import');
-    Route::post('/position', [PositionController::class, 'store'])->name('position.store');
-    Route::get('/position/{id}/edit', [PositionController::class, 'edit'])->name('position.edit');
-    Route::put('/position/{id}', [PositionController::class, 'update'])->name('position.update');
-    Route::delete('/position/{id}', [PositionController::class, 'destroy'])->name('position.destroy');
+    Route::get('/position', [PositionController::class, 'index'])->name('positions.index');
+    Route::get('/position/create', [PositionController::class, 'create'])->name('positions.create');
+    Route::get('/position/import', [PositionController::class, 'downloadTemplate'])->name('positions.template');
+    Route::post('/position/import', [PositionController::class, 'import'])->name('positions.import');
+    Route::post('/position', [PositionController::class, 'store'])->name('positions.store');
+    Route::get('/position/{id}/edit', [PositionController::class, 'edit'])->name('positions.edit');
+    Route::put('/position/{id}', [PositionController::class, 'update'])->name('positions.update');
+    Route::delete('/position/{id}', [PositionController::class, 'destroy'])->name('positions.destroy');
     
     // member
     Route::get('/members', [MemberController::class, 'index'])->name('members.index');
@@ -187,12 +177,12 @@ Route::middleware([LoginAuth::class])->group(function () {
     
 });
 
-Route::get('/', [UserController::class, 'dashboard'])->name('dashboard');
+Route::get('/', [UserController::class, 'dashboard'])->name('dashboard')->middleware('can:dashboard_show');
 
 // role general
     // search
     Route::get('/api/users/search', [UserController::class, 'search']);
-    Route::get('/api/roles/search', [RoleController::class, 'search']);
+    Route::get('/api/roles/search', [AdminRoleController::class, 'search']);
     Route::get('/api/members/search', [MemberController::class, 'search']);
     Route::get('/api/items/search', [MasterItemController::class, 'search']);
     Route::get('/api/category/search', [CategoryController::class, 'search']);
@@ -269,13 +259,13 @@ Route::get('/', [UserController::class, 'dashboard'])->name('dashboard');
     Route::delete('/withdrawals/{id}', [WithdrawalController::class, 'destroy'])->name('withdrawals.destroy');
 
     // policy
-    Route::get('/policy', [PolicyController::class, 'index'])->name('policy.index');
-    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policy.upload');
-    Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policy.loanUmum');
-    Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policy.loanKhusus');
-    Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policy.loanAgunan');
-    Route::post('/policy-general', [PolicyController::class, 'general'])->name('policy.general');
-    Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policy.agDestroy');
+    Route::get('/policy', [PolicyController::class, 'index'])->name('policies.index');
+    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policies.upload');
+    Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policies.loanUmum');
+    Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policies.loanKhusus');
+    Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policies.loanAgunan');
+    Route::post('/policy-general', [PolicyController::class, 'general'])->name('policies.general');
+    Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policies.agDestroy');
 
   
     // pos

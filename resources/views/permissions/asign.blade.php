@@ -9,7 +9,7 @@
     <div class="col-12 col-xl-10">
       <div class="row align-items-center my-4">
         <div class="col">
-          <h2 class="h3 mb-0 page-title">Role Asign</h2>
+          <h2 class="h3 mb-0 page-title">Permission Asign</h2>
         </div>
       </div>
       <hr class="my-4">
@@ -29,27 +29,28 @@
         <div class="alert alert-success" role="alert">
             <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
         </div>
-      @endif
-      <h5 class="mb-2 mt-4">User Role</h5>
-      <p class="mb-4">Akse user dari role</p>
+      @endif 
        
-      <form action={{ route('roles.asigned') }} method="POST" id="form-member" enctype="multipart/form-data">
+      <form action={{ route('permissions.asigned') }} method="POST" id="form-member" enctype="multipart/form-data">
         @csrf
         <div class="form-row">
             <div class="form-group col-md-5">
-                <label for="simple-select2">User</label>
-                <select id="userSelect" name="user_id" class="form-control"></select>
+                <label for="simple-select2">Role</label>
+                <select id="roleSelect" name="role_id" class="form-control"></select>
             </div>
-            <div class="form-group col-md-7">
-                <label for="simple-select2">Roles</label>
-                <select id="roleSelect" name="role_id[]" class="form-control"></select>
-            </div>
+        </div>
+        <hr class="my-4">
+        <div class="form-row">
+          <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="customSwitch1">
+            <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>
+          </div>
         </div>
          
          <hr class="my-4">
          <div class="form-row">
            <div class="col-md-6">
-            <small>Role yang terdaftar akan tergantikan</small>
+            <small>Izin akses yang terdaftar akan tergantikan</small>
            </div>
            <div class="col-md-6 text-right">
              <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button>

@@ -74,10 +74,13 @@ class PermissionController extends Controller
         
     }
 
-    public function asign() 
+    public function asign($id) 
     {
-        $permissions = Permission::all();
-        return view('permissions.asign', compact('permissions'));
+        $role = Role::findById($id);
+        $allPermissions = Permission::all();
+        $rolePermissions = $role->permissions->pluck('name')->toArray();
+        
+        return view('permissions.asign', compact('role','allPermissions','rolePermissions'));
     }
 
     public function search(Request $request)
@@ -96,10 +99,10 @@ class PermissionController extends Controller
     {
         $request->validate([
             'role_id' => 'required|exists:roles,id',
-            'permission_id' => 'required|array',
-            'permission_id.*' => 'exists:permissions,id',
+            'permissions' => 'required|array',
+            'permissions.*' => 'exists:permissions,name',
         ]);
-
+dd($request->all());
         $permissions = Permission::whereIn('id', $request->permission_id)->pluck('name')->toArray();
         $role = Role::findOrFail($request->role_id);
         

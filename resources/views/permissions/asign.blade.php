@@ -30,32 +30,57 @@
             <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
         </div>
       @endif 
-       
+      
       <form action={{ route('permissions.asigned') }} method="POST" id="form-member" enctype="multipart/form-data">
         @csrf
-        <div class="form-row">
-            <div class="form-group col-md-5">
-                <label for="simple-select2">Role</label>
-                <select id="roleSelect" name="role_id" class="form-control"></select>
+          <input type="hidden" name="role_id" value="{{ $role->id }}">
+          <h4>Manage Permissions untuk Role: {{ ucwords($role->name) }}</h4>
+          <div class="custom-control custom-switch mt-3">
+            <input type="checkbox" class="custom-control-input actAllToggle" id="actAll" {{ count($allPermissions) == count($rolePermissions) ? 'checked' : '' }}>
+            <label class="custom-control-label" for="actAll">Aktifkan semua</label>
+          </div>
+          <div class="row my-4">
+          <div class="col-md-12">
+            <div class="card shadow">
+              <div class="card-body">
+                <table class="table datatables" id="permissions">
+                  <thead>
+                    <tr>
+                      <th width="5%">No.</th>
+                      <th width="20%">Nama</th>
+                      <th width="50%">Deskripsi</th>
+                      <th width="5%">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody> 
+                    @foreach($allPermissions as $key => $permission)
+                      <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $permission->name }}</td>
+                        <td>{{ $permission->description }}</td>
+                        <td>
+                          <div class="custom-control custom-switch">
+                            <input type="checkbox" value="{{ $permission->name }}" class="custom-control-input actPermission" name="permissions[]" id="permission-{{$key}}" {{ in_array($permission->name, $rolePermissions) ? 'checked' : '' }}>
+                            <label class="custom-control-label" for="permission-{{$key}}"></label>
+                          </div>
+                        </td> 
+                      </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
             </div>
+          </div>
         </div>
         <hr class="my-4">
         <div class="form-row">
-          <div class="custom-control custom-switch">
-            <input type="checkbox" class="custom-control-input" id="customSwitch1">
-            <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>
+          <div class="col-md-6">
+          <small>Izin akses yang terdaftar akan tergantikan</small>
+          </div>
+          <div class="col-md-6 text-right">
+            <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button>
           </div>
         </div>
-         
-         <hr class="my-4">
-         <div class="form-row">
-           <div class="col-md-6">
-            <small>Izin akses yang terdaftar akan tergantikan</small>
-           </div>
-           <div class="col-md-6 text-right">
-             <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button>
-           </div>
-         </div>
       </form>
        
     </div>
@@ -67,66 +92,41 @@
 <script src="{{ asset('fedash/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('fedash/js/dataTables.bootstrap4.min.js') }}"></script>
 <script>
-    $('#roleUser').DataTable(
+  $(document).ready(function () {
+    $('#permissions').DataTable(
     {
-      autoWidth: true,
+      autoWidth: false,
       "lengthMenu": [
         [10, 25, 50, -1],
         [10, 25, 50, "All"]
       ]
     });
-    $('#roleSelect').select2({
-        placeholder: 'Search role...',
-        theme: 'bootstrap4',
-        minimumInputLength: 2,
-        multiple: true,
-        ajax: {
-            url: '/api/roles/search', // Your route
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    q: params.term // search term
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.map(function (item) {
-                        return {
-                            id: item.id,
-                            text: item.name
-                        };
-                    })
-                };
-            },
-            cache: true
+
+    $('#permissions tbody').on('change', '.actPermission', function () {
+      var value = $(this).val();
+      var type = $(this).is(":checked") ? "given" : "revoke";
+  
+      // Simpan per row
+      saveRowData(value, type);
+      
+    })
+  
+  });
+
+function saveRowData(permission, type) {
+    $.ajax({
+        url: '/save-row-data',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            permission: permission,
+            type: type
+        },
+        success: function(response) {
+            console.log('Data berhasil disimpan');
+            alert('Izin berhasil ditambahkan ke role.')
         }
     });
-    $('#userSelect').select2({
-        placeholder: 'Search user...',
-        theme: 'bootstrap4',
-        minimumInputLength: 2,
-        ajax: {
-            url: '/api/users/search', // Your route
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    q: params.term // search term
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.map(function (item) {
-                        return {
-                            id: item.id,
-                            text: item.name
-                        };
-                    })
-                };
-            },
-            cache: true
-        }
-    });
+}
 </script>
 @endsection

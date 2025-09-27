@@ -56,11 +56,6 @@
                 <button type="button" class="btn mb-2 mr-2 btn-primary" data-toggle="modal" data-target="#addModal">
                 <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data</button>
               @endcan
-              @can('permission_management_access')
-                <a href="{{ route('permissions.asign') }}" class="btn mb-2 btn-success">
-                  <span class="fe fe-16 fe-corner-up-right"></span>Asign Permission
-                </a>
-              @endcan
             </div>
             <div class="col-auto">
               {{--more button  --}}
@@ -215,7 +210,7 @@
     });
 
     // edit
-    $('.btnEdit').on('click', function () {
+    $('#roles tbody .btnEdit').on('click', function () {
       var id = $(this).data('id');
 
       $('#formErrors').addClass('d-none').find('#errorList').empty();

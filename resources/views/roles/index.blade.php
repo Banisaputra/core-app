@@ -103,6 +103,9 @@
                             <span class="text-muted sr-only">Action</span>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">
+                            @can('permission_management_access')
+                            <a href="{{ route('permissions.asign', $role->id) }}" class="dropdown-item btnPermission">Izin Akses</a>
+                            @endcan
                             @can('role_edit')
                             <button class="dropdown-item btnEdit" data-id="{{ $role->id }}">Edit</button>
                             @endcan
@@ -211,7 +214,7 @@
     });
 
     // edit
-    $('.btnEdit').on('click', function () {
+    $('#roles tbody').on('click', '.btnEdit', function () {
       var id = $(this).data('id');
 
       $('#formErrors').addClass('d-none').find('#errorList').empty();
@@ -231,7 +234,6 @@
         url: '/roles/' + id + '/edit',
         method: 'GET',
         success: function(response) {
-          console.log(response);
           
           $('#formRole #name').val(response.data.name);
           $('#addModal').modal('show');
@@ -243,6 +245,12 @@
       });
     });
 
+    // access permission
+    $('#roles tbody').on('click', '.btnPermission', function () {
+      var id = $(this).data('id');
+      
+    
+    });
   });
 </script>
 @endsection

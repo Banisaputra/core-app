@@ -92,9 +92,9 @@ Route::middleware([LoginAuth::class])->group(function () {
    
     // permission
     Route::get('/permissions', [AdminPermissionController::class, 'index'])->name('permissions.index')->middleware('can:permission_show');
-    Route::get('/permissions/asign', [AdminPermissionController::class, 'asign'])->name('permissions.asign')->middleware('can:permission_management_access');
+    Route::get('/permissions/{id}/asign', [AdminPermissionController::class, 'asign'])->name('permissions.asign')->middleware('can:permission_management_access');
     Route::post('/permissions', [AdminPermissionController::class, 'store'])->name('permissions.store')->middleware('can:permission_create');
-    Route::post('/permissions/asign', [AdminPermissionController::class, 'updatepermissions'])->name('permissions.asigned')->middleware('can:permission_management_access');
+    Route::post('/permissions/asign', [AdminPermissionController::class, 'updatePermission'])->name('permissions.asigned')->middleware('can:permission_management_access');
     Route::get('/permissions/{id}/edit', [AdminPermissionController::class, 'edit'])->name('permissions.edit')->middleware('can:permission_edit');
     Route::put('/permissions/{id}', [AdminPermissionController::class, 'update'])->name('permissions.update')->middleware('can:permission_edit');
     Route::delete('/permissions/{id}', [AdminPermissionController::class, 'destroy'])->name('permissions.destroy')->middleware('can:permission_delete');

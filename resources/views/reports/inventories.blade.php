@@ -10,8 +10,11 @@
 </head>
 <body>
     <h3>Laporan Adjustmen Stok</h3>
-    <p>Periode: {{ date('d-m-Y', strtotime($dateStart)) ." - ". date('d-m-Y', strtotime($dateEnd))}}</p>
-
+    <p>Filter: <br><ul>
+        @foreach ($filter as $key => $ft)
+        <li>{{$key}} : {{ $ft }}</li>
+        @endforeach
+    </ul></p>
     <table>
         <thead>
             <tr>

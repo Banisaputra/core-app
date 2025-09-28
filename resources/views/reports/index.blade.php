@@ -100,18 +100,19 @@
   $(document).ready(function() {
     $('#reportSelect').on("change", function () {
       let type = $(this).val().toUpperCase();
-      console.log(type);
+
       switch (type) {
         case "SALES":
           $('#typeSales').prop('disabled', false);
           break;
       
         default:
+          $('#typeSales').prop('disabled', true);
           break;
       }
       
     })
-  })
+  });
 </script>
 <script>
 // Function untuk handle AJAX request
@@ -141,7 +142,7 @@ function handleReportRequest(isPreview = false) {
     if (isPreview) {
         formData.append('preview', 'true');
     }
-    
+
     // AJAX request
     fetch(form.action, {
         method: 'POST',
@@ -156,6 +157,7 @@ function handleReportRequest(isPreview = false) {
     const reader = new FileReader();
     reader.onload = function() {
         const base64 = reader.result;
+        console.log(base64);
         
         if (isPreview) {
           // Buat tab baru dengan PDF viewer
@@ -164,30 +166,28 @@ function handleReportRequest(isPreview = false) {
               <!DOCTYPE html>
               <html>
               <head>
-                  <title>Preview Laporan</title>
-                  <style>
-                      body { margin: 0; }
-                      iframe { width: 100%; height: 100vh; border: none; }
-                  </style>
+                <title>Preview Laporan</title>
+                <style>
+                  body { margin: 0; }
+                  iframe { width: 100%; height: 100vh; border: none; }
+                </style>
               </head>
               <body>
-                  <iframe src="data:application/pdf;base64,${base64.split(',')[1]}"></iframe>
+                <iframe src="data:application/pdf;base64,${base64.split(',')[1]}"></iframe>
               </body>
               </html>
           `);
           newWindow.document.close();
         } else {
-          // Download seperti biasa
-          const reportType = 'penjualan'; // contoh report type
           const now = new Date();
 
           const formattedDate = 
-              now.getFullYear() +
-              String(now.getMonth() + 1).padStart(2, '0') +
-              String(now.getDate()).padStart(2, '0') +
-              String(now.getHours()).padStart(2, '0') +
-              String(now.getMinutes()).padStart(2, '0') +
-              String(now.getSeconds()).padStart(2, '0');
+            now.getFullYear() +
+            String(now.getMonth() + 1).padStart(2, '0') +
+            String(now.getDate()).padStart(2, '0') +
+            String(now.getHours()).padStart(2, '0') +
+            String(now.getMinutes()).padStart(2, '0') +
+            String(now.getSeconds()).padStart(2, '0');
 
           const blobUrl = URL.createObjectURL(blob);
           const link = document.createElement('a');
@@ -212,7 +212,7 @@ function handleReportRequest(isPreview = false) {
 
 // Event listeners
 document.getElementById('preview-btn').addEventListener('click', function() {
-    handleReportRequest(true);
+    handleReportRequest(true);    
 });
 
 document.getElementById('form-report').addEventListener('submit', function(e) {

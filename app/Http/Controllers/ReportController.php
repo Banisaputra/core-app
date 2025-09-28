@@ -171,7 +171,6 @@ class ReportController extends Controller
             ]);
         
         $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
-        // dd($filename);
         if ($request->has('preview')) {
             return $pdf->stream($filename);
         }
@@ -450,6 +449,7 @@ class ReportController extends Controller
             }
 
             $data[] = [
+                'nip' => $member->nip ?? '-',
                 'name' => $member->name ?? '-',
                 'position' => $member->position->name ?? '-',
                 'potongan_simpanan' => $simpananBulanan,

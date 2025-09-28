@@ -238,7 +238,6 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     Route::post('/policy-general', [PolicyController::class, 'general'])->name('policy.general');
     Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policy.agDestroy');
 
-
 });
 
 Route::middleware([RoleMiddleware::class . ':administrator,kepala toko,admin toko'])->group(function() {

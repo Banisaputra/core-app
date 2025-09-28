@@ -262,9 +262,16 @@ class MemberController extends Controller
 
         $success = 0;
         $failed = [];
-
+        $template_title = "";
         foreach ($rows as $index => $row) {
+            // cek template
+            if ($index == 0) $template_title = strtoupper($row[0]);
+            if ($template_title !== "TEMPLATE MASTER ANGGOTA") {
+                $failed[] = ['row' => $index + 1, 'errors' => ["Template tidak valid"]];
+                break;
+            } 
             if ($index <= 2) continue; // skip header and info 
+
             $data = [
                 'nip' => $row[0] ?? null,
                 'position' => $row[1] ?? null,
@@ -280,7 +287,9 @@ class MemberController extends Controller
                 'accountGenerate' => $row[11] ?? null,
             ];
 
-           
+            $arr_time = explode('.', $data['date_joined']);
+            $joined = date('Ymd', strtotime($arr_time[0].$arr_time[1].$arr_time[2]));
+
             $mExists = Member::where('nip', $data['nip'])->first();
             $rules = $mExists ? 'exists' : 'unique';
             $validator = Validator::make($data, [
@@ -331,7 +340,7 @@ class MemberController extends Controller
                     'no_kk' => $data['no_kk'],
                     'no_ktp' => $data['no_ktp'],
                     'address' => $data['address'],
-                    'date_joined' => $data['date_joined'],
+                    'date_joined' => $joined,
                     'updated_by' => auth()->id(),
                 ]);
             } else {
@@ -353,7 +362,7 @@ class MemberController extends Controller
                     'no_kk' => $data['no_kk'],
                     'no_ktp' => $data['no_ktp'],
                     'address' => $data['address'],
-                    'date_joined' => $data['date_joined'],
+                    'date_joined' => $joined,
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);

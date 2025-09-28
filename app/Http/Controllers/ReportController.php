@@ -46,7 +46,6 @@ class ReportController extends Controller
         $data = [];
         $filter = [];
         $file = 'reports';
-        \Log::debug($startDate);
 
         $filter['Tgl. Mulai'] = date('d-m-Y', strtotime($startDate));
         $filter['Tgl. Batas'] = date('d-m-Y', strtotime($endDate));

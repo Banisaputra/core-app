@@ -214,7 +214,7 @@ class MasterItemController extends Controller
         foreach ($rows as $index => $row) {
             // cek template
             if ($index == 0) $template_title = strtoupper($row[0]);
-            if ($template_title !== "TEMPLATE MASTER ANGGOTA") {
+            if ($template_title !== "TEMPLATE MASTER BARANG") {
                 $failed[] = ['row' => $index + 1, 'errors' => ["Template tidak valid"]];
                 break;
             } 
@@ -263,6 +263,7 @@ class MasterItemController extends Controller
                     "item_code" => $data['item_code'],
                     "item_name" => $data['item_name'],
                     "ct_id" => $categoryId,
+                    "stock" => 0,
                     "hpp" => $data['hpp']*1,
                     "sales_price" => $data['sales_price']*1,
                     "item_image" => "",

@@ -212,16 +212,22 @@ class MasterItemController extends Controller
         $failed = [];
 
         foreach ($rows as $index => $row) {
+            // cek template
+            if ($index == 0) $template_title = strtoupper($row[0]);
+            if ($template_title !== "TEMPLATE MASTER ANGGOTA") {
+                $failed[] = ['row' => $index + 1, 'errors' => ["Template tidak valid"]];
+                break;
+            } 
             if ($index <= 2) continue; // skip header and info 
 
             // check category
-            $category = Category::where('name', $row[2])->first();
+            $category = Category::where('code', $row[2])->first();
             $categoryId = $category ? $category->id : 0;
             $data = [
                 'item_code' => $row[0] ?? null,
                 'item_name' => $row[1] ?? null,
                 'ct_id' => $categoryId ?? null,
-                'stock' => $row[3] ?? null,
+                'hpp' => $row[3] ?? null,
                 'sales_price' => $row[4] ?? null,
             ];
 
@@ -234,8 +240,8 @@ class MasterItemController extends Controller
                 'item_code' => 'required|string|max:50|'.$rules.':master_items,item_code',
                 'item_name' => 'required|string|max:100',
                 'ct_id' => 'required|integer|exists:categories,id',
-                'stock' => 'required',
-                'sales_price' => 'required',
+                'hpp' => 'nullable',
+                'sales_price' => 'nullable',
             ]);
 
             if ($validator->fails()) {
@@ -247,8 +253,8 @@ class MasterItemController extends Controller
                 $itemExists->update([
                     "item_name" => $data['item_name'],
                     "ct_id" => $categoryId,
-                    "stock" => $data['stock'],
-                    "sales_price" => $data['sales_price'],
+                    "hpp" => $data['hpp']*1,
+                    "sales_price" => $data['sales_price']*1,
                     "item_image" => "",
                     "updated_by" => auth()->id(),
                 ]);
@@ -257,8 +263,8 @@ class MasterItemController extends Controller
                     "item_code" => $data['item_code'],
                     "item_name" => $data['item_name'],
                     "ct_id" => $categoryId,
-                    "stock" => $data['stock'],
-                    "sales_price" => $data['sales_price'],
+                    "hpp" => $data['hpp']*1,
+                    "sales_price" => $data['sales_price']*1,
                     "item_image" => "",
                     "created_by" => auth()->id(),
                     "updated_by" => auth()->id(),
@@ -290,7 +296,7 @@ class MasterItemController extends Controller
         ]);
 
         // Header
-        $headers = ['Kode Barang', 'Nama Barang', 'Kategori', 'Stok', 'Harga Jual'];
+        $headers = ['Kode Barang', 'Nama Barang', 'Kode Kategori', 'HPP', 'Harga Jual'];
         $sheet->fromArray($headers, null, 'A2');
 
         // Style header
@@ -302,7 +308,7 @@ class MasterItemController extends Controller
 
         // Keterangan
         $notes = [
-            'Harus diisi', 'Harus diisi', "Harus sesuai\nMaster Kategori", '0 atau lebih besar', "Tulisakan hanya angka"
+            'Harus diisi', 'Harus diisi', "Harus sesuai\nMaster Kategori", 'Tuliskan hanya angka', "Tulisakan hanya angka"
         ];
 
         foreach (range('A', 'E') as $col) {

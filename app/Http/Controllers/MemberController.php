@@ -317,56 +317,66 @@ class MemberController extends Controller
             // check generate account
             $password = Hash::make(Str::random(8));
             $email_verify = null;
+            $is_active = 0;
             if($data['accountGenerate'] == "YA") {
                 $password = Hash::make($request->email);
                 $email_verify = now();
+                $is_active = 1;
             }
-
-            if ($mExists) {
-                $user = User::findOrFails($mExists->user_id);
-                $user->update([
-                    'name' => $data['name'],
-                    'email' => $data['email'],
-                    'password' => $password,
-                    'email_verified_at' => $email_verify
-                ]);
-
-                $mExists->update([
-                    'position_id' => $position->id,
-                    'devision_id' => $devision->id,
-                    'name' => $data['name'],
-                    'telphone' => $data['telphone'],
-                    'gender' => $data['gender'],
-                    'no_kk' => $data['no_kk'],
-                    'no_ktp' => $data['no_ktp'],
-                    'address' => $data['address'],
-                    'date_joined' => $joined,
-                    'updated_by' => auth()->id(),
-                ]);
-            } else {
-                $user = User::create([
-                    'name' => $data['name'],
-                    'email' => $data['email'],
-                    'password' => $password,
-                    'email_verified_at' => $email_verify
-                ]);
+            DB::beginTransaction();
+            try {
+                if ($mExists) {
+                    $user = User::findOrFails($mExists->user_id);
+                    $user->update([
+                        'name' => $data['name'],
+                        'email' => $data['email'],
+                        'password' => $password,
+                        'email_verified_at' => $email_verify,
+                        'is_transactional' => $is_active
+                    ]);
     
-                $member = Member::create([
-                    'user_id' => $user->id,
-                    'nip' => $data['nip'],
-                    'position_id' => $position->id,
-                    'devision_id' => $devision->id,
-                    'name' => $data['name'],
-                    'telphone' => $data['telphone'],
-                    'gender' => $data['gender'],
-                    'no_kk' => $data['no_kk'],
-                    'no_ktp' => $data['no_ktp'],
-                    'address' => $data['address'],
-                    'date_joined' => $joined,
-                    'created_by' => auth()->id(),
-                    'updated_by' => auth()->id(),
-                ]);
+                    $mExists->update([
+                        'position_id' => $position->id,
+                        'devision_id' => $devision->id,
+                        'name' => $data['name'],
+                        'telphone' => $data['telphone'],
+                        'gender' => $data['gender'],
+                        'no_kk' => $data['no_kk'],
+                        'no_ktp' => $data['no_ktp'],
+                        'address' => $data['address'],
+                        'date_joined' => $joined,
+                        'updated_by' => auth()->id(),
+                    ]);
+                } else {
+                    $user = User::create([
+                        'name' => $data['name'],
+                        'email' => $data['email'],
+                        'password' => $password,
+                        'email_verified_at' => $email_verify,
+                        'is_transactional' => $is_active
+                    ]);
+        
+                    $member = Member::create([
+                        'user_id' => $user->id,
+                        'nip' => $data['nip'],
+                        'position_id' => $position->id,
+                        'devision_id' => $devision->id,
+                        'name' => $data['name'],
+                        'telphone' => $data['telphone'],
+                        'gender' => $data['gender'],
+                        'no_kk' => $data['no_kk'],
+                        'no_ktp' => $data['no_ktp'],
+                        'address' => $data['address'],
+                        'date_joined' => $joined,
+                        'created_by' => auth()->id(),
+                        'updated_by' => auth()->id(),
+                    ]);
+                }
+                DB::commit();
+            } catch (\Throwable $th) {
+                DB::rollback();
             }
+
 
             $success++;
         }
@@ -410,7 +420,7 @@ class MemberController extends Controller
             "PRIA / WANITA\nHarus diisi",
             "Harus diisi", "Harus diisi",
             "Format penulisan\nYYYY.MM.DD\nExp :\n - 2025.12.31\n - 2002.05.07",
-            'Harus diisi', "YA / TIDAK\nYA untuk membuat account"
+            'Harus diisi', "YA / TIDAK\nYA untuk membuat account\npassword default email"
         ];
 
         foreach (range('A', 'L') as $col) {
@@ -478,7 +488,7 @@ class MemberController extends Controller
             return redirect()->back()->with('success', 'Data Account berhasil diperbarui');
         } catch (\Throwable $th) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pembelian: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menyimpan akun! Hubungi Administrator.')->withInput();
         }
 
     }

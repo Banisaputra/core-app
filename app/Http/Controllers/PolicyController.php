@@ -109,7 +109,7 @@ class PolicyController extends Controller
             return redirect()->route('policy.index')->with('success', 'File syarat dan ketentuan berhasil diunggah.');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menyimpan pengaturan! Hubungi administrator.')->withInput();
         }
 
     }
@@ -217,7 +217,7 @@ class PolicyController extends Controller
             return redirect()->route('policy.index')->with('success', 'Syarat Ketentuan Umum berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menyimpan pengaturan! Hubungi administrator.' )->withInput();
         }
 
 
@@ -334,7 +334,7 @@ class PolicyController extends Controller
             return redirect()->route('policy.index')->with('success', 'Syarat Ketentuan Khusus berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menyimpan pengaturan! Hubungi administrator.')->withInput();
         }
 
 
@@ -445,7 +445,7 @@ class PolicyController extends Controller
             return redirect()->route('policy.index')->with('success', 'Syarat Ketentuan Agunan berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menyimpan pengaturan! Hubungi administrator.' )->withInput();
         }
     }
    
@@ -483,7 +483,7 @@ class PolicyController extends Controller
             return redirect()->route('policy.index')->with('success', 'Syarat Ketentuan Periode Cut Off berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pengaturan: Hubungi administrator.'. $e->message())->withInput();
+            return back()->with('error', 'Gagal menyimpan pengaturan! Hubungi administrator.')->withInput();
         }
 
 

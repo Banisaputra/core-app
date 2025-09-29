@@ -14,6 +14,8 @@ use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\DatabaseBackupService;
+use App\Repositories\PinjamanRepository;
+use App\Repositories\SimpananRepository;
 use App\Repositories\PembelianRepository;
 use App\Repositories\PenjualanRepository;
 
@@ -21,11 +23,17 @@ class UserController extends Controller
 { 
     protected $penjualanRepository;
     protected $pembelianRepository;
+    protected $simpananRepository;
+    protected $pinjamanRepository;
 
-    public function __construct(PenjualanRepository $penjualanRepository, PembelianRepository $pembelianRepository)
-    {
+    public function __construct(
+        PenjualanRepository $penjualanRepository, PembelianRepository $pembelianRepository,
+        SimpananRepository $simpananRepository, PinjamanRepository $pinjamanRepository
+    ) {
         $this->penjualanRepository = $penjualanRepository;
         $this->pembelianRepository = $pembelianRepository;
+        $this->simpananRepository = $simpananRepository;
+        $this->pinjamanRepository = $pinjamanRepository;
     }
 
     public function dashboard() 
@@ -39,26 +47,44 @@ class UserController extends Controller
         $current_year = (int)$today->format('Y');
 
         $periode_start = new DateTime("$current_year-$current_month-".($cut_off_day + 1)."");
-        $periode_start->modify("-1 month");
         $periode_end = new DateTime("$current_year-$current_month-".($cut_off_day ?? 1)."");
+        if ($current_day <= $cut_off_day) {
+            $periode_start->modify("-1 month");
+        } else {
+            $periode_end->modify("+1 month");
+
+        }
 
         // data member
         $userID = auth()->id();
         
         $saleOfYear = $this->penjualanRepository->getPenjualanPerPeriode($current_year, $cut_off_day);
         $purchaseOfYear = $this->pembelianRepository->getPembelianPerPeriode($current_year, $cut_off_day);
+        $savingOfYear = $this->simpananRepository->getSimpananPerPeriode($current_year, $cut_off_day);
+        $loanOfYear = $this->pinjamanRepository->getPinjamanPerPeriode($current_year, $cut_off_day);
 
-        // data all
+        // data monthly
         $sales = Sale::whereBetween('sa_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
-                    ->sum('sub_total');
-        $purchase = Purchase::whereBetween('pr_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
-                    ->sum('total');
+                ->sum('sub_total');
+        $purchase = Purchase::where('pr_state', '<>', '99')
+                ->whereBetween('pr_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
+                ->sum('total');
+        $saving = Saving::where('sv_state', '<>', '99')
+                ->whereBetween('sv_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
+                ->sum('sv_value');
+        $loan = Loan::where('loan_state', '<>', '99')
+                ->whereBetween('loan_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
+                ->sum('loan_value');
 
         $data = [
             "sales" => $sales,
             "purchase" => $purchase,
+            "saving" => $saving,
+            "loan" => $loan,
             "saleOfYear" => $saleOfYear,
             "purchaseOfYear" => $purchaseOfYear,
+            "savingOfYear" => $savingOfYear,
+            "loanOfYear" => $loanOfYear,
         ];
        
         return view('dashboard', $data);

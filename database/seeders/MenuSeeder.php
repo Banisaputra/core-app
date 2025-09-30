@@ -34,10 +34,6 @@ class MenuSeeder extends Seeder
                 'name' => 'Permissions', 'route' => 'permissions.index', 'icon' => 'fe-lock',
                 'order' => 3, 'permission' => 'manage_permissions', 'parent_id' => 2
             ],
-            [
-                'name' => 'Menus', 'route' => 'menus.index', 'icon' => 'fe-list',
-                'order' => 4, 'permission' => 'manage_menus', 'parent_id' => 2
-            ],
         ];
 
         foreach ($menus as $menu) {

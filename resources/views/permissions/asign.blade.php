@@ -31,7 +31,7 @@
         </div>
       @endif 
       
-      <form action={{ route('permissions.asigned') }} method="POST" id="form-member" enctype="multipart/form-data">
+      <form action="#" method="POST" id="form-member" enctype="multipart/form-data">
         @csrf
           <input type="hidden" name="role_id" value="{{ $role->id }}">
           <h4>Manage Permissions untuk Role: {{ ucwords($role->name) }}</h4>
@@ -78,7 +78,7 @@
           <small>Izin akses yang terdaftar akan tergantikan</small>
           </div>
           <div class="col-md-6 text-right">
-            <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button>
+            {{-- <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button> --}}
           </div>
         </div>
       </form>
@@ -102,31 +102,55 @@
       ]
     });
 
+    $('#actAll').on('click', function() {
+      console.log("all check");
+      var checkAll = $(this).is(":checked");
+      var type = $(this).is(":checked") ? "given" : "revoke";
+
+
+      saveRowData("all", type, 0);
+
+
+      
+    })
+
     $('#permissions tbody').on('change', '.actPermission', function () {
       var value = $(this).val();
       var type = $(this).is(":checked") ? "given" : "revoke";
   
       // Simpan per row
-      saveRowData(value, type);
+      saveRowData(value, type, 1);
       
     })
   
   });
 
-function saveRowData(permission, type) {
+function saveRowData(permission, type, isRow) {
     $.ajax({
-        url: '/save-row-data',
+        url: '/permissions/asign',
         type: 'POST',
         data: {
-            _token: '{{ csrf_token() }}',
-            permission: permission,
-            type: type
+          _token: '{{ csrf_token() }}',
+          role_id: '{{ $role->id }}',
+          permission: permission,
+          type: type,
+          is_row: isRow
+        },
+        beforeSend: function() {
+          $('#loadingOverlay, #loadingIndicator').show();
         },
         success: function(response) {
-            console.log('Data berhasil disimpan');
-            alert('Izin berhasil ditambahkan ke role.')
+          alert(response.message);
+        },
+        error: function(xhr, status, error, message) {
+          alert(xhr.responseJSON.message);
+        },
+        complete: function() {
+          $('#loadingIndicator').hide();
+          window.location.reload()
         }
     });
 }
+ 
 </script>
 @endsection

@@ -44,7 +44,7 @@
                     <div class="col-10">
                         <div class="tab-content mb-4" id="v-pills-tabContent">
                             <div class="tab-pane fade active show" id="v-pills-terms" role="tabpanel" aria-labelledby="v-pills-terms-tab">
-                                <form action="{{ route('policy.upload') }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ .upload') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="form-group">
                                         <label for="terms">Syarat & Ketentuan</label>

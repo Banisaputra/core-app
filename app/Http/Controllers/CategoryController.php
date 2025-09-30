@@ -112,7 +112,7 @@ class CategoryController extends Controller
         $category->updated_by = auth()->id();
         $category->save();
 
-        return redirect()->route('category.edit', $category->id)->with('success', 'Data Kategori berhasil diperbarui.');
+        return redirect()->route('categories.edit', $category->id)->with('success', 'Data Kategori berhasil diperbarui.');
 
     }
  

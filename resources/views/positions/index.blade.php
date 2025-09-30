@@ -12,7 +12,7 @@
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalTitle" style="display: none;" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <form action="{{ route('position.import') }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('positions.import') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="modal-header">
           <h5 class="modal-title" id="importModalTitle">Upload file</h5>
@@ -46,7 +46,7 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-                <a href="{{ route('position.create') }}" class="btn mb-2 btn-primary">
+                <a href="{{ route('positions.create') }}" class="btn mb-2 btn-primary">
                     <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
                 </a>
             </div>
@@ -56,7 +56,7 @@
                   <span class="fe fe-24 fe-download"></span>Import file
                 </button>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style="">
-                  <a class="dropdown-item" href="{{ route('position.template')}}"><small>Download Template</small></a>
+                  <a class="dropdown-item" href="{{ route('positions.template')}}"><small>Download Template</small></a>
                   <button class="dropdown-item" data-toggle="modal" data-target="#importModal"><small>Upload data</small></button>
                 </div>
               </div>
@@ -115,8 +115,8 @@
                             <span class="text-muted sr-only">Action</span>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="{{ route('position.edit', $pst->id) }}">Edit</a>
-                            <form action="{{ route('position.destroy', $pst->id) }}" method="POST" style="display: inline;" id="deleteForm">
+                            <a class="dropdown-item" href="{{ route('positions.edit', $pst->id) }}">Edit</a>
+                            <form action="{{ route('positions.destroy', $pst->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" id="btnDelete" class="dropdown-item">{{ $pst->is_transactional==1 ? "Nonaktifkan" : "Aktifkan"}}</button>

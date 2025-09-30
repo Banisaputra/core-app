@@ -98,16 +98,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/permissions/{id}/edit', [AdminPermissionController::class, 'edit'])->name('permissions.edit')->middleware('can:permission_edit');
     Route::put('/permissions/{id}', [AdminPermissionController::class, 'update'])->name('permissions.update')->middleware('can:permission_edit');
     Route::delete('/permissions/{id}', [AdminPermissionController::class, 'destroy'])->name('permissions.destroy')->middleware('can:permission_delete');
-   
-    // menus
-    Route::get('/menus', [AdminMenuController::class, 'index'])->name('menus.index');
-    Route::get('/menus/asign', [AdminMenuController::class, 'asign'])->name('menus.asign');
-    Route::post('/menus', [AdminMenuController::class, 'store'])->name('menus.store');
-    Route::post('/menus/asign', [AdminMenuController::class, 'updatemenus'])->name('menus.asigned');
-    Route::get('/menus/{id}/edit', [AdminMenuController::class, 'edit'])->name('menus.edit');
-    Route::put('/menus/{id}', [AdminMenuController::class, 'update'])->name('menus.update');
-    Route::delete('/menus/{id}', [AdminMenuController::class, 'destroy'])->name('menus.destroy');
-
+    
     // info
     Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
 

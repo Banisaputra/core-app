@@ -99,17 +99,44 @@ class PermissionController extends Controller
     {
         $request->validate([
             'role_id' => 'required|exists:roles,id',
-            'permissions' => 'required|array',
-            'permissions.*' => 'exists:permissions,name',
+            'permission' => 'required|string',
+            'type' => 'required|string',
+            'is_row' => 'required',
         ]);
-dd($request->all());
-        $permissions = Permission::whereIn('id', $request->permission_id)->pluck('name')->toArray();
-        $role = Role::findOrFail($request->role_id);
-        
-        // $permissionString = implode("','", $permissions);
-        // sprintf("\$role->syncPermission('%s');", $permissionString);
-        $role->syncPermissions($permissions);
-        return back()->with('success', 'Izin akses peran berhasil disimpan.');
+        if ($request->is_row == 1) {
+            // cek permission
+            $permission = Permission::where('name', $request->permission)->first();
+            if (!$permission) return response()->json([
+                    'success' => false,
+                    'message' => 'Izin akses tidak valid.'
+                ], 404);
+    
+            $role = Role::findOrFail($request->role_id);
+            if (!$role)  return response()->json([
+                    'success' => false,
+                    'message' => 'Peran untuk izin akses tidak valid.'
+                ], 404);
+            if (strtoupper($request->type) === "GIVEN") {
+                $role->givePermissionTo($request->permission);
+            } else if (strtoupper($request->type) === "REVOKE") {
+                $role->revokePermissionTo($request->permission);
+            }
+        } else {
+            $permissions = [];
+            if (strtoupper($request->type) == "GIVEN") {
+                $permissions = Permission::pluck('name')->toArray();
+            } 
+            $role = Role::findOrFail($request->role_id);
+            $role->syncPermissions($permissions);
+        }
+
+
+
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Izin akses peran berhasil disimpan.'
+        ]);
         
     }
 }

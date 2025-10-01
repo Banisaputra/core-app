@@ -57,7 +57,7 @@
                         <span class="ml-3 item-text">Role Info</span>
                     </a>
                 </li>
-                 @endif
+                @endif
                 @if (auth()->user()->hasPermission('position'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('position.index')}}">
@@ -65,7 +65,7 @@
                         <span class="ml-3 item-text">Jabatan</span>
                     </a>
                 </li>
-                 @endif
+                @endif
                 @if (auth()->user()->hasPermission('member'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('members.index')}}">
@@ -73,7 +73,7 @@
                         <span class="ml-3 item-text">Anggota</span>
                     </a>
                 </li>
-                 @endif
+                @endif
                 @if (auth()->user()->hasPermission('devision'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('devision.index')}}">
@@ -81,7 +81,7 @@
                         <span class="ml-3 item-text">Bagian</span>
                     </a>
                 </li>
-                 @endif
+                @endif
                 @if (auth()->user()->hasPermission('supplier'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('supplier.index')}}">
@@ -89,7 +89,7 @@
                         <span class="ml-3 item-text">Supplier</span>
                     </a>
                 </li>
-                 @endif
+                @endif
                 @if (auth()->user()->hasPermission('category'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('category.index')}}">
@@ -97,7 +97,7 @@
                         <span class="ml-3 item-text">Kategori</span>
                     </a>
                 </li>
-                 @endif
+                @endif
                 @if (auth()->user()->hasPermission('master_item'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('items.index')}}">
@@ -105,7 +105,7 @@
                         <span class="ml-3 item-text">Barang</span>
                     </a>
                 </li>
-                 @endif
+                @endif
                 @if (auth()->user()->hasPermission('setting_policy'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('policy.index')}}">
@@ -113,7 +113,7 @@
                         <span class="ml-3 item-text">Pengaturan</span>
                     </a>
                 </li>
-                 @endif
+                @endif
             </li>
         </ul>
     @endif

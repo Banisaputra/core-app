@@ -16,9 +16,10 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>NIK</th>
                 <th>Nama Anggota</th>
                 <th>Jabatan</th>
-                <th>Potongan Simpanan<br>(Wajib + SHT)</th>
+                <th>Potongan Simpanan<br>(Pokok + Wajib + SHT)</th>
                 <th>Potongan Pinjaman<br>(Uang + Barang)</th>
                 <th>Total Potongan</th>
             </tr>
@@ -28,6 +29,7 @@
                 @foreach($data as $i => $row)
                 <tr>
                     <td>{{ $i + 1 }}</td>
+                    <td>{{ $row['nip'] }}</td>
                     <td>{{ $row['name'] }}</td>
                     <td>{{ $row['position'] }}</td>
                     <td>{{ number_format($row['potongan_simpanan'], 0, ',', '.') }}</td>

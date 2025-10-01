@@ -81,6 +81,14 @@
             <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
         </div>
       @endif
+      {{-- handle error import --}}
+      @if (session()->has('failed') && count(session('failed')) > 0)
+        <div class="alert alert-danger" role="alert">Kesalahan Row <br>
+          @foreach (session('failed') as $error)
+            <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ "[".$error['row']."] ".$error['errors'][0] }} <br>           
+          @endforeach
+        </div>
+      @endif
         <div class="row my-4">
           <!-- Small table -->
           <div class="col-md-12">

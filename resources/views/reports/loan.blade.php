@@ -10,8 +10,11 @@
 </head>
 <body>
     <h3>Laporan Pinjaman</h3>
-    <p>Periode: {{ $dateStart ." - ". $dateEnd}}</p>
-
+    <p>Filter: <br><ul>
+        @foreach ($filter as $key => $ft)
+        <li>{{$key}} : {{ $ft }}</li>
+        @endforeach
+    </ul></p>
     <table>
         <thead>
             <tr>

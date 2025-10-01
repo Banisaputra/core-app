@@ -43,12 +43,27 @@
               <label for="reportSelect">Jenis Laporan</label>
               <select id="reportSelect" name="typeReport" class="form-control">
                 <option value="">-- Pilih laporan </option>
+                @if (auth()->user()->hasPermission('saving'))
                 <option value="saving">Simpanan</option>
+                @endif
+                @if (auth()->user()->hasPermission('loan'))
                 <option value="loan">Pinjaman</option>
+                @endif
+                @if (auth()->user()->hasPermission('purchase'))
                 <option value="purchase">Pembelian</option>
+                @endif
+                @if (auth()->user()->hasPermission('master_item'))
+                <option value="itemStock">Stok Barang</option>
+                @endif
+                @if (auth()->user()->hasPermission('sales'))
                 <option value="sales">Penjualan</option>
+                @endif
+                @if (auth()->user()->hasPermission('usaha'))
                 <option value="profitNlose">Laba Rugi</option>
+                @endif
+                @if (auth()->user()->hasPermission('inventory'))
                 <option value="inventory">Adjustment Stock</option>
+                @endif
               </select>
           </div>
           <div class="form-group mb-3 col-md-3">
@@ -61,6 +76,7 @@
           </div>
         </div>
         <div class="form-row">
+          @if (auth()->user()->hasPermission('sales'))
           <div class="form-group col-md-3">
             <label for="typeSales">Jenis Transaksi</label>
             <select id="typeSales" name="typeSales" class="form-control" disabled>
@@ -69,6 +85,17 @@
               <option value="kredit">Kredit</option>
             </select>
           </div>
+          @endif
+          @if (auth()->user()->hasPermission('master_item'))
+          <div class="form-group col-md-3">
+            <label for="typeStock">Type stock</label>
+            <select id="typeStock" name="typeStock" class="form-control" disabled>
+              <option value="all">SEMUA</option>
+              <option value="10">Dibawah 10</option>
+              <option value="0">Stok Kosong</option>
+            </select>
+          </div>
+          @endif           
         </div>
 
         <hr class="my-4">
@@ -100,18 +127,25 @@
   $(document).ready(function() {
     $('#reportSelect').on("change", function () {
       let type = $(this).val().toUpperCase();
-      console.log(type);
+
       switch (type) {
         case "SALES":
           $('#typeSales').prop('disabled', false);
+          $('#typeStock').val("all").prop('disabled', true);
+          break;
+        case "ITEMSTOCK":
+          $('#typeStock').prop('disabled', false);
+          $('#typeSales').val("all").prop('disabled', true);
           break;
       
         default:
+          $('#typeSales').val('all').prop('disabled', true);
+          $('#typeStock').val('all').prop('disabled', true);
           break;
       }
       
     })
-  })
+  });
 </script>
 <script>
 // Function untuk handle AJAX request
@@ -141,7 +175,7 @@ function handleReportRequest(isPreview = false) {
     if (isPreview) {
         formData.append('preview', 'true');
     }
-    
+
     // AJAX request
     fetch(form.action, {
         method: 'POST',
@@ -164,30 +198,28 @@ function handleReportRequest(isPreview = false) {
               <!DOCTYPE html>
               <html>
               <head>
-                  <title>Preview Laporan</title>
-                  <style>
-                      body { margin: 0; }
-                      iframe { width: 100%; height: 100vh; border: none; }
-                  </style>
+                <title>Preview Laporan</title>
+                <style>
+                  body { margin: 0; }
+                  iframe { width: 100%; height: 100vh; border: none; }
+                </style>
               </head>
               <body>
-                  <iframe src="data:application/pdf;base64,${base64.split(',')[1]}"></iframe>
+                <iframe src="data:application/pdf;base64,${base64.split(',')[1]}"></iframe>
               </body>
               </html>
           `);
           newWindow.document.close();
         } else {
-          // Download seperti biasa
-          const reportType = 'penjualan'; // contoh report type
           const now = new Date();
 
           const formattedDate = 
-              now.getFullYear() +
-              String(now.getMonth() + 1).padStart(2, '0') +
-              String(now.getDate()).padStart(2, '0') +
-              String(now.getHours()).padStart(2, '0') +
-              String(now.getMinutes()).padStart(2, '0') +
-              String(now.getSeconds()).padStart(2, '0');
+            now.getFullYear() +
+            String(now.getMonth() + 1).padStart(2, '0') +
+            String(now.getDate()).padStart(2, '0') +
+            String(now.getHours()).padStart(2, '0') +
+            String(now.getMinutes()).padStart(2, '0') +
+            String(now.getSeconds()).padStart(2, '0');
 
           const blobUrl = URL.createObjectURL(blob);
           const link = document.createElement('a');
@@ -212,7 +244,7 @@ function handleReportRequest(isPreview = false) {
 
 // Event listeners
 document.getElementById('preview-btn').addEventListener('click', function() {
-    handleReportRequest(true);
+    handleReportRequest(true);    
 });
 
 document.getElementById('form-report').addEventListener('submit', function(e) {

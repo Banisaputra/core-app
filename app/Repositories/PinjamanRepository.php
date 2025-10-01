@@ -2,24 +2,24 @@
 
 namespace App\Repositories;
 
-use App\Models\Sale;
+use App\Models\Loan;
 use App\Services\PeriodeService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class PinjamanRepository
 {
-    public function getPenjualanPerPeriode($tahun, $cutOffDay): Collection
+    public function getPinjamanPerPeriode($tahun, $cutOffDay): Collection
     {
         $periode = PeriodeService::generatePeriodeTahun($tahun, $cutOffDay);
         
         return $periode->map(function ($periode) {
-            $data = Sale::whereBetween('sa_date', [
+            $data = Loan::whereBetween('loan_date', [
                $periode['start_date']->format('Ymd'),
                $periode['end_date']->format('Ymd')
             ])
             ->select(
-               DB::raw('SUM(sub_total) as total_sales'),
+               DB::raw('SUM(loan_value) as total_loan'),
                DB::raw('COUNT(*) as total_transaksi')
             )
             ->first();
@@ -28,16 +28,16 @@ class PinjamanRepository
                'periode' => $periode['nama_periode'],
                'start_date' => $periode['start_date']->format('d-m-Y'),
                'end_date' => $periode['end_date']->format('d-m-Y'),
-               'total_jumlah' => $data->total_sales ?? 0,
+               'total_jumlah' => $data->total_loan ?? 0,
                'total_transaksi' => $data->total_transaksi ?? 0
             ];
         });
     }
 
-    public function getPenjualanDetailPerPeriode($tahun): Collection
+    public function getPinjamanDetailPerPeriode($tahun): Collection
     {
-        return Sale::with('items')
-            ->whereYear('sa_date', $tahun)
+        return Loan::with(['payments'])
+            ->whereYear('loan_date', $tahun)
             ->get()
             ->groupBy(function ($item) {
                $periode = PeriodeService::getPeriodeByDate($item->tanggal);

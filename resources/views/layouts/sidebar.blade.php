@@ -24,7 +24,7 @@
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
             <li class="nav-item dropdown">
-                @if (auth()->user()->hasPermission('masterSetting'))
+                @if (auth()->user()->hasPermission('masterSettings'))
                 <a href="#access-asign" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
                     <i class="fe fe-shield fe-16"></i>
                     <span class="ml-3 item-text">Akses Pengguna</span>
@@ -42,60 +42,78 @@
                     </li>
                 </ul>
                 @endif
+                @if (auth()->user()->hasPermission('backup_database'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ url('/backup/download') }}">
                         <i class="fe fe-database fe-16"></i>
                         <span class="ml-3 item-text">Backup Database</span>
                     </a>
                 </li>
+                 @endif
+                @if (auth()->user()->hasPermission('role_info'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('access.info')}}">
                         <i class="fe fe-shield fe-16"></i>
                         <span class="ml-3 item-text">Role Info</span>
                     </a>
                 </li>
+                 @endif
+                @if (auth()->user()->hasPermission('position'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('position.index')}}">
                         <i class="fe fe-pocket fe-16"></i>
                         <span class="ml-3 item-text">Jabatan</span>
                     </a>
                 </li>
+                 @endif
+                @if (auth()->user()->hasPermission('member'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('members.index')}}">
                         <i class="fe fe-user fe-16"></i>
                         <span class="ml-3 item-text">Anggota</span>
                     </a>
                 </li>
+                 @endif
+                @if (auth()->user()->hasPermission('devision'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('devision.index')}}">
                         <i class="fe fe-briefcase fe-16"></i>
                         <span class="ml-3 item-text">Bagian</span>
                     </a>
                 </li>
+                 @endif
+                @if (auth()->user()->hasPermission('supplier'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('supplier.index')}}">
                         <i class="fe fe-package fe-16"></i>
                         <span class="ml-3 item-text">Supplier</span>
                     </a>
                 </li>
+                 @endif
+                @if (auth()->user()->hasPermission('category'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('category.index')}}">
                         <i class="fe fe-align-left fe-16"></i>
                         <span class="ml-3 item-text">Kategori</span>
                     </a>
                 </li>
+                 @endif
+                @if (auth()->user()->hasPermission('master_item'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('items.index')}}">
                         <i class="fe fe-box fe-16"></i>
                         <span class="ml-3 item-text">Barang</span>
                     </a>
                 </li>
+                 @endif
+                @if (auth()->user()->hasPermission('setting_policy'))
                 <li class="nav-item w-100">
                     <a class="nav-link" href="{{ route('policy.index')}}">
                         <i class="fe fe-settings fe-16"></i>
                         <span class="ml-3 item-text">Pengaturan</span>
                     </a>
                 </li>
+                 @endif
             </li>
         </ul>
     @endif
@@ -105,24 +123,30 @@
             <span>Usaha</span>
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
+            @if (auth()->user()->hasPermission('sales'))
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('pos.index') }}">
                     <i class="fe fe-shopping-bag fe-16"></i>
                     <span class="ml-3 item-text">Penjualan</span>
                 </a>
             </li>
+            @endif
+            @if (auth()->user()->hasPermission('purchase'))
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('purchases.index')}}">
                     <i class="fe fe-package fe-16"></i>
                     <span class="ml-3 item-text">Pembelian</span>
                 </a>
             </li>
+            @endif
+            @if (auth()->user()->hasPermission('inventory'))
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('inv.index') }}">
                     <i class="fe fe-box fe-16"></i>
                     <span class="ml-3 item-text">Inventory</span>
                 </a>
             </li>
+            @endif
         </ul>
     @endif
 
@@ -131,31 +155,39 @@
         <p class="text-muted nav-heading mt-4 mb-1">
             <span>Koperasi</span>
         </p>
-        <ul class="navbar-nav flex-fill w-100 mb-2">
+        <ul class="navbar-nav flex-fill w-100 mb-2">  
+            @if (auth()->user()->hasPermission('saving'))
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('savings.index')}}">
                     <i class="fe fe-arrow-down-circle fe-16"></i>
                     <span class="ml-3 item-text">Simpanan</span>
                 </a>
             </li>
+              @endif
+                @if (auth()->user()->hasPermission('loan'))
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('loans.index')}}">
                     <i class="fe fe-arrow-up-circle fe-16"></i>
                     <span class="ml-3 item-text">Pinjaman</span>
                 </a>
             </li>
+              @endif
+                @if (auth()->user()->hasPermission('withdrawal'))
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('withdrawals.index')}}">
                     <i class="fe fe-credit-card fe-16"></i>
                     <span class="ml-3 item-text">Penarikan</span>
                 </a>
             </li>
+            @endif
+            @if (auth()->user()->hasPermission('repayment'))
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('repayments.index')}}">
                     <i class="fe fe-credit-card fe-16"></i>
                     <span class="ml-3 item-text">Pelunasan</span>
                 </a>
             </li>
+            @endif
         </ul>
     @endif
 
@@ -165,24 +197,31 @@
             <span>Laporan</span>
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
+            
+            @if (auth()->user()->hasPermission('report_deduction'))
             <li class="nav-item w-100">
                 <a class="nav-link" target="_blank" href="{{ route('reports.deductionPdf')}}">
                     <i class="fe fe-file-text fe-16"></i>
                     <span class="ml-3 item-text">Potong Gaji Anggota</span>
                 </a>
             </li> 
+            @endif
+            @if (auth()->user()->hasPermission('report_general'))
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('reports.index')}}">
                     <i class="fe fe-file-text fe-16"></i>
                     <span class="ml-3 item-text">Laporan Umum</span>
                 </a>
             </li> 
+            @endif
+            @if (auth()->user()->hasPermission('report_member'))
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('reports.index2')}}">
                     <i class="fe fe-file-text fe-16"></i>
                     <span class="ml-3 item-text">Laporan Anggota</span>
                 </a>
             </li>
+            @endif
         </ul>
     @endif
  

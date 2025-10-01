@@ -46,6 +46,7 @@
                 <option value="saving">Simpanan</option>
                 <option value="loan">Pinjaman</option>
                 <option value="purchase">Pembelian</option>
+                <option value="itemStock">Stok Barang</option>
                 <option value="sales">Penjualan</option>
                 <option value="profitNlose">Laba Rugi</option>
                 <option value="inventory">Adjustment Stock</option>
@@ -69,6 +70,14 @@
               <option value="kredit">Kredit</option>
             </select>
           </div>
+        </div>
+        <div class="form-group col-md-3">
+          <label for="typeStock">Type stock</label>
+          <select id="typeStock" name="typeStock" class="form-control" disabled>
+            <option value="all">SEMUA</option>
+            <option value="10">Dibawah 10</option>
+            <option value="0">Stok Kosong</option>
+          </select>
         </div>
 
         <hr class="my-4">
@@ -100,18 +109,24 @@
   $(document).ready(function() {
     $('#reportSelect').on("change", function () {
       let type = $(this).val().toUpperCase();
-      console.log(type);
       switch (type) {
         case "SALES":
           $('#typeSales').prop('disabled', false);
+          $('#typeStock').val("all").prop('disabled', true);
+          break;
+        case "ITEMSTOCK":
+          $('#typeStock').prop('disabled', false);
+          $('#typeSales').val("all").prop('disabled', true);
           break;
       
         default:
+          $('#typeSales').val('all').prop('disabled', true);
+          $('#typeStock').val('all').prop('disabled', true);
           break;
       }
       
     })
-  })
+  });
 </script>
 <script>
 // Function untuk handle AJAX request
@@ -164,14 +179,14 @@ function handleReportRequest(isPreview = false) {
               <!DOCTYPE html>
               <html>
               <head>
-                  <title>Preview Laporan</title>
-                  <style>
-                      body { margin: 0; }
-                      iframe { width: 100%; height: 100vh; border: none; }
-                  </style>
+                <title>Preview Laporan</title>
+                <style>
+                  body { margin: 0; }
+                  iframe { width: 100%; height: 100vh; border: none; }
+                </style>
               </head>
               <body>
-                  <iframe src="data:application/pdf;base64,${base64.split(',')[1]}"></iframe>
+                <iframe src="data:application/pdf;base64,${base64.split(',')[1]}"></iframe>
               </body>
               </html>
           `);
@@ -182,12 +197,12 @@ function handleReportRequest(isPreview = false) {
           const now = new Date();
 
           const formattedDate = 
-              now.getFullYear() +
-              String(now.getMonth() + 1).padStart(2, '0') +
-              String(now.getDate()).padStart(2, '0') +
-              String(now.getHours()).padStart(2, '0') +
-              String(now.getMinutes()).padStart(2, '0') +
-              String(now.getSeconds()).padStart(2, '0');
+            now.getFullYear() +
+            String(now.getMonth() + 1).padStart(2, '0') +
+            String(now.getDate()).padStart(2, '0') +
+            String(now.getHours()).padStart(2, '0') +
+            String(now.getMinutes()).padStart(2, '0') +
+            String(now.getSeconds()).padStart(2, '0');
 
           const blobUrl = URL.createObjectURL(blob);
           const link = document.createElement('a');

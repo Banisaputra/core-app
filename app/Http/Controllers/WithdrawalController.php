@@ -200,7 +200,7 @@ class WithdrawalController extends Controller
             return redirect()->back()->with('success', 'Penarikan berhasil dikonfirmasi');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan penarikan: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menyimpan penarikan! Hubungi Administrator.')->withInput();
         }
     }
 }

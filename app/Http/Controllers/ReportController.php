@@ -22,7 +22,8 @@ class ReportController extends Controller
 {
     public function index() 
     {
-        return view('reports.index');
+        $categories = Category::with(['parent'])->get();
+        return view('reports.index', compact('categories'));
     }
 
     public function index2()
@@ -44,8 +45,8 @@ class ReportController extends Controller
         $filter = [];
         $file = 'reports';
 
-        $filter['Tgl. Mulai'] = date('d-m-Y', strtotime($request->dateStart));
-        $filter['Tgl. Batas'] = date('d-m-Y', strtotime($request->dateEnd));
+        $filter['Tgl. Mulai'] = date('d-m-Y', strtotime($startDate));
+        $filter['Tgl. Batas'] = date('d-m-Y', strtotime($endDate));
         
         switch ($type) {
             case 'SAVING':
@@ -158,6 +159,34 @@ class ReportController extends Controller
                     ];
                 }
                 $file = 'reports.inventories';
+                break;
+            
+            case 'ITEMSTOCK':
+                $stock_type = $request->typeStock ?? "all";
+                $where = "1=1";
+                if ($stock_type != "all") {
+                    $stock_type = $stock_type*1;
+                    if ($stock_type == 10) {
+                        $where = "stock<=".$stock_type."";
+                    } else if ($stock_type == 0) {
+                        $where = "stock =".$stock_type."";
+                    }
+                }
+
+                $item_stock = MasterItem::with(['category'])
+                ->whereRaw($where)
+                ->get();
+
+                foreach ($item_stock as $key => $sa) {
+                    $data[] = [
+                        'item_code' => $sa->item_code,
+                        'item_name' => $sa->item_name,
+                        'item_hpp' => $sa->hpp,
+                        'item_price' => $sa->sales_price,
+                        'item_stock' => $sa->stock,
+                    ];
+                }
+                $file = 'reports.item-stock';
                 break;
             
             default:
@@ -450,6 +479,7 @@ class ReportController extends Controller
             }
 
             $data[] = [
+                'nip' => $member->nip ?? '-',
                 'name' => $member->name ?? '-',
                 'position' => $member->position->name ?? '-',
                 'potongan_simpanan' => $simpananBulanan,

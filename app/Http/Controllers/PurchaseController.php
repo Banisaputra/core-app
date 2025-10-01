@@ -83,7 +83,7 @@ class PurchaseController extends Controller
             return redirect()->route('purchases.index')->with('success', 'Pembelian berhasil disimpan!');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pembelian: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menyimpan pembelian! Hubungi Administrator.')->withInput();
         }
     }
  
@@ -159,7 +159,7 @@ class PurchaseController extends Controller
             return redirect()->route('purchases.index')->with('success', 'Data pembelian berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pembelian: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menyimpan pembelian! Hubungi Administrator.')->withInput();
         }
     }
  
@@ -241,7 +241,7 @@ class PurchaseController extends Controller
             return redirect()->back()->with('success', 'Pembelian berhasil dikonfirmasi');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan pembelian: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menyimpan pembelian! Hubungi Administrator.')->withInput();
         }
     }
 

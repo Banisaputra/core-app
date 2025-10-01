@@ -47,33 +47,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    // public function roles()
-    // {
-    //     return $this->belongsToMany(Role::class);
-    // }
-
-    // public function hasRole($roles)
-    // {
-    //     return $this->roles()->whereIn('name', $roles)->exists();
-    // }
-
-    // Cek apakah user punya permission melalui role
-    // public function hasPermission($permissionName)
-    // {
-    //     foreach ($this->roles as $role) {
-    //         if ($role->permissions->contains('name', $permissionName)) {
-    //             return true;
-    //         }
-    //     }
-    //     return false;
-    // }
+    } 
 
     public function member()
     {
         return $this->hasOne(Member::class);
     }
-
-
 }

@@ -10,8 +10,11 @@
 </head>
 <body>
     <h3>Laporan Adjustmen Stok</h3>
-    <p>Periode: {{ date('d-m-Y', strtotime($dateStart)) ." - ". date('d-m-Y', strtotime($dateEnd))}}</p>
-
+    <p>Filter: <br><ul>
+        @foreach ($filter as $key => $ft)
+        <li>{{$key}} : {{ $ft }}</li>
+        @endforeach
+    </ul></p>    
     <table>
         <thead>
             <tr>
@@ -43,7 +46,7 @@
                 @endforeach 
             @else
                 <tr>
-                    <td colspan=5 style="text-align: center">Tidak ada data</td>
+                    <td colspan=6 style="text-align: center">Tidak ada data</td>
                 </tr>
             @endif
         </tbody>

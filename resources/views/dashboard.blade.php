@@ -22,7 +22,7 @@
                               </span>
                            </div>
                            <div class="col pr-0">
-                              <p class="small text-muted mb-0">Penjualan Bulan ini</p>
+                              <p class="small text-muted mb-0">Penjualan Periode ini</p>
                               <span class="h3 mb-0">{{ number_format($sales,0,',','.')}}</span>
                            </div>
                         </div>
@@ -39,7 +39,7 @@
                            </span>
                         </div>
                         <div class="col pr-0">
-                           <p class="small text-muted mb-0">Pembelian Bulan ini</p>
+                           <p class="small text-muted mb-0">Pembelian Periode ini</p>
                            <span class="h3 mb-0">{{ number_format($purchase,0,',','.')}}</span>
                         </div>
                         </div>
@@ -57,7 +57,7 @@
                               </span>
                            </div>
                            <div class="col pr-0">
-                              <p class="small text-muted mb-0">Simpanan Bulan ini</p>
+                              <p class="small text-muted mb-0">Simpanan Periode ini</p>
                               <span class="h3 mb-0">{{ number_format($saving,0,',','.')}}</span>
                            </div>
                         </div>
@@ -74,7 +74,7 @@
                            </span>
                         </div>
                         <div class="col pr-0">
-                           <p class="small text-muted mb-0">Pinjaman Bulan ini</p>
+                           <p class="small text-muted mb-0">Pinjaman Periode ini</p>
                            <span class="h3 mb-0">{{ number_format($loan,0,',','.')}}</span>
                         </div>
                         </div>
@@ -195,7 +195,7 @@
          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 
          datasets: [
             { 
-               label: "Sales", 
+               label: "Penjualan", 
                barThickness: 10, 
                backgroundColor: "rgba(51, 161, 81, 1)", 
                borderColor: "rgba(51, 161, 81, 1)", 
@@ -210,7 +210,7 @@
                lineTension: .1 
             }, 
             {
-               label: "Purchase", 
+               label: "Pembelian", 
                barThickness: 10, 
                backgroundColor: "rgba(210, 214, 222, 1)",
                borderColor: "rgba(210, 214, 222, 1)", 

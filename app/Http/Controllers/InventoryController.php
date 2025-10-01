@@ -91,8 +91,11 @@ class InventoryController extends Controller
             return redirect()->route('inv.index')->with('success', 'Koreksi berhasil disimpan!');
         } catch (\Exception $e) {
             DB::rollback();
-            // $e->getMessage(); 
-            return back()->with('error', 'Gagal menyimpan Inventory! Hubungi Administrator')->withInput();
+            // $e->getMessage();
+            if ($e->getCode() == 1) {
+                return back()->with('error', 'Gagal menyimpan Inventory: '.$e->getMessage())->withInput();
+            }
+            return back()->with('error', 'Gagal menyimpan Inventory: Hubungi Administrator')->withInput();
         }
     }
  
@@ -215,7 +218,7 @@ class InventoryController extends Controller
             DB::rollback();
             // $e->getMessage();
             if ($e->getCode() == 1) {
-                // return back()->with('error', 'Gagal menyimpan Inventory: '.$e->getMessage())->withInput();
+                return back()->with('error', 'Gagal menyimpan Inventory: '.$e->getMessage())->withInput();
             }
             return back()->with('error', 'Gagal menyimpan Inventory: Hubungi Administrator')->withInput();
         }
@@ -271,7 +274,7 @@ class InventoryController extends Controller
             return redirect()->back()->with('success', 'Koreksi Inventory berhasil dikonfirmasi');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan koreksi stok! Hubungi Administrator.')->withInput();
+            return back()->with('error', 'Gagal menyimpan koreksi: ' . $e->getMessage())->withInput();
         }
     }
 

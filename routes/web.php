@@ -248,14 +248,15 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::delete('/withdrawals/{id}', [WithdrawalController::class, 'destroy'])->name('withdrawals.destroy');
 
     // policy
-    Route::get('/policy', [PolicyController::class, 'index'])->name('policy.index');
-    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policy.upload');
-    Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policy.loanUmum');
-    Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policy.loanKhusus');
-    Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policy.loanAgunan');
-    Route::post('/policy-general', [PolicyController::class, 'general'])->name('policy.general');
-    Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policy.agDestroy');
+    Route::get('/policy', [PolicyController::class, 'index'])->name('policies.index');
+    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policies.upload');
+    Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policies.loanUmum');
+    Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policies.loanKhusus');
+    Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policies.loanAgunan');
+    Route::post('/policy-general', [PolicyController::class, 'general'])->name('policies.general');
+    Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policies.agDestroy');
 
+  
     // pos
     Route::get('/pos', [PosController::class, 'index2'])->name('pos.index');
     Route::post('/submit-sale', [PosController::class, 'store']);

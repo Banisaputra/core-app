@@ -283,7 +283,7 @@ class SavingController extends Controller
             return redirect()->back()->with('success', 'Simpanan berhasil dikonfirmasi');
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Gagal menyimpan simpanan! Hubungi Administrator.')->withInput();
+            return back()->with('error', 'Gagal menyimpan simpanan: ' . $e->getMessage())->withInput();
         }
     }
 

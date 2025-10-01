@@ -131,12 +131,6 @@ class DevisionController extends Controller
         $failed = [];
 
         foreach ($rows as $index => $row) {
-            // cek template
-            if ($index == 0) $template_title = strtoupper($row[0]);
-            if ($template_title !== "TEMPLATE MASTER BAGIAN") {
-                $failed[] = ['row' => $index + 1, 'errors' => ["Template tidak valid"]];
-                break;
-            } 
             if ($index <= 2) continue; // skip header and info 
             $data = [
                 'code' => $row[0] ?? null,

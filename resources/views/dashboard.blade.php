@@ -137,5 +137,6 @@
       }
       spChart=document.getElementById("spChart");
       spChart&&new Chart(spChart,{type:"bar",data:ChartData,options:ChartOptions});
+      
     </script>
 @endsection

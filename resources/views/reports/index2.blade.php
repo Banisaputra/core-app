@@ -43,9 +43,7 @@
               <label for="reportSelect-1">Jenis Laporan</label>
               <select id="reportSelect-1" name="typeReport" class="form-control">
                 <option value="">-- Pilih laporan </option>
-                @if (auth()->user()->hasPermission('member'))
                 <option value="member">Data Anggota</option>
-                @endif
               </select>
           </div>
           <div class="form-group col-md-3">
@@ -99,12 +97,8 @@
               <label for="reportSelect-2">Jenis Laporan</label>
               <select id="reportSelect-2" name="typeReport" class="form-control">
                 <option value="">-- Pilih laporan </option>
-                @if (auth()->user()->hasPermission('saving'))
                 <option value="detail_saving">Simpanan Anggota</option>
-                @endif
-                @if (auth()->user()->hasPermission('loan'))
                 <option value="detail_loans">Pinjaman Anggota</option>
-                @endif
               </select>
           </div>
           <div class="form-group col-md-6">

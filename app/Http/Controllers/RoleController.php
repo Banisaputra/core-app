@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
-use App\Http\Controllers\Controller;
 
 class RoleController extends Controller
 {
     public function index () 
     {
-        $roles = Role::latest()->get();
+        $roles = Role::latest()->paginate();
         return view('roles.index', compact('roles'));
     }
 
@@ -27,7 +26,7 @@ class RoleController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Peran baru berhasil disimpan.',
+            'message' => 'Role created successfully',
             'data' => $role
         ]);
     }
@@ -55,20 +54,20 @@ class RoleController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Peran berhasil diupdate.',
+            'message' => 'Role updated successfully',
             'data' => $role
         ]);
     }
 
     public function destroy(string $id)
     {
-        $role = Role::findOrFail($id);
+        $role = role::findOrFail($id);
         if($role) {
             // delete
             $role->delete();
         }
 
-        return redirect()->back()->with('success', "Data peran berhasil dihapus.");
+        return redirect()->back()->with('success', "Data dan akun anggota berhasil dihapus");
         
     }
 
@@ -98,13 +97,12 @@ class RoleController extends Controller
             'role_id.*' => 'exists:roles,id',
         ]);
 
-        $roles = Role::whereIn('id', $request->role_id)->pluck('name')->toArray();
-        $user = User::findOrFail($request->user_id); 
-        
-        // $rolesString = implode("','", $roles);
-        // sprintf("\$user->syncRoles('%s');", $rolesString);
-        $user->syncRoles($roles);
-        return back()->with('success', 'Peran user berhasil disimpan.');
+        $user = User::findOrFail($request->user_id);
+
+        // Sync roles (removes existing and replaces with new)
+        $user->roles()->sync($request->role_id);
+
+        return back()->with('success', 'Roles updated successfully!');
         
     }
 

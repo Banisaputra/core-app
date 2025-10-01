@@ -1,8 +1,3 @@
-@php
-use App\Models\Menu;
-$parentMenus = Menu::whereNull('parent_id')->orderBy('order')->get();
-@endphp
-
 <aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>
     <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
         <i class="fe fe-x"><span class="sr-only"></span></i>
@@ -13,6 +8,14 @@ $parentMenus = Menu::whereNull('parent_id')->orderBy('order')->get();
                 <img src="{{ asset('images/logo-kokarhardo.png')}}" class="navbar-brand-img" width="80px" alt="logo-company">
             </a>
         </div>
+        <ul class="navbar-nav flex-fill w-100 mb-2">
+            <li class="nav-item w-100">
+                <a href="{{ url('/') }}" class="nav-link">
+                    <i class="fe fe-home fe-16"></i>
+                    <span class="ml-3 item-text">Dashboard</span>
+                </a>
+            </li>
+        </ul>
 
     @if (auth()->user()->hasPermission('master'))
             
@@ -130,10 +133,9 @@ $parentMenus = Menu::whereNull('parent_id')->orderBy('order')->get();
             @endif
             @if (auth()->user()->hasPermission('purchase'))
             <li class="nav-item w-100">
-                <a href="{{ $parent->route ? route($parent->route) : "#" }}"
-                    class="nav-link">
-                    <i class="fe {{ $parent->icon }} fe-16"></i>
-                    <span class="ml-3 item-text"> {{ $parent->name }} </span>
+                <a class="nav-link" href="{{ route('purchases.index')}}">
+                    <i class="fe fe-package fe-16"></i>
+                    <span class="ml-3 item-text">Pembelian</span>
                 </a>
             </li>
             @endif
@@ -225,5 +227,3 @@ $parentMenus = Menu::whereNull('parent_id')->orderBy('order')->get();
  
     </nav>
   </aside>
-
-  

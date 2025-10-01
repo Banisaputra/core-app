@@ -48,18 +48,14 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-              @can('role_create')
                 <button type="button" class="btn mb-2 mr-2 btn-primary" data-toggle="modal" data-target="#addModal">
                 <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data</button>
-              @endcan
-              @can('role_management_access')
                 <a href="{{ route('roles.asign') }}" class="btn mb-2 btn-success">
                   <span class="fe fe-16 fe-corner-up-right"></span>Asign Role
                 </a>
-              @endcan
             </div>
             <div class="col-auto">
-              {{--more button  --}}
+                <button type="button" class="btn btn-success"><span class="fe fe-16 mr-2 fe-download"></span>Import Data <small>(soon)</small></button>
             </div>
         </div>
         @if ($errors->any())
@@ -103,19 +99,12 @@
                             <span class="text-muted sr-only">Action</span>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">
-                            @can('permission_management_access')
-                            <a href="{{ route('permissions.asign', $role->id) }}" class="dropdown-item btnPermission">Izin Akses</a>
-                            @endcan
-                            @can('role_edit')
                             <button class="dropdown-item btnEdit" data-id="{{ $role->id }}">Edit</button>
-                            @endcan
-                            @can('role_delete')
                             <form action="{{ route('roles.destroy', $role->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" id="btnDelete" class="dropdown-item">Delete</button>
                             </form>
-                            @endcan
                           </div>
                         </td> 
                       </tr>
@@ -214,7 +203,7 @@
     });
 
     // edit
-    $('#roles tbody').on('click', '.btnEdit', function () {
+    $('.btnEdit').on('click', function () {
       var id = $(this).data('id');
 
       $('#formErrors').addClass('d-none').find('#errorList').empty();
@@ -234,6 +223,7 @@
         url: '/roles/' + id + '/edit',
         method: 'GET',
         success: function(response) {
+          console.log(response);
           
           $('#formRole #name').val(response.data.name);
           $('#addModal').modal('show');
@@ -245,12 +235,6 @@
       });
     });
 
-    // access permission
-    $('#roles tbody').on('click', '.btnPermission', function () {
-      var id = $(this).data('id');
-      
-    
-    });
   });
 </script>
 @endsection

@@ -79,7 +79,7 @@ class DevisionController extends Controller
         }
         $devision->save();
 
-        return redirect()->route('devisions.edit', $devision->id)->with('success', 'Data Kategori berhasil diperbarui.');
+        return redirect()->route('devision.edit', $devision->id)->with('success', 'Data Kategori berhasil diperbarui.');
 
     }
  

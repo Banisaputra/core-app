@@ -16,19 +16,19 @@ class SavingTypeSeeder extends Seeder
         $arr_svType = [
             [
                 'name' => 'Wajib',
-                'description' => 'Simpanan yang wajib dibayar setiap bulan.',
+                'description' => 'Simpanan yang wajib dibayar',
                 'created_by' => 1,
                 'updated_by' => 1,
             ],
             [
                 'name' => 'Pokok',
-                'description' => 'Simpanan pokok dengan nominal tertentu, dibayarkan sekali selama menjadi anggota',
+                'description' => 'Simpanan pokok dengan nominal flexible',
                 'created_by' => 1,
                 'updated_by' => 1,
             ],
             [
-                'name' => 'SHT',
-                'description' => 'Simpanan Hari Tua, Tabungan wajib setiap bulan',
+                'name' => 'Sukarela',
+                'description' => 'Simpanan yang tidak mengikat, boleh tidak dilakukan',
                 'created_by' => 1,
                 'updated_by' => 1,
             ],

@@ -11,7 +11,7 @@
                 </div>
                 <div class="card-body">
                     {{-- syarat umum --}}
-                    <form action="{{ .general') }}" method="post">
+                    <form action="{{ route('policy.general') }}" method="post">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">

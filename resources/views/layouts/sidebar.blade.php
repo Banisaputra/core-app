@@ -222,7 +222,6 @@ $parentMenus = Menu::whereNull('parent_id')->orderBy('order')->get();
             @endif
         </ul>
     @endif
-@endforeach
  
     </nav>
   </aside>

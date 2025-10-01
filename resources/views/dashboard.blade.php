@@ -17,12 +17,12 @@
                      <div class="card-body">
                         <div class="row align-items-center">
                            <div class="col-3 text-center">
-                              <span class="circle circle-sm bg-primary-light">
+                              <span class="circle circle-sm bg-primary">
                                  <i class="fe fe-16 fe-shopping-bag text-white mb-0"></i>
                               </span>
                            </div>
                            <div class="col pr-0">
-                              <p class="small text-muted mb-0">Monthly Sales</p>
+                              <p class="small text-muted mb-0">Penjualan Bulan ini</p>
                               <span class="h3 mb-0">{{ number_format($sales,0,',','.')}}</span>
                            </div>
                         </div>
@@ -39,8 +39,43 @@
                            </span>
                         </div>
                         <div class="col pr-0">
-                           <p class="small text-muted mb-0">Purchase</p>
+                           <p class="small text-muted mb-0">Pembelian Bulan ini</p>
                            <span class="h3 mb-0">{{ number_format($purchase,0,',','.')}}</span>
+                        </div>
+                        </div>
+                     </div>
+                  </div>
+               </div> 
+               {{-- koperasi --}}
+               <div class="col-md-6 col-xl-3 mb-4">
+                  <div class="card shadow border-0">
+                     <div class="card-body">
+                        <div class="row align-items-center">
+                           <div class="col-3 text-center">
+                              <span class="circle circle-sm bg-primary">
+                                 <i class="fe fe-16 fe-arrow-down text-white mb-0"></i>
+                              </span>
+                           </div>
+                           <div class="col pr-0">
+                              <p class="small text-muted mb-0">Simpanan Bulan ini</p>
+                              <span class="h3 mb-0">{{ number_format($saving,0,',','.')}}</span>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="col-md-6 col-xl-3 mb-4">
+                  <div class="card shadow border-0">
+                     <div class="card-body">
+                        <div class="row align-items-center">
+                        <div class="col-3 text-center">
+                           <span class="circle circle-sm bg-primary">
+                              <i class="fe fe-16 fe-arrow-up text-white mb-0"></i>
+                           </span>
+                        </div>
+                        <div class="col pr-0">
+                           <p class="small text-muted mb-0">Pinjaman Bulan ini</p>
+                           <span class="h3 mb-0">{{ number_format($loan,0,',','.')}}</span>
                         </div>
                         </div>
                      </div>
@@ -51,11 +86,21 @@
                <div class="col-md-6 mb-4">
                   <div class="card shadow">
                      <div class="card-header">
-                        <strong class="card-title mb-0">Sales & Purchase Chart</strong>
-                       
+                        <strong class="card-title mb-0">Penjualan & Pembelian</strong>
                      </div>
                      <div class="card-body">
                         <canvas id="spChart" width="400" height="300"></canvas>
+                     </div> 
+                  </div> 
+               </div>
+               {{-- koperasi --}}
+               <div class="col-md-6 mb-4">
+                  <div class="card shadow">
+                     <div class="card-header">
+                        <strong class="card-title mb-0">Simpanan & Pinjaman</strong>
+                     </div>
+                     <div class="card-body">
+                        <canvas id="slChart" width="400" height="300"></canvas>
                      </div> 
                   </div> 
                 </div>
@@ -69,19 +114,84 @@
    <script>
       const saleOfYear = @json($saleOfYear);
       const purchaseOfYear = @json($purchaseOfYear);
+      const savingOfYear = @json($savingOfYear);
+      const loanOfYear = @json($loanOfYear);
 
       var dataSale = [];
       var dataPurchase = [];
+      var dataSaving = [];
+      var dataLoan = [];
       saleOfYear.forEach(sale => {
          dataSale.push(sale['total_transaksi']);
       });
       purchaseOfYear.forEach(purchase => {
          dataPurchase.push(purchase['total_transaksi']);
       });
+      savingOfYear.forEach(saving => {
+         dataSaving.push(saving['total_transaksi']);
+      });
+      loanOfYear.forEach(loan => {
+         dataLoan.push(loan['total_transaksi']);
+      });
       
    </script>
     <script>
-      var ChartData = { 
+      var ChartDataSL = { 
+         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 
+         datasets: [
+            { 
+               label: "Simpanan", 
+               barThickness: 10, 
+               backgroundColor: "rgba(51, 161, 81, 1)", 
+               borderColor: "rgba(51, 161, 81, 1)", 
+               pointRadius: !1, 
+               pointColor: "#0dc516ff", 
+               pointStrokeColor: "rgba(51, 161, 81, 1)", 
+               pointHighlightFill: "#fff", 
+               pointHighlightStroke: "rgba(51, 161, 81, 1)", 
+               data: dataSaving, 
+               fill: "",
+               borderWidth: 2,
+               lineTension: .1 
+            }, 
+            {
+               label: "Pinjaman", 
+               barThickness: 10, 
+               backgroundColor: "rgba(210, 214, 222, 1)",
+               borderColor: "rgba(210, 214, 222, 1)", 
+               pointRadius: !1, 
+               pointColor: "rgba(210, 214, 222, 1)", 
+               pointStrokeColor: "#c1c7d1", 
+               pointHighlightFill: "#fff", 
+               pointHighlightStroke: "rgba(220,220,220,1)", 
+               data: dataLoan, 
+               fill: "", 
+               borderWidth: 2, 
+               lineTension: .1 
+            },
+         ] 
+      }
+      var ChartOptionsSL = { 
+         maintainAspectRatio: !1, 
+         responsive: !0, 
+         legend: { display: !1 }, 
+         scales: { 
+            xAxes: [{ 
+               gridLines: { 
+                  display: !1 
+               } 
+            }], 
+            yAxes: [{ 
+               gridLines: { 
+                  display: !1, 
+                  color: colors.borderColor, 
+                  zeroLineColor: colors.borderColor 
+               } 
+            }]
+         }
+      }
+
+      var ChartDataSP = { 
          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 
          datasets: [
             { 
@@ -116,7 +226,7 @@
             },
          ] 
       }
-      var ChartOptions = { 
+      var ChartOptionsSP = { 
          maintainAspectRatio: !1, 
          responsive: !0, 
          legend: { display: !1 }, 
@@ -135,8 +245,10 @@
             }] 
          } 
       }
-      spChart=document.getElementById("spChart");
-      spChart&&new Chart(spChart,{type:"bar",data:ChartData,options:ChartOptions});
+      var spChart=document.getElementById("spChart");
+      spChart&&new Chart(spChart,{type:"bar",data:ChartDataSP,options:ChartOptionsSP});
       
+      var slChart=document.getElementById("slChart");
+      slChart&&new Chart(slChart,{type:"bar",data:ChartDataSL,options:ChartOptionsSL});
     </script>
 @endsection

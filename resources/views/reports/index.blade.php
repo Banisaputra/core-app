@@ -43,13 +43,27 @@
               <label for="reportSelect">Jenis Laporan</label>
               <select id="reportSelect" name="typeReport" class="form-control">
                 <option value="">-- Pilih laporan </option>
+                @if (auth()->user()->hasPermission('saving'))
                 <option value="saving">Simpanan</option>
+                @endif
+                @if (auth()->user()->hasPermission('loan'))
                 <option value="loan">Pinjaman</option>
+                @endif
+                @if (auth()->user()->hasPermission('purchase'))
                 <option value="purchase">Pembelian</option>
+                @endif
+                @if (auth()->user()->hasPermission('master_item'))
                 <option value="itemStock">Stok Barang</option>
+                @endif
+                @if (auth()->user()->hasPermission('sales'))
                 <option value="sales">Penjualan</option>
+                @endif
+                @if (auth()->user()->hasPermission('usaha'))
                 <option value="profitNlose">Laba Rugi</option>
+                @endif
+                @if (auth()->user()->hasPermission('inventory'))
                 <option value="inventory">Adjustment Stock</option>
+                @endif
               </select>
           </div>
           <div class="form-group mb-3 col-md-3">
@@ -62,6 +76,7 @@
           </div>
         </div>
         <div class="form-row">
+          @if (auth()->user()->hasPermission('sales'))
           <div class="form-group col-md-3">
             <label for="typeSales">Jenis Transaksi</label>
             <select id="typeSales" name="typeSales" class="form-control" disabled>
@@ -70,6 +85,8 @@
               <option value="kredit">Kredit</option>
             </select>
           </div>
+          @endif
+          @if (auth()->user()->hasPermission('master_item'))
           <div class="form-group col-md-3">
             <label for="typeStock">Type stock</label>
             <select id="typeStock" name="typeStock" class="form-control" disabled>
@@ -78,7 +95,7 @@
               <option value="0">Stok Kosong</option>
             </select>
           </div>
-           
+          @endif           
         </div>
 
         <hr class="my-4">

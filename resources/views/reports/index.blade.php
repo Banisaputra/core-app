@@ -70,14 +70,14 @@
               <option value="kredit">Kredit</option>
             </select>
           </div>
-        </div>
-        <div class="form-group col-md-3">
-          <label for="typeStock">Type stock</label>
-          <select id="typeStock" name="typeStock" class="form-control" disabled>
-            <option value="all">SEMUA</option>
-            <option value="10">Dibawah 10</option>
-            <option value="0">Stok Kosong</option>
-          </select>
+          <div class="form-group col-md-3">
+            <label for="typeStock">Type stock</label>
+            <select id="typeStock" name="typeStock" class="form-control" disabled>
+              <option value="all">SEMUA</option>
+              <option value="10">Dibawah 10</option>
+              <option value="0">Stok Kosong</option>
+            </select>
+          </div>
         </div>
 
         <hr class="my-4">

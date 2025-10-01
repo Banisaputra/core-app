@@ -49,48 +49,14 @@
          <hr class="my-4">
          <div class="form-row">
            <div class="col-md-6">
-            <small>Role terdaftar akan terhapus</small>
+            <small>Role yang terdaftar akan tergantikan</small>
            </div>
            <div class="col-md-6 text-right">
              <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button>
            </div>
          </div>
       </form>
-      <hr class="my-4">
-      <div class="row align-items-center my-4">
-        <div class="col">
-          <h2 class="h3 mb-0 page-title">User Role (soon)</h2>
-        </div>
-      </div>
-        {{-- <div class="row my-4">
-          <!-- Small table -->
-          <div class="col-md-12">
-            <div class="card shadow">
-              <div class="card-body">
-                <!-- table -->
-                <table class="table datatables" id="roleUser">
-                  <thead>
-                    <tr>
-                      <th width="5%">No.</th>
-                      <th width="20%">Nama</th>
-                      <th>Roles</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    
-                    @foreach ($roles as $role)
-                      <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $role->name }}</td>
-                        <td>{{ $role->name }}</td>
-                      </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div> --}}
+       
     </div>
   </div>
 </div>

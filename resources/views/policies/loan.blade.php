@@ -11,7 +11,7 @@
                 </div>
                 <div class="card-body">
                     {{-- syarat umum --}}
-                    <form action="{{ route('policy.loanUmum') }}" method="post">
+                    <form action="{{ .loanUmum') }}" method="post">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
@@ -71,7 +71,7 @@
                 </div>
                 <div class="card-body">
                     {{-- setting syarat khusus --}}
-                    <form action="{{ route('policy.loanKhusus')}}" method="post">
+                    <form action="{{ route('policies.loanKhusus')}}" method="post">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
@@ -132,7 +132,7 @@
                 <div class="card-body">
                     {{-- setting syarat agunan --}}
                     <div class="row">
-                        <form action="{{ route('policy.loanAgunan') }}" method="post">
+                        <form action="{{ route('policies.loanAgunan') }}" method="post">
                         <div class="col-md-12"> 
                             @csrf
                             <div class="form-row">
@@ -207,7 +207,7 @@
                                                     <td>{{ $agp->start_year . " - " . $agp->end_year}}</td>
                                                     <td>Rp {{ number_format($agp->agp_value, 0) }}</td>
                                                     <td>
-                                                    <form action="{{ route('policy.agDestroy', $agp->id) }}" method="POST" style="display: inline;" id="deleteForm">
+                                                    <form action="{{ route('policies.agDestroy', $agp->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn mb-2 btn-outline-danger" id="btnDelete"><span class="fe fe-trash-2 fe-16"></span></button>

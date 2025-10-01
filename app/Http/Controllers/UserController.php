@@ -36,10 +36,10 @@ class UserController extends Controller
         $this->pinjamanRepository = $pinjamanRepository;
     }
 
-    public function dashboard() 
+    public function dashboard()
     {   
-        $role = strtoupper(auth()->user()->roles[0]['name']);
-        if ($role === "MEMBER") return $this->dashboardMember();
+        // $role = strtoupper(auth()->user()->roles[0]['name']);
+        // if ($role === "MEMBER") return $this->dashboardMember();
         $cut_off_day = Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value');
         $today = new DateTime();
         $current_day = (int)$today->format('d');

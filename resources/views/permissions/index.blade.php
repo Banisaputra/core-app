@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('title')
-    <title>Role Informasi - Sistem Informasi Koperasi dan Usaha</title>
+    <title>Permission Informasi - Sistem Informasi Koperasi dan Usaha</title>
 @endsection
 
 @section('page_css')
@@ -13,10 +13,10 @@
 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" style="display: none;" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form action="{{ route('roles.store')}}" method="POST" id="formRole">
+      <form action="{{ route('permissions.store')}}" method="POST" id="formPermission">
         @csrf
         <div class="modal-header">
-          <h5 class="modal-title" id="ModalLabel">Tambah Role</h5>
+          <h5 class="modal-title" id="ModalLabel">Tambah permission</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
@@ -26,8 +26,12 @@
         </div>
         <div class="modal-body">
           <div class="form-group mb-3">
-            <label for="name">Nama Role</label>
+            <label for="name">Nama Izin</label>
             <input type="text" id="name" name="name" class="form-control" required>
+          </div>
+          <div class="form-group mb-3">
+            <label for="name">Dekripsi Izin</label>
+            <textarea id="description" name="description" class="form-control" rows="4"></textarea>
           </div>
         </div>
         <div class="modal-footer">
@@ -43,19 +47,14 @@
     <div class="row justify-content-center">
       <div class="col-12">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">Daftar Role</h2>
-            <p class="card-text">Role membagi akses untuk setiap anggota</p>
+            <h2 class="h3 mb-0 page-title">Daftar Permission</h2>
+            <p class="card-text">permission membagi akses untuk setiap role</p>
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-              @can('role_create')
+              @can('permission_create')
                 <button type="button" class="btn mb-2 mr-2 btn-primary" data-toggle="modal" data-target="#addModal">
                 <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data</button>
-              @endcan
-              @can('role_management_access')
-                <a href="{{ route('roles.asign') }}" class="btn mb-2 btn-success">
-                  <span class="fe fe-16 fe-corner-up-right"></span>Asign Role
-                </a>
               @endcan
             </div>
             <div class="col-auto">
@@ -85,7 +84,7 @@
             <div class="card shadow">
               <div class="card-body">
                 <!-- table -->
-                <table class="table datatables" id="roles">
+                <table class="table datatables" id="permissions">
                   <thead>
                     <tr>
                       <th width="5%">No.</th>
@@ -95,22 +94,19 @@
                   </thead>
                   <tbody>
                     
-                    @foreach ($roles as $role)
+                    @foreach ($permissions as $permission)
                       <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $role->name }}</td>
+                        <td>{{ $permission->name }}</td>
                         <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="text-muted sr-only">Action</span>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">
-                            @can('permission_management_access')
-                            <a href="{{ route('permissions.asign', $role->id) }}" class="dropdown-item btnPermission">Izin Akses</a>
+                            @can('permission_edit')
+                            <button class="dropdown-item btnEdit" data-id="{{ $permission->id }}">Edit</button>
                             @endcan
-                            @can('role_edit')
-                            <button class="dropdown-item btnEdit" data-id="{{ $role->id }}">Edit</button>
-                            @endcan
-                            @can('role_delete')
-                            <form action="{{ route('roles.destroy', $role->id) }}" method="POST" style="display: inline;" id="deleteForm">
+                            @can('permission_delete')
+                            <form action="{{ route('permissions.destroy', $permission->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" id="btnDelete" class="dropdown-item">Delete</button>
@@ -136,7 +132,7 @@
 <script src="{{ asset('fedash/js/dataTables.bootstrap4.min.js') }}"></script>
 <script>
   $(document).ready(function () {
-    $('#roles').DataTable(
+    $('#permissions').DataTable(
     {
       autoWidth: true,
       "lengthMenu": [
@@ -146,7 +142,7 @@
     });
 
     $('#deleteForm').on('submit', function(e) {
-      if (!confirm('Apakah anda yakin ingin menghapus role ini?')) {
+      if (!confirm('Apakah anda yakin ingin menghapus permission ini?')) {
           e.preventDefault();
       }
     });
@@ -157,16 +153,16 @@
     });
 
     $('#addModal').on('hidden.bs.modal', function () {
-      $('#formRole')[0].reset();
-      $('#formRole input[name="_method"]').remove();
-      $('#formRole').attr('action', '/roles');
+      $('#formPermission')[0].reset();
+      $('#formPermission input[name="_method"]').remove();
+      $('#formPermission').attr('action', '/permissions');
       $('#formErrors').addClass('d-none').find('#errorList').empty();
-      $('#formRole #submitBtn').text('Save');
-      $('#formRole #ModalLabel').text('Tambah Role');
+      $('#formPermission #submitBtn').text('Save');
+      $('#formPermission #ModalLabel').text('Tambah permission');
     });
 
     // submit
-    $('#formRole').on('submit', function(e) {
+    $('#formPermission').on('submit', function(e) {
       e.preventDefault();
       $('#submitBtn').prop('disabled', true).text('Saving...');
 
@@ -214,43 +210,38 @@
     });
 
     // edit
-    $('#roles tbody').on('click', '.btnEdit', function () {
+    $('#roles tbody .btnEdit').on('click', function () {
       var id = $(this).data('id');
 
       $('#formErrors').addClass('d-none').find('#errorList').empty();
-      $('#formRole')[0].reset();
-      $('#formRole').attr('action', '/roles/' + id);
-      $('#formRole #submitBtn').text('Update');
-      $('#formRole #ModalLabel').text('Edit Role');
+      $('#formPermission')[0].reset();
+      $('#formPermission').attr('action', '/permissions/' + id);
+      $('#formPermission #submitBtn').text('Update');
+      $('#formPermission #ModalLabel').text('Edit permission');
 
       // check _method
-      if (!$('#formRole input[name="_method"]').length) {
-        $('#formRole').append('<input type="hidden" name="_method" value="PUT">');
+      if (!$('#formPermission input[name="_method"]').length) {
+        $('#formPermission').append('<input type="hidden" name="_method" value="PUT">');
       } else {
-        $('#formRole input[name="_method"]').val('PUT');
+        $('#formPermission input[name="_method"]').val('PUT');
       }
 
       $.ajax({
-        url: '/roles/' + id + '/edit',
+        url: '/permissions/' + id + '/edit',
         method: 'GET',
         success: function(response) {
           
-          $('#formRole #name').val(response.data.name);
+          $('#formPermission #name').val(response.data.name);
+          $('#formPermission #description').val(response.data.description);
           $('#addModal').modal('show');
         },
         error: function(xhr) {
-          alert('Failed to load data.');
+          alert('Gagal memuat data.');
           console.error(xhr.responseText);
         }
       });
     });
 
-    // access permission
-    $('#roles tbody').on('click', '.btnPermission', function () {
-      var id = $(this).data('id');
-      
-    
-    });
   });
 </script>
 @endsection

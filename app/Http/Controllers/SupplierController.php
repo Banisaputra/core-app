@@ -81,7 +81,7 @@ class SupplierController extends Controller
         $supplier->updated_by = auth()->id();
         $supplier->save();
 
-        return redirect()->route('supplier.edit', $supplier->id)->with('success', 'Data Supplier berhasil diperbarui.');
+        return redirect()->route('suppliers.edit', $supplier->id)->with('success', 'Data Supplier berhasil diperbarui.');
 
     }
  

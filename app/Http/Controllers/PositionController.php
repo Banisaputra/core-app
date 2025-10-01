@@ -77,7 +77,7 @@ class PositionController extends Controller
         }
         $position->save();
 
-        return redirect()->route('position.edit', $position->id)->with('success', 'Data Jabatan berhasil diperbarui.');
+        return redirect()->route('positions.edit', $position->id)->with('success', 'Data Jabatan berhasil diperbarui.');
 
     }
  

@@ -165,10 +165,8 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/items/{id}/edit', [MasterItemController::class, 'edit'])->name('items.edit');
     Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
     Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');   
-    
-});
 
-Route::get('/', [UserController::class, 'dashboard'])->name('dashboard')->middleware('can:dashboard_show');
+    Route::get('/', [UserController::class, 'dashboard'])->name('dashboard')->middleware('can:dashboard_show');
 
 // role general
     // search
@@ -288,3 +286,4 @@ Route::get('/', [UserController::class, 'dashboard'])->name('dashboard')->middle
     Route::get('/business', [BusinessController::class, 'index'])->name('business.index');
     Route::post('/business-sales', [BusinessController::class, 'sales'])->name('business.sales');
  
+});

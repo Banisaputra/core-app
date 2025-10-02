@@ -28,14 +28,14 @@ class Category extends Model
             $parent = Category::find($this->parent_id);
             if ($parent) {
                 // jika nilai child kosong
-                if ($this->margin_percent==0 && $this->margin_price==0) {
+                // if ($this->margin_percent==0 && $this->margin_price==0) {
                     return [
-                        'margin_percent' => $parent->margin_percent,
-                        'margin_price' => $parent->margin_price,
+                        'margin_percent' => ($parent->margin_percent*1) + ($this->margin_percent*1),
+                        'margin_price' => ($parent->margin_price*1) + ($this->margin_price*1),
                         'ppn_percent' => $parent->ppn_percent,
-                        'source' => 'parent' // Untuk debug/tracking
+                        'source' => 'parent+self' // Untuk debug/tracking
                     ];
-                }
+                // }
             }
         }
         

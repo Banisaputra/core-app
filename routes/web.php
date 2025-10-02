@@ -74,7 +74,6 @@ Route::middleware([LoginAuth::class])->group(function () {
     // access_management
     // users
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index')->middleware('can:user_show');
-    Route::get('/users/asign', [AdminUserController::class, 'asign'])->name('users.asign')->middleware('can:user_management_access');
     Route::post('/users', [AdminUserController::class, 'store'])->name('users.store')->middleware('can:user_create');
     Route::post('/users/asign', [AdminUserController::class, 'updateusers'])->name('users.asigned')->middleware('can:user_management_access');
     Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('users.edit')->middleware('can:user_edit');

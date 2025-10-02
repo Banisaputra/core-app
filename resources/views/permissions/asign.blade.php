@@ -106,21 +106,13 @@
       console.log("all check");
       var checkAll = $(this).is(":checked");
       var type = $(this).is(":checked") ? "given" : "revoke";
-
-
-      saveRowData("all", type, 0);
-
-
-      
+      saveRowData("all", type, 0);      
     })
 
     $('#permissions tbody').on('change', '.actPermission', function () {
       var value = $(this).val();
       var type = $(this).is(":checked") ? "given" : "revoke";
-  
-      // Simpan per row
       saveRowData(value, type, 1);
-      
     })
   
   });

@@ -56,7 +56,8 @@
           </div>
           <div class="form-group col-md-3">
             <label for="margin_price">Margin (Rp)</label>
-            <input type="text" class="form-control" id="margin_price" name="margin_price" data-value="" value="{{ old('margin_price')}}">
+            <input type="hidden" class="form-control" id="margin_price" name="margin_price" value="{{ old('margin_price')}}">
+            <input type="text" class="form-control" id="margin_price_input" value="{{ old('margin_price')}}">
           </div>
           <div class="form-group col-md-3">
             <label for="ppn_percent">PPN (%)</label>
@@ -106,7 +107,7 @@
          }
       })
 
-      $('#margin_price').on('input', function() {
+      $('#margin_price_input').on('input', function() {
         // Save cursor position
         const cursorPosition = this.selectionStart;
         const originalLength = this.value.length;
@@ -137,9 +138,9 @@
       });
 
       // For form submission
-      $('#margin_price').on('blur', function() {
+      $('#margin_price_input').on('blur', function() {
         const numericValue = $(this).val().replace(/\./g, '');
-        $(this).attr('data-value', numericValue)
+        $('#margin_price').val(numericValue)
       });
 
     });

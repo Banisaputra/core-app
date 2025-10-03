@@ -53,15 +53,16 @@
         <div class="form-row">
           <div class="form-group col-md-3">
             <label for="margin_percent">Margin (%)</label>
-            <input type="number" class="form-control" id="margin_percent" name="margin_percent" value="{{ old('margin_percent', $category->margin_percent ?? 0)}}">
+            <input type="text" class="form-control" id="margin_percent" name="margin_percent" value="{{ old('margin_percent', $category->margin_percent ?? 0)}}">
           </div>
           <div class="form-group col-md-3">
             <label for="margin_price">Margin (Rp)</label>
-            <input type="number" class="form-control" id="margin_price" name="margin_price" value="{{ old('margin_price', $category->margin_price ?? 0)}}">
+            <input type="hidden" class="form-control" id="margin_price" name="margin_price" data-value="" value="{{ old('margin_price', $category->margin_price ?? 0)}}">
+            <input type="text" class="form-control" id="margin_price_input" value="{{ old('margin_price', $category->margin_price ?? 0)}}">
           </div>
           <div class="form-group col-md-3">
             <label for="ppn_percent">PPN (%)</label>
-            <input type="number" class="form-control" id="ppn_percent" name="ppn_percent" value="{{ old('ppn_percent', $category->ppn_percent ?? 0)}}">
+            <input type="text" class="form-control" id="ppn_percent" name="ppn_percent" value="{{ old('ppn_percent', $category->ppn_percent ?? 0)}}">
           </div>
         </div>
         <div class="form-row"> 
@@ -93,4 +94,47 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('page_script')
+<script>
+  $(document).ready( function () {
+    $('#margin_price_input').on('input', function() {
+        // Save cursor position
+        const cursorPosition = this.selectionStart;
+        const originalLength = this.value.length;
+        
+        // Get raw value without formatting
+        let value = $(this).val().replace(/[^\d]/g, '');
+        
+        // Format to IDR
+        if (value.length > 0) {
+            let formattedValue = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && (value.length - i) % 3 === 0) {
+                    formattedValue += '.';
+                }
+                formattedValue += value[i];
+            }
+            
+            $(this).val(formattedValue);
+            
+            // Adjust cursor position based on added dots
+            const newLength = formattedValue.length;
+            const lengthDiff = newLength - originalLength;
+            const newCursorPosition = cursorPosition + lengthDiff;
+            this.setSelectionRange(newCursorPosition, newCursorPosition);
+        } else {
+            $(this).val('');
+        }
+      });
+
+      // For form submission
+      $('#margin_price_input').on('blur', function() {
+        const numericValue = $(this).val().replace(/\./g, '');
+        $('#margin_price').val(numericValue)
+      });
+  })
+
+</script>
 @endsection

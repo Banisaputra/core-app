@@ -297,7 +297,7 @@ class MasterItemController extends Controller
         ]);
 
         // Header
-        $headers = ['Kode Barang', 'Nama Barang', 'Kode Kategori', 'HPP', 'Harga Jual'];
+        $headers = ['Kode Barang', 'Nama Barang', 'Kode Kategori', 'Harga Pembelian', 'Harga Jual'];
         $sheet->fromArray($headers, null, 'A2');
 
         // Style header

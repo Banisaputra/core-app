@@ -30,7 +30,7 @@ class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::with('user', 'position', 'devision')->latest()->paginate();
+        $members = Member::with('user', 'position', 'devision')->get();
         return view('members.index', compact('members'));
     }
 

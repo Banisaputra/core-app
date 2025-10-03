@@ -46,7 +46,7 @@ Route::middleware([SqlRunnerKey::class])->group(function () {
 });
 
 // admin access
-Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])->group(function () {
+Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/backup-db', function () {
         // Jalankan command dan ambil path file
         $exitCode = Artisan::call('db:backup', ['--download' => true]);
@@ -121,16 +121,18 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
     Route::delete('/position/{id}', [PositionController::class, 'destroy'])->name('position.destroy');
     
     // member
-    Route::get('/members', [MemberController::class, 'index'])->name('members.index');
-    Route::get('/members/create', [MemberController::class, 'create'])->name('members.create');
-    Route::get('/members/import', [MemberController::class, 'downloadTemplate'])->name('members.template');
-    Route::post('/members/import', [MemberController::class, 'import'])->name('members.import');
-    Route::post('/members', [MemberController::class, 'store'])->name('members.store');
-    Route::post('/members/account', [MemberController::class, 'account'])->name('members.account');
-    Route::get('/members/{id}', [MemberController::class, 'show'])->name('members.show');
-    Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit');
-    Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');
-    Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('members.destroy');
+    Route::middleware([PermissionMiddleware::class . ':member'])->group(function () {
+        Route::get('/members', [MemberController::class, 'index'])->name('members.index');
+        Route::get('/members/create', [MemberController::class, 'create'])->name('members.create');
+        Route::get('/members/import', [MemberController::class, 'downloadTemplate'])->name('members.template');
+        Route::post('/members/import', [MemberController::class, 'import'])->name('members.import');
+        Route::post('/members', [MemberController::class, 'store'])->name('members.store');
+        Route::post('/members/account', [MemberController::class, 'account'])->name('members.account');
+        Route::get('/members/{id}', [MemberController::class, 'show'])->name('members.show');
+        Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit');
+        Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');
+        Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('members.destroy');
+    });
     
     // items
     Route::get('/items', [MasterItemController::class, 'index'])->name('items.index');
@@ -143,12 +145,9 @@ Route::middleware([LoginAuth::class, RoleMiddleware::class . ':administrator'])-
     Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
     Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');   
     
-});
-
-Route::get('/', [UserController::class, 'dashboard'])->middleware([PermissionMiddleware::class . ':dashboard']);
+    Route::get('/', [UserController::class, 'dashboard'])->middleware([PermissionMiddleware::class . ':dashboard']);
 
 // role general
-Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara,kepala toko,admin toko,badan pengawas,member'])->group(function() {
     // search
     Route::get('/api/users/search', [UserController::class, 'search']);
     Route::get('/api/roles/search', [RoleController::class, 'search']);
@@ -172,9 +171,6 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     Route::post('/report/get3', [ReportController::class, 'getMemberDetail'])->name('reports.getMemberDetail');
     Route::post('/report/pdf-loanInfo', [ReportController::class, 'loanInfo'])->name('reports.loanInfo');
 
-});
-
-Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,bendahara'])->group(function() {
     // loans
     Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
     Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
@@ -238,9 +234,6 @@ Route::middleware([RoleMiddleware::class . ':administrator,kepala koperasi,benda
     Route::post('/policy-general', [PolicyController::class, 'general'])->name('policy.general');
     Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policy.agDestroy');
 
-});
-
-Route::middleware([RoleMiddleware::class . ':administrator,kepala toko,admin toko'])->group(function() {
     // pos
     Route::get('/pos', [PosController::class, 'index2'])->name('pos.index');
     Route::post('/submit-sale', [PosController::class, 'store']);

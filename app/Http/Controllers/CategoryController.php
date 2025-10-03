@@ -102,10 +102,13 @@ class CategoryController extends Controller
             $parent = $request->ct_parent;
         }
 
+        $ppn_percent = str_replace(",", ".", $request->ppn_percent ?? 0);
+        $margin_percent = str_replace(",", ".", $request->margin_percent ?? 0);
+
         $category->code = $request->code;
         $category->name = $request->name;
-        $category->ppn_percent = $request->ppn_percent ?? 0;
-        $category->margin_percent = $request->margin_percent ?? 0;
+        $category->ppn_percent = $ppn_percent;
+        $category->margin_percent = $margin_percent;
         $category->margin_price = $request->margin_price ?? 0;
         $category->is_parent = $is_parent;
         $category->parent_id = $parent;

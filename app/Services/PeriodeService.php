@@ -12,12 +12,13 @@ class PeriodeService
         $periode = collect();
         
         for ($bulan = 1; $bulan <= 12; $bulan++) {
-            $startDate = Carbon::create($tahun, $bulan, $cutOffDay +1);
-            $endDate = Carbon::create($tahun, $bulan + 1, $cutOffDay);
+            // start dibulan sebelum nya (21 desember 2024 - 20 januari 2025) periode Januari
+            $startDate = Carbon::create($tahun, $bulan - 1, $cutOffDay +1);
+            $endDate = Carbon::create($tahun, $bulan, $cutOffDay);
             
-            // Handle December to January next year
-            if ($bulan == 12) {
-                $endDate = Carbon::create($tahun + 1, 1, $cutOffDay);
+            // Handle first periode (December to January)
+            if ($bulan == 1) {
+                $startDate = Carbon::create($tahun - 1, 12, $cutOffDay +1);
             }
             
             $periode->push([

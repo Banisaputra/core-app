@@ -86,7 +86,7 @@
                             <form action="{{ route('inv.confirm')}}" method="POST">
                                 @csrf
                                 <input type="hidden" value="{{ $inventory->id }}" name="inv_id">
-                                <button type="submit" class="btn btn-primary" {{ $inventory->inv_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-check-circle"></span>Konfirmasi Pembelian</button>
+                                <button type="submit" class="btn btn-primary" {{ $inventory->inv_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-check-circle"></span>Konfirmasi Adjustment</button>
                             </form>
                         </div>
                         <div class="col-md-4 text-center">
@@ -94,7 +94,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <input type="hidden" value="{{ $inventory->id }}" name="inv_id">
-                                <button type="submit" class="btn btn-danger" {{ $inventory->inv_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-slash"></span>Batalkan Pembelian</button>
+                                <button type="submit" class="btn btn-danger" {{ $inventory->inv_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-slash"></span>Batalkan Adjustment</button>
                             </form>
                         </div>
                     </div>

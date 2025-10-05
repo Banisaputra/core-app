@@ -253,6 +253,8 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inv.index');
     Route::get('/inventory/create', [InventoryController::class, 'create'])->name('inv.create');
     Route::post('/inventory', [InventoryController::class, 'store'])->name('inv.store');
+    Route::get('/inventory/import', [InventoryController::class, 'downloadTemplate'])->name('inv.template');
+    Route::post('/inventory/import', [InventoryController::class, 'import'])->name('inv.import');
     Route::post('/inventory/confirm', [InventoryController::class, 'confirmation'])->name('inv.confirm');
     Route::get('/inventory/{id}', [InventoryController::class, 'show'])->name('inv.show');
     Route::get('/inventory/{id}/edit', [InventoryController::class, 'edit'])->name('inv.edit');

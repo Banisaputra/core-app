@@ -221,7 +221,7 @@ async function loadProducts(query = '') {
       const data = await res.json();
       // Hide loading
       document.getElementById('productLoading').style.display = 'none';
-      renderProducts(data);
+      renderProducts(data);      
    } catch (err) {
       console.error("Failed to load products", err);
    }
@@ -233,6 +233,10 @@ function renderProducts(products) {
    if (products.length === 0) {
       productList.innerHTML = '<p class="text-muted">No products found.</p>';
       return;
+   } else if (products.length === 1) {
+      console.log(products);
+      
+      autoToCart(products[0]);
    }
 
    products.forEach(product => {
@@ -291,6 +295,25 @@ function updateCart() {
    }
    
    totalEl.textContent = formatIDR(total, 0);
+}
+
+function autoToCart(product) {
+   const id = product.id; 
+   const name = product.item_name;
+   const price = parseFloat(product.sales_price);
+   const stock = product.stock;
+   const ppn = product.effective_ppn;
+
+   if (stock == 0) return alert('stok barang kosong, restock barang diperlukan untuk transaksi!')
+   if (!cart[id]) {
+      cart[id] = { name: name, qty: 1, price: price, stock: stock, disc: 0, ppn: ppn};
+   } else {
+      if (cart[id].stock < (cart[id].qty + 1)) {
+         return alert("stock barang tidak cukup!")
+      }
+      cart[id].qty++;
+   }
+   updateCart();
 }
 
 document.addEventListener("click", e => {

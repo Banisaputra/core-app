@@ -13,7 +13,7 @@
                 @if ($errors->any())
                 <div class="alert alert-danger" role="alert">
                     @foreach ($errors->all() as $error)
-                    <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ $error }}
+                    <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ $error }} <br>
                     @endforeach
                 </div>
                 @endif
@@ -53,7 +53,7 @@
                 </div> --}}
             
                 <button class="btn btn-lg btn-primary btn-block mb-3" tabindex="3" type="submit">Login</button>
-                <p>Don't have an account? - <a class="mb-3" href="{{ route('register') }}"> Sign Up</a></p>
+                {{-- <p>Don't have an account? - <a class="mb-3" href="{{ route('register') }}"> Sign Up</a></p> --}}
                 <p class="mt-5 mb-3 text-muted">&copy; <script>document.write(new Date().getFullYear('Y'))</script></p>
             </form>             
         </div>
@@ -64,7 +64,6 @@
     <script>
         $(document).ready(function() {
             $('#showPassword').on('click', function () {
-                console.log('ready bosskuhh');
                 if ($(this).is(':checked')) {
                     $('#inputPassword').attr('type', "text")
                 } else {

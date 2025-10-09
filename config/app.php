@@ -99,7 +99,7 @@ return [
 
     'key' => env('APP_KEY'),
 
-    'sql_runner_key' => 'eb4c455014478615599aaa679f7edf95',
+    'sql_runner_key' => 'f8dc4d1960e47734e2f30d9e2b79c53f',
 
     'previous_keys' => [
         ...array_filter(

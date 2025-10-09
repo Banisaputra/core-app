@@ -47,6 +47,8 @@ Route::middleware([SqlRunnerKey::class])->group(function () {
 
 // admin access
 Route::middleware([LoginAuth::class])->group(function () {
+    Route::post('/change-password', [AuthController::class, 'changePassword'])->name('password.change');
+
     Route::get('/backup-db', function () {
         // Jalankan command dan ambil path file
         $exitCode = Artisan::call('db:backup', ['--download' => true]);

@@ -104,7 +104,6 @@ class AuthController extends Controller
             return redirect('/login')->with('success', 'Registrasi berhasil, silahkan login');
         } catch (\Throwable $th) {
             DB::rollback();
-            dd($th);
             return redirect()->back()->with('error', 'Terjadi kesalahan, Hubungi administrator');
         }
     }
@@ -114,5 +113,41 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/login');
+    }
+
+    public function changePassword(Request $request) {
+        $request->validate([
+            'old_pass' => 'required',
+            'password' => 'required|min:8|confirmed',
+            'password_confirmation' => 'required'
+        ], [
+            'old_pass.required' => 'Password lama wajib diisi.',
+            'password.required' => 'Password baru wajib diisi.',
+            'password.min' => 'Password baru minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak sesuai.',
+            'password_confirmation.required' => 'Konfirmasi password wajib diisi.'
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        
+        if (!Hash::check($request->old_pass, $user->password)) {
+            return back()->withErrors(['old_pass' => 'Password lama tidak sesuai.']);
+        }
+        if (Hash::check($request->password, $user->password)) {
+            return back()->withErrors(['new_pass' => 'Password Tidak boleh sama.']);
+        }
+        
+        DB::beginTransaction();
+        try {
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            session(['user' => $user]);
+            DB::commit();
+            return redirect('/setting/profile')->with('success', 'Password berhasil diubah.');
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Terjadi kesalahan, Hubungi administrator');
+        }
     }
 }

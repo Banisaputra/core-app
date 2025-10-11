@@ -102,16 +102,16 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
 
     // supplier
-    Route::get('/supplier', [SupplierController::class, 'index'])->name('suppliers.index');
-    Route::get('/supplier/create', [SupplierController::class, 'create'])->name('suppliers.create');
-    Route::get('/supplier/import', [SupplierController::class, 'downloadTemplate'])->name('suppliers.template');
-    Route::post('/supplier/import', [SupplierController::class, 'import'])->name('suppliers.import');
-    Route::post('/supplier', [SupplierController::class, 'store'])->name('suppliers.store');
-    Route::get('/supplier/{id}', [SupplierController::class, 'show'])->name('suppliers.show');
-    Route::get('/supplier/{id}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit');
-    Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('suppliers.update');
-    Route::delete('/supplier/{id}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
-    
+    Route::get('/supplier', [SupplierController::class, 'index'])->name('suppliers.index')->middleware('can:supplier_show');
+    Route::get('/supplier/create', [SupplierController::class, 'create'])->name('suppliers.create')->middleware('can:supplier_create');
+    Route::get('/supplier/import', [SupplierController::class, 'downloadTemplate'])->name('suppliers.template')->middleware('can:supplier_show');
+    Route::post('/supplier/import', [SupplierController::class, 'import'])->name('suppliers.import')->middleware('can:supplier_create');
+    Route::post('/supplier', [SupplierController::class, 'store'])->name('suppliers.store')->middleware('can:supplier_create');
+    Route::get('/supplier/{id}', [SupplierController::class, 'show'])->name('suppliers.show')->middleware('can:supplier_show');
+    Route::get('/supplier/{id}/edit', [SupplierController::class, 'edit'])->name('suppliers.edit')->middleware('can:supplier_edit');
+    Route::put('/supplier/{id}', [SupplierController::class, 'update'])->name('suppliers.update')->middleware('can:supplier_edit');
+    Route::delete('/supplier/{id}', [SupplierController::class, 'destroy'])->name('suppliers.destroy')->middleware('can:supplier_delete');
+
     // categories
     Route::get('/category', [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/category/create', [CategoryController::class, 'create'])->name('categories.create');

@@ -25,7 +25,7 @@
     <div class="center">
         <h3>Koperasi Karyawan</h3>
         <h4>Hardo Soloplast</h4>
-        <small>Jl. Raya No. 123</small>
+        <small></small>
     </div>
 
     <div class="date">No. Transaksi: <br>{{ $sale->sa_code }}<br>

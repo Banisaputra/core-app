@@ -436,7 +436,7 @@ class InventoryController extends Controller
                         'batch' => $batch,
                     ]);
                 } else {
-                    $batches = ItemStock::getFifoBatch($data['item_id']*1);
+                    $batches = ItemStock::getFifoBatch($itemExists->id*1);
                     if ($batches->isEmpty()) {
                         $failed[] = ['row' => $index + 1, 'errors' => [["Stock Barang tidak tersedia!"]]];
                         break;

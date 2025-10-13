@@ -20,6 +20,6 @@ Artisan::command('inspire', function () {
 //         ->appendOutputTo(storage_path('logs/auto_saving.log'))
 //         ->onOneServer(); // ← Penting untuk production
 
-Schedule::command('savings:auto-generate')->hourly()
-    ->appendOutputTo(storage_path('logs/auto_saving.log')); //for develop only
+Schedule::command('savings:auto-generate')->dailyAt('10:00');
+    // ->appendOutputTo(storage_path('logs/auto_saving.log')); //for develop only
 

@@ -98,7 +98,15 @@
 
 @section('page_script')
 <script>
-  $(document).ready( function () {
+  $(document).ready( function () {\
+     $('#is_turunan').on('click', function () {
+        if ($('#is_turunan').is(':checked')) {
+          $('#ct_parent').prop('disabled', false)
+        } else {
+          $('#ct_parent').val('').prop('disabled', true)
+         }
+      })
+      
     $('#margin_price_input').on('input', function() {
         // Save cursor position
         const cursorPosition = this.selectionStart;

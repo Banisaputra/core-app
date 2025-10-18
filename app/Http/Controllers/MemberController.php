@@ -319,7 +319,7 @@ class MemberController extends Controller
             $email_verify = null;
             $is_active = 0;
             if($data['accountGenerate'] == "YA") {
-                $password = Hash::make($request->email);
+                $password = Hash::make($data['email']);
                 $email_verify = now();
                 $is_active = 1;
             }

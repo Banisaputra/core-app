@@ -18,6 +18,16 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'admin dev',
             'email' => 'admin@dev.com',
+            'is_transactional' => 1,
+        ]);
+
+        $this->call([
+            RoleSeeder::class,
+            PermissionSeeder::class,
+            RolePermissionSeeder::class,
+            UserRoleSeeder::class,
+            MasterItemSeeder::class,
+            SavingTypeSeeder::class,
         ]);
     }
 }

@@ -35,11 +35,6 @@
                             <span class="ml-1 item-text">Role</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link pl-3" href="#">
-                            <span class="ml-1 item-text">Permission</span>
-                        </a>
-                    </li>
                 </ul>
                 @endif
                 @if (auth()->user()->hasPermission('backup_database'))

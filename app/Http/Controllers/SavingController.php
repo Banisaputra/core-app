@@ -163,6 +163,7 @@ class SavingController extends Controller
                         "member_id" => $id,
                         "sv_type_id" => $request->sv_type_id,
                         "sv_value" => $svType->value ?? 0, // sesuikan settingan
+                        "remark" => 'Generate otomatis untuk periode '.date('F Y', strtotime($request->periode)),
                         "created_by" => auth()->id(),
                         "updated_by" => auth()->id(),
                     ]);

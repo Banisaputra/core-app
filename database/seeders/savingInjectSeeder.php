@@ -19,11 +19,13 @@ class savingInjectSeeder extends Seeder
             $savings = \App\Models\Saving::where('member_id', $member->id)->get();
             foreach ($savings as $saving) {
                 // inject saving
-                $saving->update([
-                    'sv_state' => 2,
-                    'updated_by' => 1,
-                ]);
-                \App\Models\Member::where('id', $saving->member_id)->increment('balance', $saving->sv_value);
+                if ($saving->sv_state == 1) {
+                    $saving->update([
+                        'sv_state' => 2,
+                        'updated_by' => 1,
+                    ]);
+                    \App\Models\Member::where('id', $saving->member_id)->increment('balance', $saving->sv_value);
+                }
             }
         }
     }

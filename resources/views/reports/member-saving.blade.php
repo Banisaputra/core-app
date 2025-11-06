@@ -48,8 +48,6 @@
                 <?php 
                 if ($row['status'] != 99) {
                     $subtotal += $row['sv_value'];
-                } else {
-                    $subtotal -= $row['sv_value'];
                 }
                 ?>
                 @endforeach

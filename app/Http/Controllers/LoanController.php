@@ -14,6 +14,7 @@ use App\Models\AgunanPolicy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class LoanController extends Controller
 {
@@ -24,6 +25,159 @@ class LoanController extends Controller
     {
         $loans = Loan::with('member')->latest()->paginate();
         return view('loans.index', compact('loans'));
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        $file = $request->file('file');
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+
+        $success = 0;
+        $failed = [];
+        $template_title = "";
+        foreach ($rows as $index => $row) {
+            // cek template
+            if ($index == 0) $template_title = strtoupper($row[0]);
+            if ($template_title !== "TEMPLATE INJECT PINJAMAN") {
+                $failed[] = ['row' => $index + 1, 'errors' => ["Template tidak valid"]];
+                break;
+            } 
+            if ($index <= 2) continue; // skip header and info 
+
+            $data = [
+                'nip' => $row[0] ?? null,
+                'loan_date' => $row[1] ?? null,
+                'loan_tenor' => $row[2] ?? null,
+                'loan_value' => $row[3] ?? null,
+                'interest_percent' => $row[4] ?? null,
+                'loan_payment' => $row[5] ?? null,
+                'with_agunan' => $row[6] ?? null,
+                'agunan_type' => $row[7] ?? null,
+                'agunan_docYear' => $row[8] ?? null,
+                'agunan_docNumber' => $row[9] ?? null,
+                'agunan_docDetail' => $row[10] ?? null,
+            ];
+
+            $arr_time = explode('.', $data['loan_date']);
+            if (!isset($arr_time[2])) {
+                dd($index);
+            }
+            $timeStr = $arr_time[2] . '-' . $arr_time[1] . '-' . $arr_time[0];
+            
+            $loan_date = date('Ymd', strtotime($timeStr));
+            $member = Member::where('nip', $data['nip'])->first();
+ 
+            DB::beginTransaction();
+            try {
+                if ($member) {
+                    $loan_code = Loan::generateCode();
+                    $loan_value = Loan::formatIdrToNumeric($data['loan_value']);
+                    
+                    $cutOff = Policy::where('doc_type', 'GENERAL')
+                    ->where('pl_name', 'cut_off_bulanan')->first();
+
+                    $firstAngsuran = Loan::hitungAngsuranPertama($request->loan_date, $cutOff->pl_value)->format('Ymd');
+
+                    // check due date
+                    $date = new DateTime($firstAngsuran);
+                    $date->add(new DateInterval('P' . $data['loan_tenor'] . 'M'));
+                    $dueDate = $date->format('Ymd');
+
+                     
+                    $is_agunan = strtoupper($data['with_agunan']) == "YA" ? true : false;
+                    
+                    if ($is_agunan) { 
+
+                        $typeAgunan = strtoupper($data['agunan_type']);
+                        $yearAgunan = (int) $data['agunan_docYear'];
+                        $numberAgunan = strtoupper($data['agunan_docNumber']);
+                        $detailAgunan = $data['agunan_docDetail'];
+                     
+                    }
+   
+                    //insert loan
+                    $loan = Loan::create([
+                        'member_id' => $member->id,
+                        'loan_type' => "UANG",
+                        'loan_code' => $loan_code,
+                        'loan_date' => $loan_date,
+                        'loan_tenor' => $data['loan_tenor']*1,
+                        'loan_value' => $loan_value,
+                        'cut_off_record' => $cutOff->pl_value,
+                        'interest_percent' => $data['interest_percent'],
+                        'due_date' => $dueDate,
+                        'loan_state' => 2,
+                        'created_by' => 1,
+                        'updated_by' => 1,
+                    ]);
+
+                    if ($loan && $is_agunan) {
+                        LoanAgunan::create([
+                            'loan_id' => $loan->id,
+                            'agunan_type' => $typeAgunan,
+                            'doc_year' => $yearAgunan,
+                            'doc_number' => $numberAgunan,
+                            'doc_detail' => $detailAgunan,
+                            'created_by' => 1,
+                            'updated_by' => 1,
+                        ]);
+                    }
+            
+                    // insert loan payment
+                    $pay_finish = $data['loan_payment']*1;
+
+                    $loan_total = $loan->loan_value;
+                    $ln_date = $firstAngsuran;
+                    for ($i=1; $i <= ($data['loan_tenor']*1) ; $i++) { 
+                        $lp_val = round($loan->loan_value / $data['loan_tenor'], 0);
+                        $lp_intr = round(($lp_val*$loan->interest_percent)/100, 0);
+                        $ln_remain = round($loan_total - $lp_val);
+                        $pay_date = new DateTime($ln_date);
+                        $lp_date = $pay_date->add(new DateInterval('P1M'))->format('Ymd');
+                        LoanPayment::create([
+                            'lp_code' => LoanPayment::generateCode($lp_date),
+                            'loan_id' => $loan->id,
+                            'lp_date' => $lp_date,
+                            'lp_value' => $lp_val,
+                            'loan_interest' => $lp_intr,
+                            'loan_remaining' => $ln_remain,
+                            'lp_total' => ($lp_val+$lp_intr),
+                            'tenor_month' => $i,
+                            'lp_state' => $i <= $pay_finish ? 2 : 1,
+                            'remark' => '',
+                            'proof_of_payment' => '',
+                            'lp_forfeit' => 0,
+                            'created_by' => 1,
+                            'updated_by' => 1,
+                
+                        ]);
+                        $loan_total -= $lp_val;
+                        $ln_date = $lp_date;
+                        
+                    }
+                        
+                } else {
+                    $failed[] = ['row' => $index + 1, 'errors' => ["NIP tidak ditemukan"]];
+                    continue;
+                }
+                DB::commit();
+            } catch (\Throwable $th) {
+                DB::rollback();
+                $failed[] = ['row' => $index + 1, 'errors' => [" catch error: ".$th->getMessage()]];
+                continue;
+            }
+
+
+            $success++;
+        }
+
+        return redirect()->back()->with('success', "$success data berhasil diimport")->with('failed', $failed);
     }
 
     /**

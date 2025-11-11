@@ -102,15 +102,15 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="maxAgunan01">Maksimal Pinjaman kurang dari 1 Tahun</label>
-                                    <input type="text" id="maxAgunan01" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_0_1']['value']??0),2) }}" readonly>
+                                    <input type="text" id="maxAgunan01" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_0_1']['value']??0)) }}" readonly>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="maxAgunan15">Maksimal Pinjaman kurang dari 5 Tahun</label>
-                                    <input type="text" id="maxAgunan15" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_1_5']['value']??0),2) }}" readonly>
+                                    <input type="text" id="maxAgunan15" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_1_5']['value']??0)) }}" readonly>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="maxAgunan50">Maksimal Pinjaman lebih dari 5 Tahun</label>
-                                    <input type="text" id="maxAgunan50" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_5_0']['value']??0),2) }}" readonly>
+                                    <input type="text" id="maxAgunan50" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_5_0']['value']??0)) }}" readonly>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="maxTenorTA">Maksimal Tenor tanpa Agunan (bulan)</label>

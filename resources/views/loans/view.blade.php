@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div class="text-center">
-                        <form action={{ route('reports.loanInfo') }} method="POST" id="form-report" enctype="multipart/form-data">
+                        <form action={{ route('reports.loanInfo') }} method="POST" id="form-report" enctype="multipart/form-data" target="_blank">
                             @csrf
                             <input type="hidden" name="loan_id" value="{{$loan->id}}">
                             <button type="submit" class="btn mb-2 btn-primary">

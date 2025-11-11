@@ -9,6 +9,36 @@
 @endsection
 
 @section('content')
+{{-- modal import --}}
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalTitle" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form action="{{ route('loans.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title" id="importModalTitle">Upload file</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body"> 
+          <div class="form-group mb-3">
+            <label for="loanFile"> Format file harus sesuai template</label>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="loanFile" name="file" accept=".xlsx,.xls" required>
+              <label class="custom-file-label" for="loanFile">Choose file</label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn mb-2 btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn mb-2 btn-primary">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <div class="container-fluid">
     <div class="row justify-content-center">
       <div class="col-12">
@@ -24,6 +54,15 @@
             </div>
             <div class="col-auto">
                 {{-- other button --}}
+                <div class="dropdown">
+                <button class="btn btn-sm btn-success more-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown">
+                  <span class="fe fe-24 fe-download"></span>Import file
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style=""> 
+                  <button class="dropdown-item" data-toggle="modal" data-target="#importModal"><small>Upload data</small></button>
+                </div>
+              </div>
+              {{-- end other button --}}
             </div>
         </div>
         @if ($errors->any())
@@ -41,6 +80,14 @@
         @if (session()->has('success'))
           <div class="alert alert-success" role="alert">
               <span class="fe fe-help-circle fe-16 mr-2"></span> {{ session('success') }} <br>           
+          </div>
+        @endif
+        {{-- handle error import --}}
+        @if (session()->has('failed') && count(session('failed')) > 0)
+          <div class="alert alert-danger" role="alert">Kesalahan Row <br>
+            @foreach (session('failed') as $error)
+              <span class="fe fe-minus-circle fe-16 mr-2"></span> {{ "[".$error['row']."] ".$error['errors'][0] }} <br>           
+            @endforeach
           </div>
         @endif
         <div class="row my-4">
@@ -119,6 +166,16 @@
       if (!confirm('Apakah anda yakin ingin menghapus pinjaman ini?')) {
           e.preventDefault();
       }
+    });
+    // import file
+    $('#loanFile').on('change', function() {
+      var fileName = $(this).val().split('\\').pop();
+      $(this).next('.custom-file-label').html(fileName);
+    });
+
+    $('#importModal').on('hidden.bs.modal', function () {
+      $(this).find('form')[0].reset();
+      $('#importModal .custom-file-label').html('Choose file');
     });
   })
 </script>

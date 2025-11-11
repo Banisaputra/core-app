@@ -176,6 +176,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     // loans
     Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
     Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
+    Route::post('/loans/import', [LoanController::class, 'import'])->name('loans.import');
     Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
     Route::get('/loans/{id}', [LoanController::class, 'show'])->name('loans.show');
     Route::get('/loans/{id}/edit', [LoanController::class, 'edit'])->name('loans.edit');

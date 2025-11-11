@@ -134,7 +134,7 @@ class LoanController extends Controller
                     $ln_date = $firstAngsuran;
                     for ($i=1; $i <= ($data['loan_tenor']*1) ; $i++) { 
                         $lp_val = round($loan->loan_value / $data['loan_tenor'], 0);
-                        $lp_intr = round(($lp_val*$loan->interest_percent)/100, 0);
+                        $lp_intr = round(($loan->loan_value*$loan->interest_percent)/100, 0);
                         $ln_remain = round($loan_total - $lp_val);
                         $pay_date = new DateTime($ln_date);
                         $lp_date = $pay_date->add(new DateInterval('P1M'))->format('Ymd');

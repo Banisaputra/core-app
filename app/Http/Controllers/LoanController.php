@@ -121,7 +121,7 @@ class LoanController extends Controller
                     ]);
 
                     if ($loan && $is_agunan) {
-                        LoanAgunan::create([
+                        $lag = LoanAgunan::create([
                             'loan_id' => $loan->id,
                             'agunan_type' => $typeAgunan,
                             'doc_year' => $yearAgunan,
@@ -130,6 +130,9 @@ class LoanController extends Controller
                             'created_by' => 1,
                             'updated_by' => 1,
                         ]);
+
+                        $loan->ref_doc_id = $lag->id;
+                        $loan->save();
                     }
             
                     // insert loan payment

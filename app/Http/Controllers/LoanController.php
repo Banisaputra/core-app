@@ -65,9 +65,7 @@ class LoanController extends Controller
             ];
 
             $arr_time = explode('.', $data['loan_date']);
-            if (!isset($arr_time[2])) {
-                dd($index);
-            }
+            
             $timeStr = $arr_time[2] . '-' . $arr_time[1] . '-' . $arr_time[0];
             
             $loan_date = date('Ymd', strtotime($timeStr));
@@ -82,7 +80,7 @@ class LoanController extends Controller
                     $cutOff = Policy::where('doc_type', 'GENERAL')
                     ->where('pl_name', 'cut_off_bulanan')->first();
 
-                    $firstAngsuran = Loan::hitungAngsuranPertama($request->loan_date, $cutOff->pl_value)->format('Ymd');
+                    $firstAngsuran = Loan::hitungAngsuranPertama($loan_date, $cutOff->pl_value)->format('Ymd');
 
                     // check due date
                     $date = new DateTime($firstAngsuran);

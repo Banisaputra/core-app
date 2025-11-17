@@ -339,7 +339,7 @@ class LoanController extends Controller
             ]);
 
             if ($loan && $is_agunan) {
-                LoanAgunan::create([
+                $lag = LoanAgunan::create([
                     'loan_id' => $loan->id,
                     'agunan_type' => $request->ln_agunan,
                     'doc_year' => $request->ln_docYear,
@@ -348,6 +348,9 @@ class LoanController extends Controller
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
+
+                $loan->ref_doc_id = $lag->id;
+                $loan->save();
             }
     
             // insert loan payment
@@ -396,7 +399,7 @@ class LoanController extends Controller
     public function show(string $id)
     {
         $data = [
-            "loan" => Loan::with('member','payments')->findOrFail($id),
+            "loan" => Loan::with('member','payments', 'loanAgunan')->findOrFail($id),
         ];
 
         return view('loans.view', $data);
@@ -404,7 +407,8 @@ class LoanController extends Controller
 
     public function edit(string $id)
     {
-        $loan = Loan::with('member')->findOrFail($id);
+        $loan = Loan::with('member', 'loanAgunan')->findOrFail($id);
+        // dd($loan);
         return view('loans.edit', compact('loan'));
     }
 

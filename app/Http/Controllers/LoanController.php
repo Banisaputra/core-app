@@ -140,8 +140,8 @@ class LoanController extends Controller
                             'doc_year' => $yearAgunan,
                             'doc_number' => $numberAgunan,
                             'doc_detail' => $detailAgunan,
-                            'updated_by' => auht()->id() ?? 1,
-                            'created_by' => auht()->id() ?? 1,
+                            'updated_by' => auth()->id() ?? 1,
+                            'created_by' => auth()->id() ?? 1,
                         ]);
 
                         $loan->ref_doc_id = $lag->id;

@@ -75,6 +75,11 @@ class LoanController extends Controller
             
             $loan_date = date('Ymd', strtotime($timeStr));
             $member = Member::where('nip', $data['nip'])->first();
+
+            if ($member == null) {
+                $failed[] = ['row' => $index + 1, 'errors' => ["NIP tidak ditemukan"]];
+                continue;
+            }
             // cek pinjaman(uang) exists
             $loan_exists = Loan::where('member_id', $member->id)
             ->where('loan_state', 2)->where('loan_type', 'UANG')->count();

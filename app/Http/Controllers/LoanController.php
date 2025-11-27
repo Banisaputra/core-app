@@ -23,7 +23,7 @@ class LoanController extends Controller
      */
     public function index()
     {
-        $loans = Loan::with('member')->latest()->paginate();
+        $loans = Loan::with('member')->latest();
         return view('loans.index', compact('loans'));
     }
 
@@ -191,7 +191,6 @@ class LoanController extends Controller
                 $failed[] = ['row' => $index + 1, 'errors' => [" catch error: ".$th->getMessage()]];
                 continue;
             }
-
 
             $success++;
         }

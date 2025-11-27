@@ -51,7 +51,8 @@
                 </tr>
                     @foreach ($row['payments'] as $pay)
                     <tr>
-                        <td colspan="3" style="text-align: center">{{ $pay['lp_code'] }}</td>
+                        <td colspan="2" style="text-align: center">{{ $pay['lp_code'] }}</td>
+                        <td style="text-align: center">{{ date('d M Y', strtotime($pay['lp_date'])) }}</td>
                         <td>{{ $pay['tenor_month']}}x</td>
                         <td style="text-align: right">{{ number_format($pay['lp_total'],0, ',','.') }}</td>
                         <td>@if ($pay['lp_state'] == 1)

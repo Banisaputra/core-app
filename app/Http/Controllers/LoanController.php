@@ -23,7 +23,7 @@ class LoanController extends Controller
      */
     public function index()
     {
-        $loans = Loan::with('member')->latest();
+        $loans = Loan::with('member')->all();
         return view('loans.index', compact('loans'));
     }
 

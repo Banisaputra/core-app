@@ -124,8 +124,8 @@ class LoanController extends Controller
                         'interest_percent' => $data['interest_percent'],
                         'due_date' => $dueDate,
                         'loan_state' => 2,
-                        'created_by' => 1,
-                        'updated_by' => 1,
+                        'created_by' => auth()->id() ?? 1,
+                        'updated_by' => auth()->id() ?? 1,
                     ]);
 
                     if ($loan && $is_agunan) {
@@ -135,8 +135,8 @@ class LoanController extends Controller
                             'doc_year' => $yearAgunan,
                             'doc_number' => $numberAgunan,
                             'doc_detail' => $detailAgunan,
-                            'created_by' => 1,
-                            'updated_by' => 1,
+                            'updated_by' => auht()->id() ?? 1,
+                            'created_by' => auht()->id() ?? 1,
                         ]);
 
                         $loan->ref_doc_id = $lag->id;
@@ -167,8 +167,8 @@ class LoanController extends Controller
                             'remark' => '',
                             'proof_of_payment' => '',
                             'lp_forfeit' => 0,
-                            'created_by' => 1,
-                            'updated_by' => 1,
+                            'created_by' => auth()->id() ?? 1,
+                            'updated_by' => auth()->id() ?? 1,
                 
                         ]);
                         $loan_total -= $lp_val;

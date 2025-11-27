@@ -100,6 +100,7 @@
                       <th width="5%">No.</th>
                       <th width="10%">Kode</th>
                       <th width="20%">Anggota</th>
+                      <th width="20%">NIK</th>
                       <th width="15%">Tanggal Pinjam</th>
                       <th width="15%">Jatuh Tempo</th>
                       <th width="15%">Nominal</th>
@@ -114,6 +115,7 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $loan->loan_code }}</td>
                             <td>{{ ucwords($loan->member->name) }}</td>
+                            <td>{{ ucwords($loan->member->nip) }}</td>
                             <td>{{ date('d M Y', strtotime($loan->loan_date)) }}</td>
                             <td>{{ date('d M Y', strtotime($loan->due_date)) }}</td>
                             <td>Rp {{ number_format($loan->loan_value, 2) }}</td>

@@ -65,7 +65,12 @@ class LoanController extends Controller
             ];
 
             $arr_time = explode('.', $data['loan_date']);
-            
+
+            if (count($arr_time) !== 3) {
+                $failed[] = ['row' => $index + 1, 'errors' => ["Format tanggal tidak valid!"]];
+                continue;
+            }
+
             $timeStr = $arr_time[2] . '-' . $arr_time[1] . '-' . $arr_time[0];
             
             $loan_date = date('Ymd', strtotime($timeStr));
@@ -73,8 +78,11 @@ class LoanController extends Controller
             // cek pinjaman(uang) exists
             $loan_exists = Loan::where('member_id', $member->id)
             ->where('loan_state', 2)->where('loan_type', 'UANG')->count();
-            if ($loan_exists > 0)
+
+            if ($loan_exists > 0) {
+                $failed[] = ['row' => $index + 1, 'errors' => ["Pengguna memiliki pinjaman aktif yang belum diselesaikan"]];
                 continue;
+            }
 
             DB::beginTransaction();
             try {

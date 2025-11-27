@@ -127,6 +127,9 @@
                                   @case(2)
                                     <span class="text-success">Disetujui</span>
                                     @break
+                                  @case(3)
+                                    <span class="text-success">Selesai</span>
+                                    @break
                                   @default
                                     <span class="text-info">Pengajuan</span>
                               @endswitch

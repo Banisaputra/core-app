@@ -443,6 +443,7 @@ class ReportController extends Controller
                            [$periode_start->format('Ymd'), $periode_end->format('Ymd')]);
                 }])
                 ->where('member_id', $m_id)
+                ->whereIn('loan_state', [2])
                 ->whereHas('payments', function($query) use ($periode_start, $periode_end) {
                     $query->whereRaw("DATE_FORMAT(lp_date, '%Y%m%d') BETWEEN ? AND ?", 
                            [$periode_start->format('Ymd'), $periode_end->format('Ymd')]);
@@ -453,6 +454,7 @@ class ReportController extends Controller
             $savingDetails = Saving::with(['member', 'svType'])
                 ->whereBetween("sv_date", [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
                 ->where('member_id', $m_id)
+                ->whereIn('sv_state', [2])
                 ->orderBy('id')
                 ->get();
 

@@ -16,6 +16,7 @@ use App\Models\MasterItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Barryvdh\Snappy\Facades\SnappyPdf as SnappyPDF;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -64,12 +65,13 @@ class ReportController extends Controller
                         'sv_value' => $sv->sv_value,
                     ];
                 }
+                
                 $file = 'reports.saving';
                 break;
 
             case 'LOAN':
                 $loans = Loan::with(['member','payments'])
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('loan_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
                 ->get();
 
                 foreach ($loans as $key => $loan) {
@@ -221,6 +223,9 @@ class ReportController extends Controller
 
     public function getMemberList(Request $request) 
     {
+        ini_set('memory_limit', '1024M'); // 1GB
+        ini_set('max_execution_time', 300);
+
         $request->validate([
             "typeReport" => "required",
             "activate" => "required"
@@ -233,6 +238,7 @@ class ReportController extends Controller
 
         switch ($type) {
             case 'MEMBER':
+
                 $query = "
                     SELECT m.nip, m.name mb_name, p.name ps_name, d.name dv_name, m.is_transactional mb_active
                     FROM members m
@@ -418,11 +424,14 @@ class ReportController extends Controller
         ])->setPaper([0,0,164.36,600], 'portrait');
 
         return $pdf->stream('Bukti-stuk-pinjaman-'. date('dmY', strtotime($loan->created_at)).'.pdf');
-    }
-
-    // for PDF report type
+    } 
+ 
+    // for PDF report type modified
     public function deduction(Request $request) 
     {
+        ini_set('memory_limit', '1024M'); // 1GB
+        ini_set('max_execution_time', '300'); // 5 menit
+
         $cut_off_day = Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value');
         $today = new DateTime();
         $current_day = (int)$today->format('d');
@@ -433,63 +442,65 @@ class ReportController extends Controller
         $periode_start->modify("-1 month");
         $periode_end = new DateTime("$current_year-$current_month-".($cut_off_day ?? 0)."");
 
-        $members = Member::with(['position','devision','user'])->get();
+        // $members = Member::with(['position','devision','user'])->get();
+        
         $data = [];
 
-        foreach ($members as $member) {
-            $m_id = $member->id;
-            $loanDetails = Loan::with(['member', 'payments' => function($query) use ($periode_start, $periode_end) {
-                $query->whereRaw("DATE_FORMAT(lp_date, '%Y%m%d') BETWEEN ? AND ?", 
-                           [$periode_start->format('Ymd'), $periode_end->format('Ymd')]);
+        Member::with(['position','devision','user'])
+        ->chunk(500, function($members) use (&$data, $periode_start, $periode_end) {
+            $memberIds = $members->pluck('id');
+            
+            // Ambil savings per batch
+            $savingsAll = Saving::whereIn('member_id', $memberIds)
+            ->whereBetween('sv_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
+            ->whereIn('sv_state', [2])
+            ->get()
+            ->groupBy('member_id');
+            
+            
+            // Ambil loan & payments per batch
+            $loansAll = Loan::with(['payments' => function($q) use ($periode_start, $periode_end) {
+                    $q->whereBetween('lp_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')]);
                 }])
-                ->where('member_id', $m_id)
+                ->whereIn('member_id', $memberIds)
                 ->whereIn('loan_state', [2])
-                ->whereHas('payments', function($query) use ($periode_start, $periode_end) {
-                    $query->whereRaw("DATE_FORMAT(lp_date, '%Y%m%d') BETWEEN ? AND ?", 
-                           [$periode_start->format('Ymd'), $periode_end->format('Ymd')]);
-                })
-                ->orderBy('id')
-                ->get();
+                ->get()
+                ->groupBy('member_id');
 
-            $savingDetails = Saving::with(['member', 'svType'])
-                ->whereBetween("sv_date", [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
-                ->where('member_id', $m_id)
-                ->whereIn('sv_state', [2])
-                ->orderBy('id')
-                ->get();
+            foreach ($members as $member) {
+                $m_id = $member->id;
+                $savingDetails = $savingsAll->get($m_id) ?? collect();
+                $loanDetails = $loansAll->get($m_id) ?? collect();
+                
+                $simpananBulanan = $savingDetails->sum('sv_value');
 
-                // $sql = $loanDetails->toSql();
-                // $bindings = $loanDetails->getBindings();
-                // // Format query dengan binding
-                // $fullQuery = vsprintf(str_replace('?', "'%s'", $sql), $bindings);
-                // dd($fullQuery);
+                $angsuranPinjaman = 0;
+                $cicilanBarang = 0;
 
-            $simpananBulanan = 0;
-            $angsuranPinjaman = 0;
-            $cicilanBarang = 0;
-
-            for ($i=0; $i < count($savingDetails); $i++) { 
-                $saving = $savingDetails[$i];
-                $simpananBulanan += $saving->sv_value;
-            }
-            for ($i=0; $i < count($loanDetails) ; $i++) { 
-                $loan = $loanDetails[$i];
-                if(strtoupper($loan->type) == "BARANG") {
-                    $cicilanBarang += $loan->payments[0]['lp_total']*1;
-                } else {
-                    $angsuranPinjaman += $loan->payments[0]['lp_total']*1;
+                foreach ($loanDetails as $loan) {
+                    if ($loan->payments->isNotEmpty()) {
+                        $firstPay = $loan->payments->first();
+                        if (!$firstPay) continue;
+                        if (strtoupper($loan->type) === "BARANG") {
+                            $cicilanBarang += $firstPay->lp_total;
+                        } else {
+                            $angsuranPinjaman += $firstPay->lp_total;
+                        }
+                    }
                 }
+                $data[] = [
+                    'nip' => $member->nip ?? '-',
+                    'name' => $member->name ?? '-',
+                    'position' => $member->position->name ?? '-',
+                    'potongan_simpanan' => $simpananBulanan,
+                    'potongan_pinjaman' => $angsuranPinjaman + $cicilanBarang,
+                    'total' => $simpananBulanan + $angsuranPinjaman + $cicilanBarang,
+                ];
+                
             }
-
-            $data[] = [
-                'nip' => $member->nip ?? '-',
-                'name' => $member->name ?? '-',
-                'position' => $member->position->name ?? '-',
-                'potongan_simpanan' => $simpananBulanan,
-                'potongan_pinjaman' => $angsuranPinjaman + $cicilanBarang,
-                'total' => $simpananBulanan + $angsuranPinjaman + $cicilanBarang,
-            ];
-        }
+            // Bersihkan memory tiap chunk
+            unset($savingsAll, $loansAll);
+        });
 
         $pdf = PDF::loadView('reports.deduction-salary', [
             'data' => $data,
@@ -499,6 +510,7 @@ class ReportController extends Controller
 
         return $pdf->stream('Laporan-Potongan-Gaji-' . $periode_start->format('Ymd') . "-" . $periode_end->format('Ymd') . '.pdf');
     }
+
     // --------unset---
     // for excel report type
     public function deductionXlsx(Request $request)
@@ -569,3 +581,4 @@ class ReportController extends Controller
 
 
 }
+

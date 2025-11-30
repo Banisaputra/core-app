@@ -251,6 +251,8 @@ class MemberController extends Controller
 
     public function import(Request $request)
     {
+        ini_set('max_execution_time', 300); 
+
         $request->validate([
             'file' => 'required|mimes:xlsx,xls'
         ]);
@@ -288,7 +290,11 @@ class MemberController extends Controller
             ];
 
             $arr_time = explode('.', $data['date_joined']);
-            $joined = date('Ymd', strtotime($arr_time[0].$arr_time[1].$arr_time[2]));
+            if (count($arr_time) !== 3) {
+                $failed[] = ['row' => $index + 1, 'errors' => ["Tanggal bergabung tidak valid"]];
+                continue;
+            }
+            $joined = date('Ymd', strtotime($arr_time[2].$arr_time[1].$arr_time[0]));
 
             $mExists = Member::where('nip', $data['nip'])->first();
             $rules = $mExists ? 'exists' : 'unique';

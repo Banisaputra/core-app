@@ -124,7 +124,7 @@ class SavingController extends Controller
         ]);
 
         // loop member
-        $members = Member::pluck('id');
+        $members = Member::where('is_transactional', 1)->pluck('id')->toArray();;
         $wajib = SavingType::where('name', 'like', 'Wajib')->first();
         $month = date('m', strtotime($request->periode));
         $year = date('Y', strtotime($request->periode));

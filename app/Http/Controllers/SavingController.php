@@ -14,13 +14,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class SavingController extends Controller
-{
-    // public function index() 
-    // {
-    //     $savings = Saving::with('member', 'svType')->latest()->get();
-    //     return view('savings.index', compact('savings'));
-    // }
-
+{ 
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -238,6 +232,7 @@ class SavingController extends Controller
                 if ($wajib->id == $request->sv_type_id) {
                     $exists = Saving::where('member_id', $id)
                         ->where('sv_type_id', $wajib->id)
+                        ->where('sv_state', '<>', 99)
                         ->whereBetween('sv_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
                         ->exists();
     
@@ -263,7 +258,7 @@ class SavingController extends Controller
                     \Log::error('Error fetching record: ' . $th->getMessage(), [
                         'exception' => $th,
                     ]);
-                    return redirect()->back()->with('error', 'Anggota sudah melakukan jenis simpanan bulan ini.');
+                    return redirect()->back()->with('error', 'Anggota sudah melakukan jenis simpanan pada bulan ini.');
                 }    
             }
         }

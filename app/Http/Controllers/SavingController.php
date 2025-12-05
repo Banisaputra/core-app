@@ -15,10 +15,99 @@ use Illuminate\Support\Facades\Storage;
 
 class SavingController extends Controller
 {
-    public function index() 
+    // public function index() 
+    // {
+    //     $savings = Saving::with('member', 'svType')->latest()->get();
+    //     return view('savings.index', compact('savings'));
+    // }
+
+    public function index(Request $request)
     {
-        $savings = Saving::with('member', 'svType')->latest()->get();
-        return view('savings.index', compact('savings'));
+        if ($request->ajax()) {
+
+            $columns = [
+                'id',
+                'sv_date',
+                'member_id',
+                'sv_type_id',
+                'sv_value',
+            ];
+
+            $search = $request->input('search.value');
+            $orderColumnIndex = $request->order[0]['column'];
+            $orderColumn = $columns[$orderColumnIndex] ?? 'id';
+            $orderDir = $request->order[0]['dir'] ?? 'desc';
+
+            $query = Saving::with('member', 'svType')
+                ->select('savings.*');
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('sv_value', 'like', "%{$search}%")
+                    ->orWhereHas('member', function ($m) use ($search) {
+                        $m->where('name', 'like', "%{$search}%");
+                    });
+                });
+            }
+
+            $totalFiltered = $query->count();
+
+            $data = $query
+                ->orderBy($orderColumn, $orderDir)
+                ->offset($request->start)
+                ->limit($request->length)
+                ->get();
+
+            $start = $request->start;
+            $formatted = [];
+            foreach ($data as $index => $saving) {
+
+                // state
+                $stateText = match($saving->sv_state) {
+                    99 => '<span class="text-danger">Dibatalkan</span>',
+                    2  => '<span class="text-success">Dikonfirmasi</span>',
+                    default => '<span class="text-info">Pengajuan</span>',
+                };
+
+                // Action button
+                $action = '
+                    <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="text-muted sr-only">Action</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="'.route('savings.show', $saving->id).'">View</a>
+                        <a class="dropdown-item" href="'.route('savings.edit', $saving->id).'">Edit</a>
+                        <form action="'.route('savings.destroy', $saving->id).'" method="POST" style="display:inline;" onsubmit="return confirm(\'Yakin batal?\')">
+                            '.csrf_field().method_field('DELETE').'
+                            <button type="submit" class="dropdown-item">Batalkan</button>
+                        </form>
+                    </div>
+                ';
+                
+                $formatted[] = [
+                    'rownum' => $start + $index + 1,
+                    'sv_code' => $saving->sv_code,
+                    'member' => [
+                        'nip' => $saving->member->nip ?? '-',
+                        'name' => $saving->member->name ?? '-',
+                    ],
+                    'sv_date' => date('d M Y', strtotime($saving->sv_date)),
+                    'type' => $saving->svType->name ?? '-',
+                    'sv_value' => number_format($saving->sv_value),
+                    'sv_state' => $stateText,
+                    'action' => $action,
+                ];
+            }
+
+            return response()->json([
+                "draw" => intval($request->draw),
+                "recordsTotal" => Saving::count(),
+                "recordsFiltered" => $totalFiltered,
+                "data" => $formatted,
+            ]);
+        }
+
+        return view('savings.index');
     }
 
     public function create() 

@@ -64,44 +64,7 @@
                       <th width="10%">Status</th>
                       <th width="5%">Action</th>
                     </tr>
-                  </thead>
-                  <tbody>
-                    
-                    @foreach ($savings as $saving)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $saving->sv_code }}</td>
-                            <td>{{ $saving->member->nip }}</td>
-                            <td>{{ ucwords($saving->member->name) }}</td>
-                            <td>{{ date('d M Y', strtotime($saving->sv_date)) }}</td>
-                            <td>{{ $saving->svType->name }}</td>
-                            <td>Rp {{ number_format($saving->sv_value, 2) }}</td>
-                              <td>@switch($saving->sv_state)
-                                  @case(99)
-                                    <span class="text-danger">Dibatalkan</span>
-                                    @break
-                                  @case(2)
-                                    <span class="text-success">Dikonfirmasi</span>
-                                    @break
-                                  @default
-                                    <span class="text-info">Pengajuan</span>
-                                @endswitch</td> 
-                            <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="text-muted sr-only">Action</span>
-                              </button>
-                              <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" href="{{ route('savings.show', $saving->id) }}">View</a>
-                                <a class="dropdown-item" href="{{ route('savings.edit', $saving->id) }}">Edit</a>
-                                <form action="{{ route('savings.destroy', $saving->id) }}" method="POST" style="display: inline;" id="deleteForm">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" id="btnDelete" class="dropdown-item">Batalkan</button>
-                                </form>
-                              </div>
-                            </td> 
-                        </tr>
-                    @endforeach
-                  </tbody>
+                  </thead> 
                 </table>
               </div>
             </div>
@@ -119,6 +82,20 @@
   $(document).ready(function() {
     $('#savings').DataTable(
     {
+      processing: true,
+      serverSide: true,
+      ajax: "{{ route('savings.index') }}",
+      columns: [
+          { data: 'rownum', name: 'rownum', orderable: false, searchable: false},
+          { data: 'sv_code', name: 'sv_code' },
+          { data: 'member.nip', name: 'nip' },
+          { data: 'member.name', name: 'name' },
+          { data: 'sv_date', name: 'sv_date' },
+          { data: 'type', name: 'type' },
+          { data: 'sv_value', name: 'sv_value' },
+          { data: 'sv_state', name: 'sv_state', orderable: false, searchable: false },
+          { data: 'action', name: 'action', orderable: false, searchable: false },
+      ],
       autoWidth: true,
       "lengthMenu": [
         [10, 25, 50, -1],

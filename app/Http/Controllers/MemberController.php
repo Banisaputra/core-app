@@ -294,7 +294,7 @@ class MemberController extends Controller
                 $failed[] = ['row' => $index + 1, 'errors' => ["Tanggal bergabung tidak valid"]];
                 continue;
             }
-            $joined = date('Ymd', strtotime($arr_time[2].$arr_time[1].$arr_time[0]));
+            $joined = date('Ymd', strtotime($arr_time[0].$arr_time[1].$arr_time[2]));
 
             $mExists = Member::where('nip', $data['nip'])->first();
             $rules = $mExists ? 'exists' : 'unique';

@@ -44,6 +44,8 @@ class SavingController extends Controller
             if ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('sv_value', 'like', "%{$search}%")
+                    ->orWhere('sv_code', 'like', "%{$search}%")
+                    ->orWhere('sv_date', 'like', "%{$search}%")
                     ->orWhereHas('member', function ($m) use ($search) {
                         $m->where('name', 'like', "%{$search}%");
                     });

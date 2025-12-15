@@ -23,7 +23,7 @@ class LoanController extends Controller
      */
     public function index()
     {
-        $loans = Loan::with('member')->get();
+        $loans = Loan::with('member')->orderBy('id','desc')->get();
         return view('loans.index', compact('loans'));
     }
 
@@ -370,7 +370,7 @@ class LoanController extends Controller
             $ln_date = $firstAngsuran;
             for ($i=1; $i <= $request->loan_tenor ; $i++) { 
                 $lp_val = round($loan->loan_value / $loan->loan_tenor, 0);
-                $lp_intr = round(($lp_val*$loan->interest_percent)/100, 0);
+                $lp_intr = round(($loan->loan_value*$loan->interest_percent)/100, 0);
                 $ln_remain = round($loan_total - $lp_val);
                 $pay_date = new DateTime($ln_date);
                 $lp_date = $pay_date->add(new DateInterval('P1M'))->format('Ymd');

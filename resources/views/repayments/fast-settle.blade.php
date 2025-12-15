@@ -131,15 +131,26 @@
                   </thead>
                   <tbody>
                     @foreach ($loans as $loan)
+                      <?php 
+                        $bunga = (($loan->interest_percent * $loan->loan_value) / 100);
+                        $minAngsur = ceil(($loan->loan_tenor*30)/100);
+                        $bunga_under_30 = (($loan->interest_percent * $loan->loan_value) / 100)*$minAngsur;
+                        $currAngsur = $loan->loan_tenor - $loan->payments->where('lp_state', 1)->count();
+                        $sisa_pokok = $loan->payments->where('lp_state', 1)->sum('lp_value');
+                        // $subtotal = $loan->payments->where('lp_state', 1)->sum('lp_total');
+                        $subtotal = $loan->loan_value + $bunga_under_30;
+
+                      ?>
                       <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        {{-- <td>{{ $loop->iteration }}</td> --}}
+                        <td>{{ $currAngsur }}</td>
                         <td>{{ $loan->loan_code }}</td>
                         <td>{{ $loan->loan_tenor }}</td>
                         <td>{{ date('d M Y', strtotime($loan->due_date)) }}</td>
                         <td>{{ $loan->payments->where('lp_state', 1)->count() }}</td>
-                        <td>Rp {{ number_format(($loan->interest_percent * ($loan->loan_value / $loan->loan_tenor)) / 100, 0) }}</td>
+                        <td>Rp {{ number_format(($loan->interest_percent * $loan->loan_value) / 100, 0) }}</td>
                         <td>Rp {{ number_format($loan->payments->where('lp_state', 1)->sum('lp_value'), 0) }}</td>
-                        <td>Rp {{ number_format($loan->payments->where('lp_state', 1)->sum('lp_total'), 0) }}</td>
+                        <td>Rp {{ number_format( $currAngsur < $minAngsur ? $subtotal : $sisa_pokok, 0) }}</td>
                       </tr>
                     @endforeach
                   </tbody>

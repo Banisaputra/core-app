@@ -32,6 +32,7 @@ class SavingController extends Controller
             $orderColumn = $columns[$orderColumnIndex] ?? 'id';
             $orderDir = $request->order[0]['dir'] ?? 'desc';
 
+            $all_count = Saving::count();
             $query = Saving::with('member', 'svType')
                 ->select('savings.*');
 
@@ -51,9 +52,9 @@ class SavingController extends Controller
             $data = $query
                 ->orderBy($orderColumn, $orderDir)
                 ->offset($request->start)
-                ->limit($request->length)
-                ->get();
-
+                ->limit($request->length == -1 ? $all_count : $request->length)
+                ->get(); 
+                
             $start = $request->start;
             $formatted = [];
             foreach ($data as $index => $saving) {

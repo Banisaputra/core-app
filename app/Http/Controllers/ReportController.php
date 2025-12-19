@@ -468,6 +468,9 @@ class ReportController extends Controller
                 ->groupBy('member_id');
 
             foreach ($members as $member) {
+                if ($member->is_transactional != 1) {
+                    continue; // Skip non-transactional members
+                }
                 $m_id = $member->id;
                 $savingDetails = $savingsAll->get($m_id) ?? collect();
                 $loanDetails = $loansAll->get($m_id) ?? collect();

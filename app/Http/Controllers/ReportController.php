@@ -48,8 +48,8 @@ class ReportController extends Controller
         $filter = [];
         $file = 'reports';
 
-        $filter['Tgl. Mulai'] = date('d-m-Y H:i:s', strtotime($startDate));
-        $filter['Tgl. Batas'] = date('d-m-Y H:i:s', strtotime($endDate));
+        $filter['Tgl. Mulai'] = date('d-m-Y', strtotime($startDate));
+        $filter['Tgl. Batas'] = date('d-m-Y', strtotime($endDate));
         
         switch ($type) {
             case 'SAVING':
@@ -107,7 +107,7 @@ class ReportController extends Controller
                     $where = "payment_type='".strtoupper($pay_type)."'";
                 }
                 $sales = Sale::with(['saDetail'])
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('created_at', [$startDate, $endDate."23:59:59"])
                 ->whereRaw($where)
                 ->get();
 

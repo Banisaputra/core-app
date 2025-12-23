@@ -118,13 +118,13 @@ class PosController extends Controller
                     ]);
                 }
 
-                if ($currentLoan['total_pokok'] > $currentLoan['maxPokok']) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Angsuran Pokok melebihi batas maksimal '.number_format((int) $currentLoan['maxPokok'],0).' per anggota',
-                        'receipt' => []
-                    ]);
-                }
+                // if ($currentLoan['total_pokok'] > $currentLoan['maxPokok']) {
+                //     return response()->json([
+                //         'success' => false,
+                //         'message' => 'Pinjaman Pokok melebihi batas maksimal '.number_format((int) $currentLoan['maxPokok'],0).' per anggota',
+                //         'receipt' => []
+                //     ]);
+                // }
 
                 $loan_code = Loan::generateCode();
                 $date = new DateTime(now());

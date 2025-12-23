@@ -67,7 +67,7 @@
          </div>
       </form>
                       
-      @if (auth()->user()->hasPermission('masterSettings'))
+      @if (auth()->user()->hasPermission('masterSettings.manage'))
       <hr class="my-4">
       <h5 class="mb-2 mt-4"> Konfirmasi Simpanan</h5>
       <p class="mb-4">Kosongkan jika tidak ada Anggota yang ter kecuali, atau isikan nama Anggota jika dikecualikan.</p>

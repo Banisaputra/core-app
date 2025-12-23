@@ -48,8 +48,8 @@ class ReportController extends Controller
         $filter = [];
         $file = 'reports';
 
-        $filter['Tgl. Mulai'] = date('d-m-Y', strtotime($startDate));
-        $filter['Tgl. Batas'] = date('d-m-Y', strtotime($endDate));
+        $filter['Tgl. Mulai'] = date('d-m-Y H:i:s', strtotime($startDate));
+        $filter['Tgl. Batas'] = date('d-m-Y H:i:s', strtotime($endDate));
         
         switch ($type) {
             case 'SAVING':

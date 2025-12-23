@@ -107,7 +107,7 @@ class ReportController extends Controller
                     $where = "payment_type='".strtoupper($pay_type)."'";
                 }
                 $sales = Sale::with(['saDetail'])
-                ->whereBetween('created_at', [$startDate, $endDate."23:59:59"])
+                ->whereBetween('created_at', [$startDate, $endDate." 23:59:59"])
                 ->whereRaw($where)
                 ->get();
 

@@ -101,6 +101,7 @@
                       <th width="5%">No.</th>
                       <th width="15%">Kode</th>
                       <th width="">Nama</th>
+                      <th width="10%">Kategori</th>
                       <th width="15%">Stok</th>
                       <th width="15%">Harga</th>
                       <th width="15%">Status</th>
@@ -114,6 +115,7 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $item->item_code }}</td>
                             <td>{{ $item->item_name }}</td>
+                            <td>{{ $item->category->name ?? "-" }}</td>
                             <td>{{ $item->stock }}</td>
                             <td>Rp {{ number_format($item->sales_price, 0) }}</td>
                             <td>{!! $item->is_transactional == 1 ? "<span class='dot dot-lg bg-success mr-1'></span>Aktif" : "<span class='dot dot-lg bg-secondary mr-1'></span>Tidak Aktif" !!}</td>

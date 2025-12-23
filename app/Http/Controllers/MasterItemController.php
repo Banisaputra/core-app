@@ -26,7 +26,7 @@ class MasterItemController extends Controller
      */
     public function index()
     {
-        $items = MasterItem::all();
+        $items = MasterItem::with('category')->get();
         return view('master_items.index', compact('items'));
     }
 

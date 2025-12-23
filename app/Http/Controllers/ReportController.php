@@ -453,7 +453,7 @@ class ReportController extends Controller
             // Ambil savings per batch
             $savingsAll = Saving::whereIn('member_id', $memberIds)
             ->whereBetween('sv_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
-            ->whereIn('sv_state', [2])
+            ->whereIn('sv_state', [1])
             ->get()
             ->groupBy('member_id');
             

@@ -122,7 +122,7 @@ class Member extends Model
         $maxBayar = 0;
         if (strtoupper($jabatan->name) == "STAFF") {
             $maxBayar = $loanPolicy['max_potong_gaji_staff']['value'];
-        } else if (strtoupper($jabatan->name) == "OPERATOR") {
+        } else if (strtoupper($jabatan->name) == "PRODUKSI") {
             $maxBayar = $loanPolicy['max_potong_gaji_operator']['value'];
         }
         

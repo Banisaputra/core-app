@@ -65,46 +65,7 @@
              <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button>
            </div>
          </div>
-      </form>
-                      
-      @if (auth()->user()->hasPermission('masterSettings.manage'))
-      <hr class="my-4">
-      <h5 class="mb-2 mt-4"> Konfirmasi Simpanan</h5>
-      <p class="mb-4">Kosongkan jika tidak ada Anggota yang ter kecuali, atau isikan nama Anggota jika dikecualikan.</p>
-       
-      <form action={{ route('savings.generated') }} method="POST" id="form-member" enctype="multipart/form-data">
-        @csrf
-        <div class="form-row">
-           <div class="form-group mb-3 col-md-3">
-               <label for="periode">Periode</label>
-               <input class="form-control" id="periode" type="month" name="periode">
-            </div>
-            <div class="form-group col-md-3">
-              <label for="simple-select2">Jenis Simpanan</label>
-              <select id="svType" name="sv_type_id" class="form-control">
-                <option value="">-- Pilih jenis simpanan</option>
-                @foreach ($sv_types as $type)
-                    <option value="{{ $type->id }}">{{ ucwords($type->name) }}</option>
-                @endforeach
-              </select>
-            </div>
-            <div class="form-group col-md-6">
-              <label for="simple-select2">Anggota</label>
-              <select id="memberSelect" name="member_id[]" class="form-control"></select>
-            </div>
-        </div>
-         
-         <hr class="my-4">
-         <div class="form-row">
-           <div class="col-md-6">
-            <small>Note: Anggota tercatat tidak akan dikonfirmasi simpanan pada periode terpilih</small>
-           </div>
-           <div class="col-md-6 text-right">
-             <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Submit</button>
-           </div>
-         </div>
-      </form>
-      @endif
+      </form> 
     </div>
   </div>
 </div>

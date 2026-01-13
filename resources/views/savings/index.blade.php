@@ -26,6 +26,7 @@
             </div>
             <div class="col-auto">
               {{-- other button --}}
+               
             </div>
         </div>
          @if ($errors->any())
@@ -95,7 +96,7 @@
             <div class="card shadow">
               <div class="card-body">
                 <!-- table -->
-                <form id="bulkForm" method="POST" action="{{ route('savings.bulk') }}">
+                <form id="bulkForm" method="POST" action="{{ route('savings.revision') }}">
                   @csrf
 
                   <input type="hidden" name="ids" id="selectedIds">
@@ -124,6 +125,9 @@
                   {{-- <button type="submit" class="btn btn-danger mt-2" id="bulkBtn" disabled>
                     Konfirmasi Data Terpilih
                   </button> --}}
+                  <button type="submit" class="btn btn-danger mt-2" id="bulkBtn" disabled>
+                    Revisi Data Terpilih
+                  </button>
                 </form>
               </div>
             </div>

@@ -39,6 +39,7 @@ class SavingController extends Controller
 
             $columns = [
                 'id',
+                'nip',
                 'sv_date',
                 'member_id',
                 'sv_type_id',
@@ -60,6 +61,9 @@ class SavingController extends Controller
                     ->orWhere('sv_date', 'like', "%{$search}%")
                     ->orWhereHas('member', function ($m) use ($search) {
                         $m->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('member', function ($m) use ($search) {
+                        $m->where('nip', 'like', "%{$search}%");
                     });
                 });
             }
@@ -431,4 +435,48 @@ class SavingController extends Controller
         }
     }
 
+    public function savingRevision(Request $request) {
+        $request->validate([
+            'ids' => 'required|string'
+        ]);
+
+        $ids = array_map(
+            'intval',
+            json_decode($request->ids, true)
+        );
+
+        DB::beginTransaction();
+        try {
+            $count = 0;
+            foreach ($ids as $id) {
+                $found = false;
+                $saving = Saving::with(['member'])->findOrFail($id);
+                if ($saving->sv_date == 20251001) {
+                    $saving->sv_code = Saving::generateCodeRev('2511');
+                    $saving->sv_date = 20251102;
+                    $found = true;
+                    } else if ($saving->sv_date == 20251101) {
+                        $saving->sv_code = Saving::generateCodeRev('2512');
+                        $saving->sv_date = 20251202;
+                        $found = true;
+                        } else if ($saving->sv_date == 20251201) {
+                            $saving->sv_code = Saving::generateCodeRev('2601');
+                            $saving->sv_date = 20260102;
+                            $found = true;
+                }
+                if ($found) {
+                    $count++;
+                    $saving->update();
+                }
+                
+            }
+            
+            DB::commit();
+            return redirect()->back()->with('success', $count . ' Simpanan berhasil direvisi');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Gagal menyimpan simpanan! Hubungi Administrator.'.$e->getmessage())->withInput();
+        }
+        
+    }
 }

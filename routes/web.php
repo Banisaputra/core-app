@@ -202,6 +202,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::post('/savings', [SavingController::class, 'store'])->name('savings.store');
     Route::post('/savings/confirm', [SavingController::class, 'confirmation'])->name('savings.confirm');
     Route::post('/savings/bulk', [SavingController::class, 'bulkConfirmation'])->name('savings.bulk');
+    Route::post('/savings/rev', [SavingController::class, 'savingRevision'])->name('savings.revision');
     Route::get('/savings/{id}', [SavingController::class, 'show'])->name('savings.show');
     Route::get('/savings/{id}/edit', [SavingController::class, 'edit'])->name('savings.edit');
     Route::put('/savings/{id}', [SavingController::class, 'update'])->name('savings.update');

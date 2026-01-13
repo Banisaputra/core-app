@@ -54,14 +54,14 @@
             </div>
             <div class="col-auto">
                 {{-- other button --}}
-                <div class="dropdown">
+                {{-- <div class="dropdown">
                 <button class="btn btn-sm btn-success more-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown">
                   <span class="fe fe-24 fe-download"></span>Import file
                 </button>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style=""> 
                   <button class="dropdown-item" data-toggle="modal" data-target="#importModal"><small>Upload data</small></button>
                 </div>
-              </div>
+              </div> --}}
               {{-- end other button --}}
             </div>
         </div>

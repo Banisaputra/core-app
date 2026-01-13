@@ -65,6 +65,9 @@ class LoanController extends Controller
                     ->orWhere('loan_date', 'like', "%{$search}%")
                     ->orWhereHas('member', function ($m) use ($search) {
                         $m->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('member', function ($m) use ($search) {
+                        $m->where('nip', 'like', "%{$search}%");
                     });
                 });
             }

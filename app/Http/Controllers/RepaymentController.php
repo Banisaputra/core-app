@@ -56,6 +56,9 @@ class RepaymentController extends Controller
                     ->orWhere('lp_date', 'like', "%{$search}%")
                     ->orWhereHas('loan.member', function ($m) use ($search) {
                         $m->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('loan.member', function ($m) use ($search) {
+                        $m->where('nip', 'like', "%{$search}%");
                     });
                 });
             }

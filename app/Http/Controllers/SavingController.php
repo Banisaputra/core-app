@@ -52,8 +52,7 @@ class SavingController extends Controller
             $orderDir = $request->order[0]['dir'] ?? 'desc';
 
             $all_count = $query->count();
-            // $query = Saving::with('member', 'svType')->select('savings.*');
-
+            
             if ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('sv_value', 'like', "%{$search}%")
@@ -435,6 +434,7 @@ class SavingController extends Controller
         }
     }
 
+    // hapus soon
     public function savingRevision(Request $request) {
         $request->validate([
             'ids' => 'required|string'

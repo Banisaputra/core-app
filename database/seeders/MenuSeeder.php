@@ -19,7 +19,7 @@ class MenuSeeder extends Seeder
                 'order' => 1, 'permission' => 'dashboard_show', 'parent_id' => null
             ],
             [
-                'name' => 'user_management', 'route' => null, 'icon' => 'fe-shield',
+                'name' => 'User Management', 'route' => null, 'icon' => 'fe-shield',
                 'order' => 2, 'permission' => 'manage_access', 'parent_id' => null
             ],
             [

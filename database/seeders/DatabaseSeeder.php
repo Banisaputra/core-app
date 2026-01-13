@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'admin dev',
             'email' => 'admin@dev.com',
+            'is_transactional' => 1
         ]);
     }
 }

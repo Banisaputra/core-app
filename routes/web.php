@@ -168,7 +168,8 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/report2', [ReportController::class, 'index2'])->name('reports.index2');
     Route::get('/report/pdf-deduction', [ReportController::class, 'deduction'])->name('reports.deductionPdf');
     Route::get('/report/xlsx-deduction', [ReportController::class, 'exportPotonganGajiExcel'])->name('reports.deductionXlsx');
-    Route::post('/report/get', [ReportController::class, 'getReport'])->name('reports.getReport');
+    Route::post('/report/get', [ReportController::class, 'getReport'])->name('reports.getReport')
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
     Route::post('/report/get2', [ReportController::class, 'getMemberList'])->name('reports.getMemberList');
     Route::post('/report/get3', [ReportController::class, 'getMemberDetail'])->name('reports.getMemberDetail');
     Route::post('/report/pdf-loanInfo', [ReportController::class, 'loanInfo'])->name('reports.loanInfo');
@@ -200,6 +201,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::post('/savings/generate', [SavingController::class, 'generated'])->name('savings.generated');
     Route::post('/savings', [SavingController::class, 'store'])->name('savings.store');
     Route::post('/savings/confirm', [SavingController::class, 'confirmation'])->name('savings.confirm');
+    Route::post('/savings/bulk', [SavingController::class, 'bulkConfirmation'])->name('savings.bulk');
     Route::get('/savings/{id}', [SavingController::class, 'show'])->name('savings.show');
     Route::get('/savings/{id}/edit', [SavingController::class, 'edit'])->name('savings.edit');
     Route::put('/savings/{id}', [SavingController::class, 'update'])->name('savings.update');
@@ -215,6 +217,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/repayment/generate', [RepaymentController::class, 'generate'])->name('repayments.generate');
     Route::post('/repayment/generate', [RepaymentController::class, 'generated'])->name('repayments.generated');
     Route::post('/repayment', [RepaymentController::class, 'settle'])->name('repayments.settle');
+    Route::post('/repayment/bulk', [RepaymentController::class, 'bulkConfirmation'])->name('repayments.bulk');
     Route::post('/repayment/settle', [RepaymentController::class, 'getSettle'])->name('repayments.getSettle');
     Route::post('/repayment/settle-confirm', [RepaymentController::class, 'settleConfirm'])->name('repayments.settleConfirm');
 

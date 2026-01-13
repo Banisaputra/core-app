@@ -12,13 +12,11 @@
             letter-spacing: 0.2px;
         }
 
-        h3 {
-            text-align: center;
+        h3 { 
             margin-bottom: 4px;
         }
 
         p {
-            text-align: center;
             margin-top: 0;
             margin-bottom: 10px;
         }
@@ -62,21 +60,48 @@
 </head>
 <body>
 
-    <h3>Laporan Potongan Gaji Anggota</h3>
-    <p>Periode: {{ date('d-m-Y', strtotime($periode_start)) ." s/d ". date('d-m-Y', strtotime($periode_end)) }}</p>
+    <h3>Laporan Summary Simpanan</h3>
+    <p>Filter: <br><ul>
+        @foreach ($filter as $key => $ft)
+        <li>{{$key}} : {{ $ft }}</li>
+        @endforeach
+    </ul></p>
+    <table>
+        <tr>
+            <td><strong>Total Simpanan Pokok</strong></td>
+            <td>: Rp {{ number_format($header->total_pokok ?? 0, 0) }}</td>
 
+            <td><strong>Total Simpanan Wajib</strong></td>
+            <td>: Rp {{ number_format($header->total_wajib ?? 0, 0) }}</td>
+        </tr>
+        <tr>
+            <td><strong>Total Simpanan SHT</strong></td>
+            <td>: Rp {{ number_format($header->total_sht ?? 0, 0) }}</td>
+            
+            <td><strong>Total Dana Cadangan</strong></td>
+            <td>: Rp {{ number_format($header->total_cadangan ?? 0, 0) }}</td>
+        </tr>
+        <tr>
+            <td><strong>Grand Total</strong></td>
+            <td>: Rp {{ number_format($header->grand_total ?? 0, 0) }}</td>
+
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+    <br>
     <table>
         <thead>
             <tr>
                 <th>No</th>
                 <th>NIK</th>
                 <th>Nama Anggota</th>
-                <th>Bagian</th>
-                <th>Potongan Simpanan<br>(Pokok + Wajib + SHT)</th>
-                <th>Pinjaman Uang</th>
-                <th>Angsuran ke</th>
-                <th>Pinjaman Barang</th>
-                <th>Total Potongan</th>
+                <th>Jabatan</th>
+                <th>Dana Cadangan</th>
+                <th>Simpanan Pokok</th>
+                <th>Simpanan Wajib</th>
+                <th>Simpanan SHT</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
@@ -86,15 +111,15 @@
                 <td>{{ $row['nip'] }}</td>
                 <td>{{ $row['name'] }}</td>
                 <td>{{ $row['position'] }}</td>
-                <td class="angka">{{ number_format($row['potongan_simpanan'], 0, ',', '.') }}</td>
-                <td class="angka">{{ number_format($row['potongan_pinjaman_uang'], 0, ',', '.') }}</td>
-                <td class="angka">{{ $row['angsuran_ke'] }}</td>
-                <td class="angka">{{ number_format($row['potongan_pinjaman_barang'], 0, ',', '.') }}</td>
+                <td class="angka">{{ number_format($row['simpanan_cadangan'], 0, ',', '.') }}</td>
+                <td class="angka">{{ number_format($row['simpanan_pokok'], 0, ',', '.') }}</td>
+                <td class="angka">{{ number_format($row['simpanan_wajib'], 0, ',', '.') }}</td>
+                <td class="angka">{{ number_format($row['simpanan_sht'], 0, ',', '.') }}</td>
                 <td class="angka">{{ number_format($row['total'], 0, ',', '.') }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="7" style="text-align:center;">Tidak ada data</td>
+                <td colspan="9" style="text-align:center;">Tidak ada data</td>
             </tr>
             @endforelse
         </tbody>
@@ -102,3 +127,5 @@
 
 </body>
 </html>
+
+

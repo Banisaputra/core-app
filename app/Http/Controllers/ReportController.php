@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use DateTime;
 use DateInterval;
+use Throwable;
 use App\Models\Loan;
 use App\Models\Sale;
 use App\Models\Member;
@@ -13,12 +14,13 @@ use App\Models\Category;
 use App\Models\Purchase;
 use App\Models\Inventory;
 use App\Models\MasterItem;
+use App\Models\SavingType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
-use Barryvdh\Snappy\Facades\SnappyPdf as SnappyPDF;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Barryvdh\Snappy\Facades\SnappyPdf as SnappyPDF;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
@@ -36,6 +38,9 @@ class ReportController extends Controller
 
     public function getReport(Request $request) 
     {
+        ini_set('memory_limit', '2048M');
+        ini_set('max_execution_time', 0);
+
         $request->validate([
             "typeReport" => "required",
             "dateStart" => "nullable|date",
@@ -45,6 +50,7 @@ class ReportController extends Controller
         $startDate = $request->dateStart ?? now();
         $endDate = $request->dateEnd ?? now();
         $data = [];
+        $header = [];
         $filter = [];
         $file = 'reports';
 
@@ -52,6 +58,208 @@ class ReportController extends Controller
         $filter['Tgl. Batas'] = date('d-m-Y', strtotime($endDate));
         
         switch ($type) {
+            case 'SVSUMMARY':
+                try {
+                    $data = Member::select(
+                        'members.id',
+                        'members.nip',
+                        'members.name',
+                        'positions.name as position',
+
+                        DB::raw("
+                            SUM(CASE 
+                                WHEN saving_types.name = 'Dana Cadangan' THEN savings.sv_value 
+                                ELSE 0 
+                            END) AS simpanan_cadangan
+                        "),
+
+                        DB::raw("
+                            SUM(CASE 
+                                WHEN saving_types.name = 'Pokok' THEN savings.sv_value 
+                                ELSE 0 
+                            END) AS simpanan_pokok
+                        "),
+
+                        DB::raw("
+                            SUM(CASE 
+                                WHEN saving_types.name = 'Wajib' THEN savings.sv_value 
+                                ELSE 0 
+                            END) AS simpanan_wajib
+                        "),
+
+                        DB::raw("
+                            SUM(CASE 
+                                WHEN saving_types.name = 'SHT' THEN savings.sv_value 
+                                ELSE 0 
+                            END) AS simpanan_sht
+                        "),
+
+                        DB::raw("
+                            SUM(sv_value) AS total
+                        ")
+                    )
+                    ->join('savings', function ($join) use ($startDate, $endDate) {
+                        $join->on('savings.member_id', '=', 'members.id')
+                            ->where('savings.sv_state', 2)
+                            ->whereBetween('savings.sv_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))]);
+                    })
+                    ->leftJoin('saving_types', 'saving_types.id', '=', 'savings.sv_type_id')
+                    ->leftJoin('positions', 'positions.id', '=', 'members.position_id')
+                    ->groupBy(
+                        'members.id',
+                        'members.nip',
+                        'members.name',
+                        'positions.name'
+                    )
+                    ->orderBy('members.id', 'ASC') 
+                    ->get();
+
+                    // header info
+                    $header = DB::table('savings as s')
+                        ->select(
+                            DB::raw("
+                                SUM(CASE WHEN st.name = 'Dana Cadangan' THEN s.sv_value ELSE 0 END) AS total_cadangan
+                            "),
+                            DB::raw("
+                                SUM(CASE WHEN st.name = 'Pokok' THEN s.sv_value ELSE 0 END) AS total_pokok
+                            "),
+                            DB::raw("
+                                SUM(CASE WHEN st.name = 'Wajib' THEN s.sv_value ELSE 0 END) AS total_wajib
+                            "),
+                            DB::raw("
+                                SUM(CASE WHEN st.name = 'SHT' THEN s.sv_value ELSE 0 END) AS total_sht
+                            "),
+                            DB::raw("SUM(s.sv_value) AS grand_total")
+                        )
+                        ->leftJoin('saving_types as st', 'st.id', '=', 's.sv_type_id')
+                        ->where('s.sv_state', 2)
+                        ->whereBetween('s.sv_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                        ->first();
+
+
+                } catch (\Throwable $e) {
+
+                    // \Log::error('PDF REAL ERROR', [
+                    //     'msg'  => $e->getMessage(),
+                    //     'file' => $e->getFile(),
+                    //     'line' => $e->getLine(),
+                    //     'trace' => $e->getTraceAsString(),
+                    // ]);
+
+                    // // 🔴 PENTING: KIRIM ERROR ASLI KE RESPONSE
+                    // return response()->json([
+                    //     'real_error' => $e->getMessage(),
+                    //     'file' => $e->getFile(),
+                    //     'line' => $e->getLine(),
+                    // ], 500);
+
+                    abort(500, 'Terjadi kesalahan saat generate laporan. Silakan hubungi administrator.');
+
+                }
+
+                $file = 'reports.summary-saving';
+                break;
+
+            case 'LNSUMMARY':
+                try {
+                    $data = DB::table('members as m')
+                    ->select(
+                        'm.id',
+                        'm.nip',
+                        'm.name',
+                        'p.name as position',
+                        'lt.jenis_pinjaman',
+
+                        DB::raw('COALESCE(l.loan_value, 0) as jumlah_pinjaman'),
+                        DB::raw('COALESCE(l.loan_tenor, 0) as loan_tenor'),
+
+                        DB::raw('COALESCE(lp.lp_value, 0) as pokok'),
+                        DB::raw('COALESCE(lp.loan_interest, 0) as bunga'),
+                        DB::raw('COALESCE(lp.tenor_month, 0) as angsuran_ke'),
+
+                        DB::raw('COALESCE(lp.lp_total, 0) as total_tagihan'),
+                        DB::raw('COALESCE(lp.loan_remaining, 0) as sisa_pinjaman')
+                    )
+
+                    /* MASTER JENIS PINJAMAN */
+                    ->crossJoin(DB::raw("
+                        (
+                            SELECT 'UANG' AS jenis_pinjaman
+                            UNION ALL
+                            SELECT 'BARANG'
+                        ) lt
+                    "))
+
+                    /* LOAN (FILTER TANGGAL PINJAM) */
+                    ->join('loans as l', function ($join) use ($startDate, $endDate) {
+                        $join->on('l.member_id', '=', 'm.id')
+                            ->whereColumn('l.loan_type', 'lt.jenis_pinjaman')
+                            ->where('l.loan_state', 2)
+                            ->whereBetween('l.loan_date', [
+                                date('Ymd', strtotime($startDate)),
+                                date('Ymd', strtotime($endDate))
+                            ]);
+                    })
+
+                    /* TAGIHAN TERAKHIR */
+                    ->leftJoin('loan_payments as lp', function ($join) {
+                        $join->on('lp.loan_id', '=', 'l.id')
+                            ->whereRaw('lp.tenor_month = (
+                                COALESCE((
+                                    SELECT MAX(li.tenor_month)
+                                    FROM loan_payments li
+                                    WHERE li.loan_id = l.id
+                                    AND li.lp_state = 2
+                                ), 0) + 1
+                            )');
+                    })
+
+                    ->leftJoin('positions as p', 'p.id', '=', 'm.position_id')
+                    ->orderBy('m.id', 'ASC')
+                    ->orderByRaw("FIELD(lt.jenis_pinjaman, 'UANG', 'BARANG')")
+                    ->get();
+
+                        
+                    // header info
+                    $header = DB::table('loans as l')
+                        ->select(
+                            DB::raw("
+                                SUM(CASE WHEN l.loan_type = 'UANG' THEN lp.lp_value ELSE 0 END) AS total_pinjaman_uang
+                            "),
+                            DB::raw("
+                                SUM(CASE WHEN l.loan_type = 'BARANG' THEN lp.lp_value ELSE 0 END) AS total_pinjaman_barang
+                            "),
+                            
+                            DB::raw("SUM(lp.lp_value) AS grand_total")
+                        )
+                        ->leftJoin('loan_payments as lp', 'lp.loan_id', '=', 'l.id')
+                        ->where('l.loan_state', 2)
+                        ->whereBetween('l.loan_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                        ->first();
+
+
+                } catch (\Throwable $e) {
+
+                    // \Log::error('PDF REAL ERROR', [
+                    //     'msg'  => $e->getMessage(),
+                    //     'file' => $e->getFile(),
+                    //     'line' => $e->getLine(),
+                    //     'trace' => $e->getTraceAsString(),
+                    // ]);
+
+                    // // 🔴 PENTING: KIRIM ERROR ASLI KE RESPONSE
+                    // return response()->json([
+                    //     'real_error' => $e->getMessage(),
+                    //     'file' => $e->getFile(),
+                    //     'line' => $e->getLine(),
+                    // ], 500);
+
+                    abort(500, 'Terjadi kesalahan saat generate laporan. Silakan hubungi administrator.');
+
+                }
+
+                $file = 'reports.summary-loan';
+                break;
             case 'SAVING':
                 $savings = Saving::with(['member','svType'])
                 ->whereBetween('created_at', [$startDate, $endDate])
@@ -194,30 +402,35 @@ class ReportController extends Controller
                 break;
             
             default:
-                # code...
+                // invalid report type
+
                 break;
         }
 
-        $pdf = PDF::loadView($file, [
+        if ($type == 'SVSUMMARY' || $type == 'LNSUMMARY') {
+            $pdf = PDF::loadView($file, [
+                'data' => $data,
+                'filter' => $filter,
+                'header' => $header
+            ])->setPaper('A4', 'landscape');
+        } else {
+            $pdf = PDF::loadView($file, [
                 'data' => $data,
                 'filter' => $filter,
             ]);
+        }
         
         $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
         if ($request->has('preview')) {
-            return $pdf->stream($filename);
+            // return $pdf->stream($filename);
+            return response()->make($pdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            ]);
+        } else {
+            return $pdf->download($filename);
         }
     
-        return $pdf->download($filename);
-
-        // old
-        //  $pdf = PDF::loadView($file, [
-        //         'data' => $data,
-        //         'dateStart' => $startDate,
-        //         'dateEnd' => $endDate,
-        //     ]);
-
-        // return $pdf->stream('Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf');
 
     }
 
@@ -460,7 +673,8 @@ class ReportController extends Controller
             
             // Ambil loan & payments per batch
             $loansAll = Loan::with(['payments' => function($q) use ($periode_start, $periode_end) {
-                    $q->whereBetween('lp_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')]);
+                    $q->whereBetween('lp_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
+                    ->where('lp_state', 1);
                 }])
                 ->whereIn('member_id', $memberIds)
                 ->whereIn('loan_state', [2])
@@ -479,11 +693,13 @@ class ReportController extends Controller
 
                 $angsuranPinjaman = 0;
                 $cicilanBarang = 0;
+                $tenor_month = 0;
 
                 foreach ($loanDetails as $loan) {
                     if ($loan->payments->isNotEmpty()) {
                         $firstPay = $loan->payments->first();
                         if (!$firstPay) continue;
+                        $tenor_month = $firstPay->tenor_month;
                         if (strtoupper($loan->type) === "BARANG") {
                             $cicilanBarang += $firstPay->lp_total;
                         } else {
@@ -494,9 +710,11 @@ class ReportController extends Controller
                 $data[] = [
                     'nip' => $member->nip ?? '-',
                     'name' => $member->name ?? '-',
-                    'position' => $member->position->name ?? '-',
+                    'position' => $member->devision->name ?? '-',
                     'potongan_simpanan' => $simpananBulanan,
-                    'potongan_pinjaman' => $angsuranPinjaman + $cicilanBarang,
+                    'potongan_pinjaman_uang' => $angsuranPinjaman,
+                    'angsuran_ke' => $tenor_month,
+                    'potongan_pinjaman_barang' => $cicilanBarang,
                     'total' => $simpananBulanan + $angsuranPinjaman + $cicilanBarang,
                 ];
                 
@@ -509,12 +727,11 @@ class ReportController extends Controller
             'data' => $data,
             'periode_start' => $periode_start->format('Ymd'),
             'periode_end' => $periode_end->format('Ymd'),
-        ]);
+        ])->setPaper('A4', 'landscape');
 
         return $pdf->stream('Laporan-Potongan-Gaji-' . $periode_start->format('Ymd') . "-" . $periode_end->format('Ymd') . '.pdf');
     }
 
-    // --------unset---
     // for excel report type
     public function deductionXlsx(Request $request)
     {

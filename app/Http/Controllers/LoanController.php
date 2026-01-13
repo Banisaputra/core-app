@@ -21,10 +21,112 @@ class LoanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $loans = Loan::with('member')->orderBy('id','desc')->get();
-        return view('loans.index', compact('loans'));
+         if ($request->ajax()) {
+            $query = Loan::with('member');
+
+            // filter tanggal
+            if ($request->filled('date_start') && $request->filled('date_end')) {
+                $query->whereBetween('loan_date', [
+                    date('Ymd', strtotime($request->date_start)),
+                    date('Ymd', strtotime($request->date_end))
+                ]);
+            }
+            // filter status
+            if ($request->filled('status')) {
+                $query->where('loan_state', $request->status);
+            }
+    
+            // filter jenis
+            if ($request->filled('type')) {
+                $query->where('loan_type', $request->type);
+            }
+
+            $columns = [
+                'id',
+                'loan_date',
+                'member_id',
+                'loan_type',
+                'loan_value',
+            ];
+
+            $search = $request->input('search.value');
+            $orderColumnIndex = $request->order[0]['column'];
+            $orderColumn = $columns[$orderColumnIndex] ?? 'id';
+            $orderDir = $request->order[0]['dir'] ?? 'desc';
+
+            $all_count = $query->count();
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('loan_value', 'like', "%{$search}%")
+                    ->orWhere('loan_code', 'like', "%{$search}%")
+                    ->orWhere('loan_date', 'like', "%{$search}%")
+                    ->orWhereHas('member', function ($m) use ($search) {
+                        $m->where('name', 'like', "%{$search}%");
+                    });
+                });
+            }
+
+            $totalFiltered = $query->count();
+
+            $data = $query
+                ->orderBy($orderColumn, $orderDir)
+                ->offset($request->start)
+                ->limit($request->length == -1 ? $all_count : $request->length)
+                ->get(); 
+                
+            $start = $request->start;
+            $formatted = [];
+            foreach ($data as $index => $loan) {
+
+                // state
+                $stateText = match($loan->loan_state) {
+                    99 => '<span class="text-danger">Ditolak</span>',
+                    3  => '<span class="text-success">Selesai</span>',
+                    2  => '<span class="text-success">Disetujui</span>',
+                    default => '<span class="text-info">Pengajuan</span>',
+                };
+
+                // Action button
+                $action = '
+                    <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="text-muted sr-only">Action</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="'.route('loans.show', $loan->id).'">View</a>
+                        <a class="dropdown-item" href="'.route('loans.edit', $loan->id).'">Edit</a>
+                    </div>
+                ';
+                
+                $formatted[] = [
+                    'id' => $loan->id,
+                    'rownum' => $start + $index + 1,
+                    'loan_code' => $loan->loan_code,
+                    'member' => [
+                        'nip' => $loan->member->nip ?? '-',
+                        'name' => $loan->member->name ?? '-',
+                    ],
+                    'loan_date' => date('d M Y', strtotime($loan->loan_date)),
+                    'due_date' => date('d M Y', strtotime($loan->due_date)),
+                    'type' => $loan->loan_type,
+                    'loan_value' => number_format($loan->loan_value),
+                    'state' => $stateText,
+                    'action' => $action,
+                ];
+            }
+
+            return response()->json([
+                "draw" => intval($request->draw),
+                "recordsTotal" => Loan::count(),
+                "recordsFiltered" => $totalFiltered,
+                "data" => $formatted,
+            ]);
+        }
+
+        // $loans = Loan::with('member')->orderBy('id','desc')->get();
+        return view('loans.index');
     }
 
     public function import(Request $request)

@@ -28,6 +28,12 @@
     @yield('page_css')
   </head>
   <body class="vertical dark ">
+    <div id="loading-overlay" style="display:none;">
+      <div class="loading-box">
+        <div class="spinner"></div>
+        <p>Sedang memproses data…</p>
+      </div>
+    </div>
     <div class="wrapper">
       
       {{-- navabar --}}
@@ -278,10 +284,18 @@
         });
       }
     </script>
+    <script>
+      function showLoader() {
+        document.getElementById('loading-overlay').style.display = 'flex';
+      }
+      function hideLoader() {
+        document.getElementById('loading-overlay').style.display = 'none';
+      }
+    </script>
 
     {{-- page script --}}
     @yield('page_script')
-    
+
     <script src="{{ asset('fedash/js/apps.js') }}"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>

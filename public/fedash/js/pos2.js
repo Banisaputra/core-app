@@ -19,6 +19,12 @@ function formatIDR(value, decimal) {
       minimumFractionDigits: decimal
    });
 }
+function showLoader() {
+   document.getElementById('loading-overlay').style.display = 'flex';
+}
+function hideLoader() {
+   document.getElementById('loading-overlay').style.display = 'none';
+}
  
 cashBtn.addEventListener('click', function () {
    if (cust_name == '') {
@@ -76,7 +82,7 @@ creditPayment.addEventListener('click', function () {
       alert('Pelanggan Harus Dipilih!');
       return;
    }
-
+   showLoader();
    // Collect cart data
    var cartItems = [];
    cartItems = Object.entries(cart).map((item) => {
@@ -93,7 +99,7 @@ creditPayment.addEventListener('click', function () {
          subtotal: function() { return (this.price - this.disc_price) * this.qty }
       };
    });
-
+   
   // Send to backend
   fetch('/submit-sale', {
     method: 'POST',
@@ -114,6 +120,7 @@ creditPayment.addEventListener('click', function () {
   .then(res => res.json())
   .then(response => {
     if (response.success) {
+      hideLoader();
         $('#creditModal .close').trigger('click');
         alert('Payment successful!\nAngsuran: ' + formatIDR(total/tenor, 0) + ' selama '+ tenor +' bulan');
       
@@ -153,6 +160,7 @@ cashPayment.addEventListener('click', function () {
       return;
    }
   
+   showLoader();
     // Collect cart data
    var cartItems = [];
    cartItems = Object.entries(cart).map((item) => {
@@ -169,7 +177,7 @@ cashPayment.addEventListener('click', function () {
          subtotal: function() { return (this.price - this.disc_price) * this.qty }
       };
    });
-
+ 
   // Send to backend
   fetch('/submit-sale', {
     method: 'POST',
@@ -189,6 +197,7 @@ cashPayment.addEventListener('click', function () {
   .then(res => res.json())
   .then(response => {
     if (response.success) {
+      hideLoader();
         $('#cashModal .close').trigger('click');
         alert('Payment successful!\nChange:' + formatIDR(received - total, 0));
       
@@ -234,8 +243,6 @@ function renderProducts(products) {
       productList.innerHTML = '<p class="text-muted">No products found.</p>';
       return;
    } else if (products.length === 1) {
-      console.log(products);
-      
       autoToCart(products[0]);
    }
 

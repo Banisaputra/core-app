@@ -50,6 +50,8 @@
                 <option value="sales">Penjualan</option>
                 <option value="profitNlose">Laba Rugi</option>
                 <option value="inventory">Adjustment Stock</option>
+                {{-- <option value="svsummary">Summary Simpanan</option>
+                <option value="lnsummary">Summary Pinjaman</option> --}}
               </select>
           </div>
           <div class="form-group mb-3 col-md-3">
@@ -133,33 +135,15 @@
 <script>
 // Function untuk handle AJAX request
 function handleReportRequest(isPreview = false) {
-    const form = document.getElementById('form-report');
-    const previewBtn = document.getElementById('preview-btn');
-    const previewText = document.getElementById('preview-text');
-    const previewSpinner = document.getElementById('preview-spinner');
-    const submitBtn = document.getElementById('submit-btn');
-    const submitText = document.getElementById('submit-text');
-    const downloadSpinner = document.getElementById('download-spinner');
-    const reportType = document.getElementById('reportSelect').value;
-     
-    // Show loading state
-    if (isPreview) {
-        previewBtn.disabled = true;
-        previewText.textContent = 'Loading...';
-        previewSpinner.classList.remove('d-none');
-    } else {
-        submitBtn.disabled = true;
-        submitText.textContent = 'Mengunduh...';
-        downloadSpinner.classList.remove('d-none');
-    }
-    
-    // Get form data
-    const formData = new FormData(form);
-    if (isPreview) {
-        formData.append('preview', 'true');
-    }
 
-    // AJAX request
+    const form = document.getElementById('form-report');
+    const reportType = document.getElementById('reportSelect').value;
+
+    const formData = new FormData(form);
+    if (isPreview) formData.append('preview', 'true');
+
+    showLoader();
+
     fetch(form.action, {
         method: 'POST',
         body: formData,
@@ -168,62 +152,54 @@ function handleReportRequest(isPreview = false) {
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
         }
     })
-    .then(response => response.blob())
-    .then(blob => {
-    const reader = new FileReader();
-    reader.onload = function() {
-        const base64 = reader.result;
-        
-        if (isPreview) {
-          // Buat tab baru dengan PDF viewer
-          const newWindow = window.open('', '_blank');
-          newWindow.document.write(`
-              <!DOCTYPE html>
-              <html>
-              <head>
-                <title>Preview Laporan</title>
-                <style>
-                  body { margin: 0; }
-                  iframe { width: 100%; height: 100vh; border: none; }
-                </style>
-              </head>
-              <body>
-                <iframe src="data:application/pdf;base64,${base64.split(',')[1]}"></iframe>
-              </body>
-              </html>
-          `);
-          newWindow.document.close();
-        } else {
-          const now = new Date();
+    .then(response => {
 
-          const formattedDate = 
-            now.getFullYear() +
-            String(now.getMonth() + 1).padStart(2, '0') +
-            String(now.getDate()).padStart(2, '0') +
-            String(now.getHours()).padStart(2, '0') +
-            String(now.getMinutes()).padStart(2, '0') +
-            String(now.getSeconds()).padStart(2, '0');
+        const contentType = response.headers.get('Content-Type') || '';
 
-          const blobUrl = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = blobUrl;
-          link.download = `Laporan-${reportType}-${formattedDate}.pdf`;
-          link.click();
-          URL.revokeObjectURL(blobUrl);
+        // 🚨 BUKAN PDF = ERROR
+        if (!contentType.includes('application/pdf')) {
+            return response.text().then(text => {
+              console.log('===== RESPONSE BUKAN PDF =====');
+              console.log(text);
+              console.log('==============================');
+              throw new Error('Response bukan PDF');
+            });
         }
-    };
-    reader.readAsDataURL(blob);
-    if (isPreview) {
-      previewBtn.disabled = false;
-      previewText.textContent = 'Preview';
-      previewSpinner.classList.add('d-none');
-    } else {
-      submitBtn.disabled = false;
-      submitText.textContent = 'Download';
-      downloadSpinner.classList.add('d-none');
-    }
-  })
+
+        return response.blob();
+    })
+    .then(blob => {
+
+        const blobUrl = URL.createObjectURL(blob);
+
+        if (isPreview) {
+            window.open(blobUrl, '_blank');
+        } else {
+            const now = new Date();
+            const filename = `Laporan-${reportType}-${now.getTime()}.pdf`;
+
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        URL.revokeObjectURL(blobUrl);
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Gagal generate PDF');
+    })
+    .finally(() => {
+        hideLoader();
+        // reset UI
+        document.getElementById('preview-btn')?.removeAttribute('disabled');
+        document.getElementById('submit-btn')?.removeAttribute('disabled');
+    });
 }
+
 
 // Event listeners
 document.getElementById('preview-btn').addEventListener('click', function() {

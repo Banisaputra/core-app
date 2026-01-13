@@ -97,8 +97,13 @@
             <label for="simple-select2">Anggota</label>
             <select id="memberSelect" name="member_id" class="form-control" required></select>
           </div>
-          <div class="form-group col-md-6">
-
+          <div class="form-group col-md-3">
+            <label for="loan_type">Jenis Pinjaman</label>
+            <select name="loan_type" id="loan_type" class="form-control">
+              <option value="">SEMUA</option>
+              <option value="UANG">UANG</option>
+              <option value="BARANG">BARANG</option>
+            </select>
           </div>
         </div>
         <div class="form-row">
@@ -109,9 +114,22 @@
       </form>
       <hr class="my-4">
       @if (count($loans) > 0)
-        <button type="button" class="btn mb-2 btn-primary" id="settleConfirm" data-id="{{ $member_id }}" data-toggle="modal" data-target="#settleConfirmModal"><span class="fe fe-16 mr-2 fe-check-circle"></span>Konfirmasi Pelunasan</button>
+        <button type="button" class="btn mb-2 btn-primary" id="settleConfirm" data-id="{{ $member['id'] }}" data-toggle="modal" data-target="#settleConfirmModal"><span class="fe fe-16 mr-2 fe-check-circle"></span>Konfirmasi Pelunasan</button>
       @endif
-
+      @if (count($member) > 0)
+        <div class="row">
+          <p class="col-sm-2">Nama Anggota</p>
+          <div class="col-sm-10">
+              <h5>{{ $member['name'] }}</h5>
+          </div>
+        </div>
+        <div class="row">
+          <p class="col-sm-2">NIP</p>
+          <div class="col-sm-10">
+              <h5>{{ $member['nip']}}</h5>
+          </div>
+        </div>
+      @endif
       <div class="row my-4">
           <div class="col-md-12">
             <div class="card shadow">
@@ -121,10 +139,11 @@
                     <tr>
                       <th width="5%">No.</th>
                       <th width="10%">Kode Pinjaman</th>
-                      <th width="10%">Total tenor</th>
+                      <th width="10%">Jenis</th>
+                      <th width="10%">Total Tenor</th>
                       <th width="10%">Jatuh Tempo</th>
-                      <th width="15%">Sisa Tenor</th>
-                      <th width="15%">Bunga Pinjaman</th>
+                      <th width="10%">Sisa Tenor</th>
+                      <th width="15%">Bunga</th>
                       <th width="15%">Sisa Pokok</th>
                       <th width="15%">Subtotal</th>
                     </tr>
@@ -140,9 +159,9 @@
 
                       ?>
                       <tr>
-                        {{-- <td>{{ $loop->iteration }}</td> --}}
-                        <td>{{ $currAngsur }}</td>
+                        <td>{{ $loop->iteration }}</td>
                         <td>{{ $loan->loan_code }}</td>
+                        <td>{{ $loan->loan_type }}</td>
                         <td>{{ $loan->loan_tenor }}</td>
                         <td>{{ date('d M Y', strtotime($loan->due_date)) }}</td>
                         <td>{{ $loan->payments->where('lp_state', 1)->count() }}</td>

@@ -16,8 +16,26 @@ use Illuminate\Support\Facades\Storage;
 class SavingController extends Controller
 { 
     public function index(Request $request)
-    {
+    {        
         if ($request->ajax()) {
+            $query = Saving::with('member', 'svType');
+
+            // filter tanggal
+            if ($request->filled('date_start') && $request->filled('date_end')) {
+                $query->whereBetween('created_at', [
+                    $request->date_start,
+                    $request->date_end . " 23:59:59"
+                ]);
+            }
+            // filter status
+            if ($request->filled('status')) {
+                $query->where('sv_state', $request->status);
+            }
+    
+            // filter jenis
+            if ($request->filled('type')) {
+                $query->where('sv_type_id', $request->type);
+            }
 
             $columns = [
                 'id',
@@ -32,9 +50,8 @@ class SavingController extends Controller
             $orderColumn = $columns[$orderColumnIndex] ?? 'id';
             $orderDir = $request->order[0]['dir'] ?? 'desc';
 
-            $all_count = Saving::count();
-            $query = Saving::with('member', 'svType')
-                ->select('savings.*');
+            $all_count = $query->count();
+            // $query = Saving::with('member', 'svType')->select('savings.*');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
@@ -82,6 +99,7 @@ class SavingController extends Controller
                 ';
                 
                 $formatted[] = [
+                    'id' => $saving->id,
                     'rownum' => $start + $index + 1,
                     'sv_code' => $saving->sv_code,
                     'member' => [
@@ -103,8 +121,12 @@ class SavingController extends Controller
                 "data" => $formatted,
             ]);
         }
+        
+        $data = [
+            "sv_types" => SavingType::all(),
+        ];
 
-        return view('savings.index');
+        return view('savings.index', $data);
     }
 
     public function create() 
@@ -369,6 +391,40 @@ class SavingController extends Controller
             
             DB::commit();
             return redirect()->back()->with('success', 'Simpanan berhasil dikonfirmasi');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Gagal menyimpan simpanan! Hubungi Administrator.')->withInput();
+        }
+    }
+
+    public function bulkConfirmation(Request $request) 
+    {
+        $request->validate([
+            'ids' => 'required|string'
+        ]);
+
+        $ids = array_map(
+            'intval',
+            json_decode($request->ids, true)
+        );
+
+        DB::beginTransaction();
+        try {
+            $count = 0;
+            foreach ($ids as $id) {
+                $saving = Saving::with(['member'])->findOrFail($id);
+                if ($saving->sv_state == 1) {
+                    $saving->update([
+                        'sv_state' => 2,
+                        'updated_by' => auth()->id()
+                    ]);
+                    Member::where('id', $saving->member_id)->increment('balance', $saving->sv_value);
+                    $count++;
+                }
+            }
+            
+            DB::commit();
+            return redirect()->back()->with('success', $count . ' Simpanan berhasil dikonfirmasi');
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', 'Gagal menyimpan simpanan! Hubungi Administrator.')->withInput();

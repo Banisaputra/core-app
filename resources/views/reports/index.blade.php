@@ -57,10 +57,12 @@
           <div class="form-group mb-3 col-md-3">
               <label for="dateStart">Mulai</label>
               <input class="form-control" id="dateStart" type="date" name="dateStart">
+              <small>*Kosongkan untuk mengambil semua data</small>
           </div>
           <div class="form-group mb-3 col-md-3">
               <label for="dateEnd">Sampai</label>
               <input class="form-control" id="dateEnd" type="date" name="dateEnd">
+              <small>*Kosongkan untuk mengambil semua data</small>
           </div>
         </div>
         <div class="form-row">

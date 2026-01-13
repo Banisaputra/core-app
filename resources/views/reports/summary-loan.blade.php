@@ -78,7 +78,7 @@
             <th>No</th>
             <th>NIK</th>
             <th>Nama Anggota</th>
-            <th>Jabatan</th>
+            <th>Bagian</th>
             <th>Jenis</th>
             <th>Jumlah Pinjaman</th>
             <th>Tenor</th>
@@ -96,7 +96,7 @@
     <td>{{ $loop->iteration }}</td>
     <td>{{ $row->nip }}</td>
     <td>{{ $row->name }}</td>
-    <td>{{ $row->position }}</td>
+    <td>{{ $row->devision }}</td>
 
     <td>{{ strtoupper($row->jenis_pinjaman) }}</td>
     <td class="angka">{{ number_format($row->jumlah_pinjaman ?? 0, 0, ',', '.') }}</td>

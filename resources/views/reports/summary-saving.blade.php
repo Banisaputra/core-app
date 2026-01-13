@@ -96,7 +96,7 @@
                 <th>No</th>
                 <th>NIK</th>
                 <th>Nama Anggota</th>
-                <th>Jabatan</th>
+                <th>Bagian</th>
                 <th>Dana Cadangan</th>
                 <th>Simpanan Pokok</th>
                 <th>Simpanan Wajib</th>
@@ -110,7 +110,7 @@
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $row['nip'] }}</td>
                 <td>{{ $row['name'] }}</td>
-                <td>{{ $row['position'] }}</td>
+                <td>{{ $row['devision'] }}</td>
                 <td class="angka">{{ number_format($row['simpanan_cadangan'], 0, ',', '.') }}</td>
                 <td class="angka">{{ number_format($row['simpanan_pokok'], 0, ',', '.') }}</td>
                 <td class="angka">{{ number_format($row['simpanan_wajib'], 0, ',', '.') }}</td>

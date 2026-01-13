@@ -65,6 +65,7 @@ class ReportController extends Controller
                         'members.nip',
                         'members.name',
                         'positions.name as position',
+                        'devisions.name as devision',
 
                         DB::raw("
                             SUM(CASE 
@@ -105,6 +106,7 @@ class ReportController extends Controller
                     })
                     ->leftJoin('saving_types', 'saving_types.id', '=', 'savings.sv_type_id')
                     ->leftJoin('positions', 'positions.id', '=', 'members.position_id')
+                    ->leftJoin('devisions', 'devision.id', '=', 'members.devision_id')
                     ->groupBy(
                         'members.id',
                         'members.nip',
@@ -168,6 +170,7 @@ class ReportController extends Controller
                         'm.nip',
                         'm.name',
                         'p.name as position',
+                        'd.name as devision',
                         'lt.jenis_pinjaman',
 
                         DB::raw('COALESCE(l.loan_value, 0) as jumlah_pinjaman'),
@@ -215,6 +218,7 @@ class ReportController extends Controller
                     })
 
                     ->leftJoin('positions as p', 'p.id', '=', 'm.position_id')
+                    ->leftJoin('devisions as d', 'd.id', '=', 'm.devision_id')
                     ->orderBy('m.id', 'ASC')
                     ->orderByRaw("FIELD(lt.jenis_pinjaman, 'UANG', 'BARANG')")
                     ->get();

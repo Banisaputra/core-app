@@ -84,7 +84,7 @@
         <hr class="my-4">
         <div class="form-row">
           <div class="col-md-6">
-            <small>*Kode dibuat otomatis oleh sistem</small>
+            <small>*Kode dibuat otomatis oleh sistem sesuai hari kerja</small>
           </div>
           <div class="col-md-6 text-right">
             <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Simpan</button>

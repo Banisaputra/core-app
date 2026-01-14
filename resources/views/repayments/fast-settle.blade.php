@@ -22,6 +22,7 @@
       <form action="{{ route('repayments.settleConfirm')}}" method="post">
         @csrf
         <input type="hidden" id="member_id" name="member_id" value="">
+        <input type="hidden" name="loan_type" id="loan_type" value="">
         <div class="modal-header">
           <h5 class="modal-title" id="settleConfirmModalLabel">Konfirmasi Pelunasan</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -35,6 +36,7 @@
                 <tr>
                   <th>ID</th>
                   <th>Kode</th>
+                  <th>Tipe</th>
                   <th>Angsuran (%)</th>
                   <th>Penalti</th>
                   <th>Total Pelunasan</th>
@@ -45,7 +47,7 @@
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan='3' style="text-align: right"><b>Subtotal</b></td>
+                  <td colspan='4' style="text-align: right"><b>Subtotal</b></td>
                   <td id="bungaTotal"></td>
                   <td id="subtotal"></td>
                 </tr>
@@ -114,7 +116,7 @@
       </form>
       <hr class="my-4">
       @if (count($loans) > 0)
-        <button type="button" class="btn mb-2 btn-primary" id="settleConfirm" data-id="{{ $member['id'] }}" data-toggle="modal" data-target="#settleConfirmModal"><span class="fe fe-16 mr-2 fe-check-circle"></span>Konfirmasi Pelunasan</button>
+        <button type="button" class="btn mb-2 btn-primary" id="settleConfirm" data-id="{{ $member['id'] }}" data-lntype="{{ $type }}" data-toggle="modal" data-target="#settleConfirmModal"><span class="fe fe-16 mr-2 fe-check-circle"></span>Konfirmasi Pelunasan</button>
       @endif
       @if (count($member) > 0)
         <div class="row">
@@ -232,12 +234,12 @@
 
     $('#settleConfirm').on('click', function() {
       let id = $(this).data('id');
+      let loan_type = $(this).data('lntype');
       var data = '';
       var total_penalti = 0;
       var total_pokok = 0;
       for (let i = 0; i < loansJS.length; i++) {
         const tempLoan = loansJS[i];
-        console.log(tempLoan);
         var bunga = ((tempLoan['loan_value']*tempLoan['interest_percent'])/100)/tempLoan['loan_tenor'];
         var tenor_remaining = 0;
         var value_remaining = 0;
@@ -250,12 +252,11 @@
           
         });
         var angsuran = ((tempLoan['loan_tenor']-tenor_remaining) / tempLoan['loan_tenor']) * 100;
-        console.log(angsuran < 30);
-        
 
         data += `<tr>
           <td>${i+1}</td>
           <td>${tempLoan['loan_code']}</td>
+          <td>${tempLoan['loan_type']}</td>
           <td>${angsuran}</td>
           <td>${angsuran < 30 ? formatIDR(bunga,0) : formatIDR(0,0)}</td>
           <td>${formatIDR(value_remaining,0) }</td>
@@ -265,7 +266,9 @@
         total_pokok += value_remaining;
         
       }
+
       $('#settleConfirmModal #member_id').val(id);
+      $('#settleConfirmModal #loan_type').val(loan_type);
       $('#settleConfirmModal #confirmTable').html(data);
       $('#settleConfirmModal #bungaTotal').html("<b>"+formatIDR(total_penalti,0)+"</b>");
       $('#settleConfirmModal #subtotal').html("<b>"+formatIDR(total_pokok,0)+"</b>");

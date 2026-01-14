@@ -64,7 +64,7 @@ class Member extends Model
         
         
         if ($selisihTahun < 1) {
-            $max_tenor = round((($loanPolicy['max_agunan_0_1']['value'] * 1) / $min_angsur)??0 ,0);
+            $max_tenor = round((($loanPolicy['max_agunan_0_1']['value'] * 1) / $min_angsur)?? 0 ,0);
             $tenor = round($loan / $min_angsur, 0);
             if($tenor > $max_tenor) $valid = false;
             $angsuran = $loan / $tenor;

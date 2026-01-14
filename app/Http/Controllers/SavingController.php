@@ -162,7 +162,7 @@ class SavingController extends Controller
         $svn_code = Saving::generateCode(date('ym', strtotime($request->sv_date)));
 
         // image path
-        $photoPath = null;
+        $photoPath = "";
         if ($request->hasFile('proof_of_payment')) {
             $photoPath = $request->file('proof_of_payment')->store('proof_of_payment', 'public_direct');
             // jika symlink tidak tersedia
@@ -236,7 +236,7 @@ class SavingController extends Controller
 
         // loop member
         $members = Member::where('is_transactional', 1)->pluck('id')->toArray();;
-        $wajib = SavingType::where('name', 'like', 'Wajib')->first();
+        $pokok = SavingType::where('name', 'like', 'Pokok')->first();
         $month = date('m', strtotime($request->periode));
         $year = date('Y', strtotime($request->periode));
 
@@ -253,42 +253,78 @@ class SavingController extends Controller
         $periode_start->modify("-1 month");
         $periode_end = new DateTime("$year-$month-".($cutOff ?? 0)."");
 
-        foreach ($members as $key => $id) {
-            if (!in_array($id, $request->member_id ?? [])) {
-                if ($wajib->id == $request->sv_type_id) {
-                    $exists = Saving::where('member_id', $id)
-                        ->where('sv_type_id', $wajib->id)
-                        ->where('sv_state', '<>', 99)
-                        ->whereBetween('sv_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
-                        ->exists();
-    
-                    if ($exists) {
-                        return back()->with('error', 'Ada anggota yang sudah melakukan simpanan pada bulan ini untuk jenis simpanan tersebut.')->withInput();
-                    }
-                }
+        DB::beginTransaction();
+        try {
+            $exists = Saving::whereIn('member_id', $members)
+                ->where('sv_type_id', $pokok->id)
+                ->where('sv_state', '<>', 99) 
+                ->exists();
 
-                try {
-                    $svType=SavingType::findOrFail($request->sv_type_id);
-                    Saving::create([
-                        "sv_code" => Saving::generateCode(date('ym', strtotime($request->periode))),
-                        "sv_date" => date('Ymd', strtotime($request->periode)),
-                        "member_id" => $id,
-                        "sv_type_id" => $request->sv_type_id,
-                        "sv_value" => $svType->value ?? 0, // sesuikan settingan
-                        "remark" => 'Generate otomatis untuk periode '.date('F Y', strtotime($request->periode)),
-                        "created_by" => auth()->id(),
-                        "updated_by" => auth()->id(),
-                    ]);
-                } catch (\Throwable $th) {
-                    // Log the full error for debugging
-                    \Log::error('Error fetching record: ' . $th->getMessage(), [
-                        'exception' => $th,
-                    ]);
-                    return redirect()->back()->with('error', 'Anggota sudah melakukan jenis simpanan pada bulan ini.');
-                }    
+            if ($exists) {
+                throw new \Exception('Ada anggota yang sudah melakukan simpanan pokok.');
             }
+
+            $exists = Saving::whereIn('member_id', $members)
+                ->where('sv_type_id', $request->sv_type_id)
+                ->where('sv_state', '<>', 99)
+                ->whereBetween('sv_date', [
+                    $periode_start->format('Ymd'),
+                    $periode_end->format('Ymd')
+                ])
+                ->exists();
+
+            if ($exists) {
+                throw new \Exception('Ada anggota yang sudah melakukan simpanan pada periode ini.');
+            }
+
+            $svType = SavingType::findOrFail($request->sv_type_id);
+
+            $dateCode = date('ym', strtotime($request->periode));
+            $prefix = 'SVN-' . $dateCode . '-';
+ 
+            $last = Saving::whereRaw("DATE_FORMAT(sv_date, '%y%m') = ?", [$dateCode])
+                ->orderByDesc('sv_code')
+                ->lockForUpdate()
+                ->first();
+
+            $counter = 1;
+
+            if ($last && preg_match('/(\d{4})$/', $last->sv_code, $m)) {
+                $counter = (int)$m[1] + 1;
+            }
+
+            foreach ($members as $id) {
+
+                $svCode = $prefix . str_pad($counter, 4, '0', STR_PAD_LEFT);
+                $counter++;
+
+                Saving::create([
+                    'sv_code' => $svCode,
+                    'sv_date' => date('Ym', strtotime($request->periode)) . "02",
+                    'member_id' => $id,
+                    'sv_type_id' => $request->sv_type_id,
+                    'sv_value' => $svType->value ?? 0,
+                    'remark' => 'Generate otomatis untuk periode ' . date('F Y', strtotime($request->periode)),
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+            } 
+
+            DB::commit();
+
+            return back()->with('success', 'Data simpanan berhasil digenerate.');
+
+        } catch (\Throwable $th) {
+
+            DB::rollBack();
+
+            \Log::error('Generate simpanan gagal', [
+                'message' => $th->getMessage(),
+                'trace' => $th->getTraceAsString()
+            ]);
+
+            return back()->with('error', $th->getMessage())->withInput();
         }
-        return redirect()->back()->with('success', 'Data simpanan berhasil digenerate.');
     }
 
     public function show(string $id)
@@ -303,10 +339,7 @@ class SavingController extends Controller
         $sv_types = SavingType::all();
         return view('savings.edit', compact('saving', 'sv_types'));
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
+ 
     public function update(Request $request, string $id)
     {
         $saving = Saving::findOrFail($id);
@@ -353,10 +386,7 @@ class SavingController extends Controller
         return redirect()->route('savings.edit', $saving->id)->with('success', 'Data simpanan berhasil diperbarui.');
 
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
+ 
     public function destroy(string $id)
     {
         $saving = Saving::findOrFail($id);
@@ -451,18 +481,20 @@ class SavingController extends Controller
             foreach ($ids as $id) {
                 $found = false;
                 $saving = Saving::with(['member'])->findOrFail($id);
-                if ($saving->sv_date == 20251001) {
-                    $saving->sv_code = Saving::generateCodeRev('2511');
-                    $saving->sv_date = 20251102;
-                    $found = true;
-                    } else if ($saving->sv_date == 20251101) {
-                        $saving->sv_code = Saving::generateCodeRev('2512');
-                        $saving->sv_date = 20251202;
+                if ($saving->sv_state <> 99 ) {
+                    if ($saving->sv_date == 20251001) {
+                        $saving->sv_code = Saving::generateCodeRev('2511');
+                        $saving->sv_date = 20251102;
                         $found = true;
-                        } else if ($saving->sv_date == 20251201) {
-                            $saving->sv_code = Saving::generateCodeRev('2601');
-                            $saving->sv_date = 20260102;
+                        } else if ($saving->sv_date == 20251101) {
+                            $saving->sv_code = Saving::generateCodeRev('2512');
+                            $saving->sv_date = 20251202;
                             $found = true;
+                            } else if ($saving->sv_date == 20251201) {
+                                $saving->sv_code = Saving::generateCodeRev('2601');
+                                $saving->sv_date = 20260102;
+                                $found = true;
+                    }
                 }
                 if ($found) {
                     $count++;

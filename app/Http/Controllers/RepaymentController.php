@@ -140,8 +140,9 @@ class RepaymentController extends Controller
     {
         $loans = session('loans', []);
         $member = session('member', []);
+        $type = session('type', []);
         
-        return view('repayments.fast-settle', compact('loans','member'));
+        return view('repayments.fast-settle', compact('loans','member','type'));
     }
 
     public function generate()
@@ -226,19 +227,19 @@ class RepaymentController extends Controller
         ->whereIn('loan_type', $type)
         ->get(); 
 
-        return redirect()->route('repayments.create')->with(['loans' => $loans, 'member' => $member]);
+        return redirect()->route('repayments.create')->with(['loans' => $loans, 'member' => $member, 'type' => json_encode($type)]);
 
     }
 
     public function settleConfirm (Request $request) 
     {
         $member = Member::findOrFail($request->member_id);
-
-        // get loan
+        $type = explode(',', $request->loan_type);
+        // get loan  
         $loans = Loan::with(['member','payments'])->where('member_id', $member->id)
         ->where('loan_state', 2)
+        ->whereIn('loan_type', $type)
         ->get();
-
         foreach ($loans as $keyL => $loan) {
             foreach ($loan->payments as $keyP => $pay) {
                 if ($pay->lp_state == 1) {

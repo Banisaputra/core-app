@@ -159,7 +159,7 @@ class SavingController extends Controller
             'proof_of_payment' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $svn_code = Saving::generateCode();
+        $svn_code = Saving::generateCode(date('ym', strtotime($request->sv_date)));
 
         // image path
         $photoPath = null;

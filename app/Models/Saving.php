@@ -28,7 +28,7 @@ class Saving extends Model
 
         // Ambil entri terakhir di bulan ini
         $last = self::whereRaw("DATE_FORMAT(sv_date, '%y%m') = ?", [$dateCode])
-                    ->orderByDesc('id')
+                    ->orderByDesc('sv_date')
                     ->first();
         $counter = 1;
         

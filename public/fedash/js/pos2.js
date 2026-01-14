@@ -70,6 +70,7 @@ cashReceive.addEventListener('input', function () {
 
 // save sales
 creditPayment.addEventListener('click', function () {
+   creditPayment.disabled = true;
   const total = parseFloat(document.getElementById('crTotal').textContent.replace(/[^\d]/g, ''));
   const tenor = parseFloat(tenorReceive.value);
   const memberId = document.getElementById('memberSelect').value *1;
@@ -121,8 +122,8 @@ creditPayment.addEventListener('click', function () {
   .then(response => {
     if (response.success) {
       hideLoader();
-        $('#creditModal .close').trigger('click');
-        alert('Payment successful!\nAngsuran: ' + formatIDR(total/tenor, 0) + ' selama '+ tenor +' bulan');
+      $('#creditModal .close').trigger('click');
+      alert('Payment successful!\nAngsuran: ' + formatIDR(total/tenor, 0) + ' selama '+ tenor +' bulan');
       
       // Clear cart
       document.getElementById('cartBody').innerHTML = '';
@@ -140,6 +141,9 @@ creditPayment.addEventListener('click', function () {
   .catch(error => {
     console.error(error);
     alert('Error submitting sale.');
+  })
+  .finally(() => {
+      creditPayment.disabled = false;
   });
 });
 

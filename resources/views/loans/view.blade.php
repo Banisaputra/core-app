@@ -135,11 +135,17 @@
                                 @case(99)
                                     Ditolak
                                     @break
+                                @case(1)
+                                    Pengajuan
+                                    @break
                                 @case(2)
                                     Disetujui
                                     @break
+                                @case(3)
+                                    Selesai
+                                    @break
                                 @default
-                                    Pengajuan
+                                    invalid
                             @endswitch</h5>
                         </div>
                     </div>

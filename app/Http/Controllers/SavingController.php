@@ -159,6 +159,7 @@ class SavingController extends Controller
             'proof_of_payment' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
+        // ambil kode terakhir di periode request
         $svn_code = Saving::generateCode(date('ym', strtotime($request->sv_date)));
 
         // image path

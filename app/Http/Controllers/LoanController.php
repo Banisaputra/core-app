@@ -45,6 +45,7 @@ class LoanController extends Controller
 
             $columns = [
                 'id',
+                'type',
                 'loan_date',
                 'member_id',
                 'loan_type',
@@ -63,6 +64,7 @@ class LoanController extends Controller
                     $q->where('loan_value', 'like', "%{$search}%")
                     ->orWhere('loan_code', 'like', "%{$search}%")
                     ->orWhere('loan_date', 'like', "%{$search}%")
+                    ->orWhere('loan_type', 'like', "%{$search}%")
                     ->orWhereHas('member', function ($m) use ($search) {
                         $m->where('name', 'like', "%{$search}%");
                     })

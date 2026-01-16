@@ -32,7 +32,7 @@ $parentMenus = Menu::whereNull('parent_id')->orderBy('order')->get();
                     @if(!$child->permission || auth()->user()->can($child->permission))
                         <li class="nav-item">
                             <a class="nav-link pl-3" href="{{ route($child->route) }}"> 
-                                <i class="fe {{ $child->icon }}"></i>
+                                <i class="fe {{ $child->icon ?? 'fe-grid' }}"></i>
                                 <span class="ml-1 item-text">{{ $child->name }}</span>
                             </a>
                         </li>

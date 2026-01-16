@@ -21,6 +21,7 @@ class RolePermissionSeeder extends Seeder
         $permissions = [
             'dashboard_show' => 'Dapat mengakses dan melihat dashboard',
             'manage_access' => 'Dapat mengelola menu hak akses sistem',
+            'manage_master_data' => 'Dapat mengakses menu-menu master',
             'manage_categories' => 'Dapat mengelola menu kategori barang',
             'manage_databases' => 'Dapat mengelola menu database dan backup data',
             'manage_devisions' => 'Dapat mengelola menu divisi/departemen',

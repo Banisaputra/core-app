@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('title')
-    <title>Permission Informasi - Sistem Informasi Koperasi dan Usaha</title>
+    <title>Informasi Menu - Sistem Informasi Koperasi dan Usaha</title>
 @endsection
 
 @section('page_css')
@@ -13,10 +13,10 @@
 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" style="display: none;" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form action="{{ route('permissions.store')}}" method="POST" id="formPermission">
+      <form action="{{ route('menus.store')}}" method="POST" id="formMenu">
         @csrf
         <div class="modal-header">
-          <h5 class="modal-title" id="ModalLabel">Tambah permission</h5>
+          <h5 class="modal-title" id="ModalLabel">Tambah Menu</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
@@ -47,12 +47,12 @@
     <div class="row justify-content-center">
       <div class="col-12">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">Daftar Permission</h2>
-            <p class="card-text">permission membagi akses untuk setiap role</p>
+            <h2 class="h3 mb-0 page-title">Daftar Menu</h2>
+            <p class="card-text">Menu yang dapat diakses</p>
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-              @can('permission_create')
+              @can('menu_create')
                 <button type="button" class="btn mb-2 mr-2 btn-primary" data-toggle="modal" data-target="#addModal">
                 <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data</button>
               @endcan
@@ -84,29 +84,35 @@
             <div class="card shadow">
               <div class="card-body">
                 <!-- table -->
-                <table class="table datatables" id="permissions">
+                <table class="table datatables" id="menus">
                   <thead>
                     <tr>
                       <th width="5%">No.</th>
-                      <th width="20%">Nama</th>
+                      <th width="25%">Nama</th>
+                      <th>Permission</th>
+                      <th>Icon</th>
+                      <th>Parent</th>
                       <th width="5%">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     
-                    @foreach ($permissions as $permission)
+                    @foreach ($menus as $menu)
                       <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $permission->name }}</td>
+                        <td>{{ $menu->name }}</td>
+                        <td>{{ $menu->permission }}</td>
+                        <td>{{ $menu->icon }}</td>
+                        <td>{{ $menu->parent_id ? "TIDAK" : "YA" }}</td>
                         <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="text-muted sr-only">Action</span>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">
-                            @can('permission_edit')
-                            <button class="dropdown-item btnEdit" data-id="{{ $permission->id }}">Edit</button>
+                            @can('menu_edit')
+                            <button class="dropdown-item btnEdit" data-id="{{ $menu->id }}">Edit</button>
                             @endcan
-                            @can('permission_delete')
-                            <form action="{{ route('permissions.destroy', $permission->id) }}" method="POST" style="display: inline;" id="deleteForm">
+                            @can('menu_delete')
+                            <form action="{{ route('menus.destroy', $menu->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" id="btnDelete" class="dropdown-item">Delete</button>
@@ -132,7 +138,7 @@
 <script src="{{ asset('fedash/js/dataTables.bootstrap4.min.js') }}"></script>
 <script>
   $(document).ready(function () {
-    $('#permissions').DataTable(
+    $('#menus').DataTable(
     {
       autoWidth: true,
       "lengthMenu": [
@@ -142,7 +148,7 @@
     });
 
     $('#deleteForm').on('submit', function(e) {
-      if (!confirm('Apakah anda yakin ingin menghapus permission ini?')) {
+      if (!confirm('Apakah anda yakin ingin menghapus menu ini?')) {
           e.preventDefault();
       }
     });
@@ -153,16 +159,16 @@
     });
 
     $('#addModal').on('hidden.bs.modal', function () {
-      $('#formPermission')[0].reset();
-      $('#formPermission input[name="_method"]').remove();
-      $('#formPermission').attr('action', '/permissions');
+      $('#formmenu')[0].reset();
+      $('#formmenu input[name="_method"]').remove();
+      $('#formmenu').attr('action', '/menus');
       $('#formErrors').addClass('d-none').find('#errorList').empty();
-      $('#formPermission #submitBtn').text('Save');
-      $('#formPermission #ModalLabel').text('Tambah permission');
+      $('#formmenu #submitBtn').text('Save');
+      $('#formmenu #ModalLabel').text('Tambah menu');
     });
 
     // submit
-    $('#formPermission').on('submit', function(e) {
+    $('#formmenu').on('submit', function(e) {
       e.preventDefault();
       $('#submitBtn').prop('disabled', true).text('Saving...');
 
@@ -210,29 +216,29 @@
     });
 
     // edit
-    $('#permissions tbody .btnEdit').on('click', function () {
+    $('#menus tbody .btnEdit').on('click', function () {
       var id = $(this).data('id');
       
       $('#formErrors').addClass('d-none').find('#errorList').empty();
-      $('#formPermission')[0].reset();
-      $('#formPermission').attr('action', '/permissions/' + id);
-      $('#formPermission #submitBtn').text('Update');
-      $('#formPermission #ModalLabel').text('Edit permission');
+      $('#formmenu')[0].reset();
+      $('#formmenu').attr('action', '/menus/' + id);
+      $('#formmenu #submitBtn').text('Update');
+      $('#formmenu #ModalLabel').text('Edit menu');
 
       // check _method
-      if (!$('#formPermission input[name="_method"]').length) {
-        $('#formPermission').append('<input type="hidden" name="_method" value="PUT">');
+      if (!$('#formmenu input[name="_method"]').length) {
+        $('#formmenu').append('<input type="hidden" name="_method" value="PUT">');
       } else {
-        $('#formPermission input[name="_method"]').val('PUT');
+        $('#formmenu input[name="_method"]').val('PUT');
       }
 
       $.ajax({
-        url: '/permissions/' + id + '/edit',
+        url: '/menus/' + id + '/edit',
         method: 'GET',
         success: function(response) {
           
-          $('#formPermission #name').val(response.data.name);
-          $('#formPermission #description').val(response.data.description);
+          $('#formmenu #name').val(response.data.name);
+          $('#formmenu #description').val(response.data.description);
           $('#addModal').modal('show');
         },
         error: function(xhr) {

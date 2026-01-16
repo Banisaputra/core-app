@@ -71,7 +71,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     // storage link
     Route::get('/create-storage-link', [StorageLinkController::class, 'create']);
 
-    // access_management
+    // ============= Access Management ================
     // users
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index')->middleware('can:user_show');
     Route::post('/users', [AdminUserController::class, 'store'])->name('users.store')->middleware('can:user_create');
@@ -98,11 +98,26 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::put('/permissions/{id}', [AdminPermissionController::class, 'update'])->name('permissions.update')->middleware('can:permission_edit');
     Route::delete('/permissions/{id}', [AdminPermissionController::class, 'destroy'])->name('permissions.destroy')->middleware('can:permission_delete');
     
+    // menu
+    Route::get('/menu', [AdminMenuController::class, 'index'])->name('menus.index')->middleware('can:manage_menus');
+    Route::get('/menu/create', [AdminMenuController::class, 'create'])->name('menus.create')->middleware('can:menu_create');
+    Route::post('/menu', [AdminMenuController::class, 'store'])->name('menus.store')->middleware('can:menu_create');
+    Route::get('/menu/{id}', [AdminMenuController::class, 'show'])->name('menus.show')->middleware('can:menu_show');
+    Route::get('/menu/{id}/edit', [AdminMenuController::class, 'edit'])->name('menus.edit')->middleware('can:menu_edit');
+    Route::put('/menu/{id}', [AdminMenuController::class, 'update'])->name('menus.update')->middleware('can:menu_edit');
+    Route::delete('/menu/{id}', [AdminMenuController::class, 'destroy'])->name('menus.destroy')->middleware('can:menu_delete');
+    
+    
+    // ====================================
+
     // info
     Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
 
+
+    // ============== Master Data =======================
+    
     // supplier
-    Route::get('/supplier', [SupplierController::class, 'index'])->name('suppliers.index')->middleware('can:supplier_show');
+    Route::get('/supplier', [SupplierController::class, 'index'])->name('suppliers.index')->middleware('can:manage_suppliers');
     Route::get('/supplier/create', [SupplierController::class, 'create'])->name('suppliers.create')->middleware('can:supplier_create');
     Route::get('/supplier/import', [SupplierController::class, 'downloadTemplate'])->name('suppliers.template')->middleware('can:supplier_show');
     Route::post('/supplier/import', [SupplierController::class, 'import'])->name('suppliers.import')->middleware('can:supplier_create');

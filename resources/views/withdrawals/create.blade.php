@@ -53,8 +53,8 @@
             <input type="date" class="form-control" id="wd_date" name="wd_date" value="{{old('wd_date')}}">
           </div>
           <div class="form-group col-md-3">
-            <label for="wd_value">Jumlah</label>
-            <input type="number" class="form-control" id="wd_value" name="wd_value" value="{{old('wd_value')}}">
+            <label for="wd_value">Saldo</label>
+            <input type="text" class="form-control" id="wd_value" name="wd_value" value="0" readonly>
           </div>
         </div>
         <div class="form-row">
@@ -119,7 +119,23 @@
             },
             cache: true
         }
-    });
+    }).on("select2:select", function (e) {
+      let mID = e.params.data.id  
+      $.ajax({
+        type: "GET",
+        url: "/api/member/balance",
+        data: {
+          "member_id": mID
+        },
+        dataType: "json",
+        encode: true,
+      }).done(function (data) {
+        let wd_value = formatIDR(parseInt(data.balance), 0);
+        console.log(wd_value);
+        $('#wd_value').val(wd_value)
+      });
+
+    }); 
 
     $('#proof_of_withdrawal').on('change', function(event) {
       const file = event.target.files[0];

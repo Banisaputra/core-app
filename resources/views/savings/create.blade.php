@@ -18,7 +18,7 @@
         </div>
         
       </div>
-      <form action="{{ route('savings.store')}}" method="POST" enctype="multipart/form-data">
+      <form id="formSaving" action="{{ route('savings.store')}}" method="POST" enctype="multipart/form-data">
         @csrf
         <hr class="my-4">
         @if ($errors->any())
@@ -87,7 +87,7 @@
             <small>*Kode dibuat otomatis oleh sistem sesuai hari kerja</small>
           </div>
           <div class="col-md-6 text-right">
-            <button type="submit" class="btn btn-primary"><span class="fe fe-16 mr-2 fe-check-circle"></span>Simpan</button>
+            <button type="submit" class="btn btn-primary" id="savingSubmit"><span class="fe fe-16 mr-2 fe-check-circle"></span>Simpan</button>
           </div>
         </div>
       </form>
@@ -149,6 +149,11 @@
       const selected = $(this).find(':selected');
       const value = selected.data('value') || 0;
       $('#sv_value').val(value);
+    })
+
+    $('#formSaving').on('submit', function (e) {
+      $('#savingSubmit').prop('disabled', true);
+      showLoader();
     })
 
   });

@@ -291,6 +291,13 @@
       function hideLoader() {
         document.getElementById('loading-overlay').style.display = 'none';
       }
+      function formatIDR(value, decimal) {
+        return value.toLocaleString('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: decimal
+        });
+      }
     </script>
 
     {{-- page script --}}

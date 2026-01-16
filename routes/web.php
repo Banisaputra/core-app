@@ -159,6 +159,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/api/category/{id}/margin', [CategoryController::class, 'getMargin']);
     Route::get('/api/supplier/search', [SupplierController::class, 'search']);
     Route::get('/api/saving-type/search', [SavingTypeController::class, 'search']);
+    Route::get('/api/member/balance', [MemberController::class, 'getBalance']);
 
     // profile
     Route::get('/setting/profile', [UserController::class, 'profile'])->name('setting.profile');

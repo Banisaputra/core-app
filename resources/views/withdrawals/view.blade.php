@@ -95,7 +95,7 @@
                             <form action="{{ route('withdrawals.confirm')}}" method="POST">
                                 @csrf
                                 <input type="hidden" value="{{ $withdrawal->id }}" name="wd_id">
-                                <button type="submit" class="btn btn-primary" {{ $withdrawal->wd_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-check-circle"></span>Konfirmasi Simpanan</button>
+                                <button type="submit" class="btn btn-primary" {{ $withdrawal->wd_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-check-circle"></span>Konfirmasi Penarikan</button>
                             </form>
                         </div>
                         <div class="col-md-4 text-center">
@@ -103,7 +103,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <input type="hidden" value="{{ $withdrawal->id }}" name="wd_id">
-                                <button type="submit" class="btn btn-danger" {{ $withdrawal->wd_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-slash"></span>Batalkan Simpanan</button>
+                                <button type="submit" class="btn btn-danger" {{ $withdrawal->wd_state > 1 ? "disabled" : "" }}><span class="fe fe-16 mr-2 fe-slash"></span>Batalkan Penarikan</button>
                             </form>
                         </div>
                     </div>

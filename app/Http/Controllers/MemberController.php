@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Log;
 use Exception;
+use App\Models\Loan;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Member;
@@ -496,6 +497,30 @@ class MemberController extends Controller
             DB::rollback();
             return back()->with('error', 'Gagal menyimpan akun! Hubungi Administrator.')->withInput();
         }
+
+    }
+
+    public function getBalance(Request $request) {
+        
+        $member = Member::findOrFail($request->member_id);
+
+        $loan = Loan::with(['payments' => function ($query) {
+            $query->where('lp_state', 1);
+        }])
+        ->where('member_id', $member->id)
+        ->get();
+
+        $saldo = $member->balance;
+        foreach ($loan as $key => $pay) {
+            foreach ($pay->payments as $key => $settle) {
+                $saldo -= $settle->lp_total;
+            }
+        }
+        // dd($balance->balance);
+        return response()->json([
+        'member_id' => $member->id,
+        'balance' => $saldo,
+    ]);
 
     }
 

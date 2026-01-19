@@ -108,11 +108,11 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::delete('/menus/{id}', [AdminMenuController::class, 'destroy'])->name('menus.destroy')->middleware('can:menu_delete');
     
     
-    // ====================================
+    // ==#===============================#===
 
     // info
     Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
-
+    // ==#===============================#===
 
     // ============== Master Data =======================
     

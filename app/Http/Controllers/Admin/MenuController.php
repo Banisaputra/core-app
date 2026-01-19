@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Menu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
 class MenuController extends Controller
@@ -18,31 +19,89 @@ class MenuController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:100|unique:menus,name',
+            'route' => 'required|string|max:100|unique:menus,route',
+            'permission' => 'required|string|max:100|unique:menus,permission',
         ]);
 
-        $menu = Menu::create([
-            'name' => $request->name,
-            'route' => $request->route,
-            'icon' => $request->icon,
-            'order' => $request->order,
-            'permission' => $request->permisson,
-            'parent_id' => $request->parent_id,
-        ]);
+        if ($request->parent_id) {
+            $request->validate([
+                'parent_id' => 'exists:menus,id',
+            ]);
+        }
+        if ($request->order) {
+            $request->validate([
+                'order' => 'integer',
+            ]);
+        }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Menu baru berhasil ditambahkan.',
-            'data' => $menu
-        ]);
+        DB::beginTransaction();
+        try {
+
+            // cek parent
+            $parentMenu = null;
+            if ($request->parent_id) {
+                $parentMenu = Menu::find($request->parent_id);
+                if (!$parentMenu) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Menu Utama tidak ditemukan.',
+                    ], 404);
+                } else {
+                    // order terakhir dari parent
+                    $lastOrder = Menu::where('parent_id', $request->parent_id)->max('order');
+                    if (!$request->order) {
+                        $request->order = $lastOrder ? $lastOrder + 1 : 1;
+                    } else {
+                        // geser order menu lain jika ada yang sama
+                        Menu::where('parent_id', $request->parent_id)
+                            ->where('order', '>=', $request->order)
+                            ->increment('order');
+                    }
+                }
+            } else {
+                // order terakhir dari menu utama
+                $lastOrder = Menu::whereNull('parent_id')->max('order');
+                if (!$request->order) {
+                    $request->order = $lastOrder ? $lastOrder + 1 : 1;
+                } else {
+                    // geser order menu lain jika ada yang sama
+                    Menu::whereNull('parent_id')
+                        ->where('order', '>=', $request->order)
+                        ->increment('order');
+                }
+            }
+         
+            $menu = Menu::create([
+                'name' => $request->name,
+                'route' => $request->route,
+                'icon' => $request->icon,
+                'order' => $request->order,
+                'permission' => $request->permission,
+                'parent_id' => $request->parent_id,
+            ]);
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Menu baru berhasil ditambahkan.',
+                'data' => $menu
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat menyimpan menu, Hubungi administrator.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function edit($id) 
     {
-        $permission = Permission::findOrFail($id);
+        $menu = Menu::findOrFail($id);
 
         return response()->json([
             'status' => 'success',
-            'data' => $permission
+            'data' => $menu
         ]);
     }
 
@@ -50,30 +109,91 @@ class MenuController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:100|unique:menus,name,'.$id,
+            'route' => 'required|string|max:100|unique:menus,route,'.$id,
+            'permission' => 'required|string|max:100|unique:menus,permission,'.$id,
         ]);
 
-        $permission = Permission::findOrFail($id);
-        $permission->update([
-            'name' => $request->name,
-            'description' => $request->description,
-        ]);
+        if ($request->parent_id) {
+            $request->validate([
+                'parent_id' => 'exists:menus,id',
+            ]);
+        }
+        if ($request->order) {
+            $request->validate([
+                'order' => 'integer',
+            ]);
+        }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Izin akses berhasil diupdate.',
-            'data' => $permission
-        ]);
+        DB::beginTransaction();
+        try {
+            // cek parent
+            $parentMenu = null;
+            if ($request->parent_id) {
+                $parentMenu = Menu::find($request->parent_id);
+                if (!$parentMenu) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Menu Utama tidak ditemukan.',
+                    ], 404);
+                } else {
+                    // order terakhir dari parent
+                    $lastOrder = Menu::where('parent_id', $request->parent_id)->max('order');
+                    if (!$request->order) {
+                        $request->order = $lastOrder ? $lastOrder + 1 : 1;
+                    } else {
+                        // geser order menu lain jika ada yang sama
+                        Menu::where('parent_id', $request->parent_id)
+                            ->where('order', '>=', $request->order)
+                            ->increment('order');
+                    }
+                }
+            } else {
+                // order terakhir dari menu utama
+                $lastOrder = Menu::whereNull('parent_id')->max('order');
+                if (!$request->order) {
+                    $request->order = $lastOrder ? $lastOrder + 1 : 1;
+                } else {
+                    // geser order menu lain jika ada yang sama
+                    Menu::whereNull('parent_id')
+                        ->where('order', '>=', $request->order)
+                        ->increment('order');
+                }
+            }
+
+            $menu = Menu::findOrFail($id);
+            $menu->update([
+                'name' => $request->name,
+                'route' => $request->route,
+                'icon' => $request->icon,
+                'order' => $request->order,
+                'permission' => $request->permission,
+                'parent_id' => $request->parent_id
+            ]);
+
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Menu berhasil diupdate.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat update menu, Hubungi administrator.',
+                'error' => $e->getMessage()
+            ], 500);
+        } 
     }
 
     public function destroy(string $id)
     {
-        $permission = Permission::findOrFail($id);
-        if($permission) {
+        $menu = Menu::findOrFail($id);
+        if($menu) {
             // delete
-            $permission->delete();
+            $menu->delete();
         }
 
-        return redirect()->back()->with('success', "Izin akses berhasil dihapus.");
+        return redirect()->back()->with('success', "Menu berhasil dihapus.");
         
     }
 }

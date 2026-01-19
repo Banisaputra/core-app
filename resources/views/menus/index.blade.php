@@ -26,12 +26,35 @@
         </div>
         <div class="modal-body">
           <div class="form-group mb-3">
-            <label for="name">Nama Izin</label>
+            <label for="name">Nama</label>
             <input type="text" id="name" name="name" class="form-control" required>
           </div>
           <div class="form-group mb-3">
-            <label for="name">Dekripsi Izin</label>
-            <textarea id="description" name="description" class="form-control" rows="4"></textarea>
+            <label for="route">Route</label>
+            <input type="text" id="route" name="route" class="form-control" required>
+          </div>
+          <div class="form-group mb-3">
+            <label for="icon">Icon</label>
+            <input type="text" id="icon" name="icon" class="form-control">
+          </div>
+          <div class="form-group mb-3">
+            <label for="order">Urutan</label>
+            <input type="number" id="order" name="order" class="form-control">
+          </div>
+          <div class="form-group mb-3">
+            <label for="parent_id">Submenu</label>
+            <select id="parent_id" name="parent_id" class="form-control">
+              <option value="">Menu Utama</option>
+              @foreach ($menus as $menu)
+                @if (!($menu->parent_id))
+                  <option value="{{ $menu->id }}">{{ $menu->name }}</option>
+                @endif
+              @endforeach
+            </select>
+          </div>
+          <div class="form-group mb-3">
+            <label for="permission">Permission</label>
+            <input type="text" id="permission" name="permission" class="form-control" required>
           </div>
         </div>
         <div class="modal-footer">
@@ -159,16 +182,16 @@
     });
 
     $('#addModal').on('hidden.bs.modal', function () {
-      $('#formmenu')[0].reset();
-      $('#formmenu input[name="_method"]').remove();
-      $('#formmenu').attr('action', '/menus');
+      $('#formMenu')[0].reset();
+      $('#formMenu input[name="_method"]').remove();
+      $('#formMenu').attr('action', '/menus');
       $('#formErrors').addClass('d-none').find('#errorList').empty();
-      $('#formmenu #submitBtn').text('Save');
-      $('#formmenu #ModalLabel').text('Tambah menu');
+      $('#formMenu #submitBtn').text('Save');
+      $('#formMenu #ModalLabel').text('Tambah Menu');
     });
 
     // submit
-    $('#formmenu').on('submit', function(e) {
+    $('#formMenu').on('submit', function(e) {
       e.preventDefault();
       $('#submitBtn').prop('disabled', true).text('Saving...');
 
@@ -180,15 +203,15 @@
         data: formData,
         processData: false,
         contentType: false,
-        success: function(response) {
-          alert(response.message);
+        success: function(resp) {
+          alert(resp.message);
           $('#addModal').modal('hide');
           setTimeout(function() {
             location.reload();
           }, 500);
         },
         error: function(xhr) {
-          console.error(xhr.responseText);
+          // console.error(xhr.responseText);
 
           // Optionally show validation errors
           if (xhr.status === 422) {
@@ -220,30 +243,34 @@
       var id = $(this).data('id');
       
       $('#formErrors').addClass('d-none').find('#errorList').empty();
-      $('#formmenu')[0].reset();
-      $('#formmenu').attr('action', '/menus/' + id);
-      $('#formmenu #submitBtn').text('Update');
-      $('#formmenu #ModalLabel').text('Edit menu');
+      $('#formMenu')[0].reset();
+      $('#formMenu').attr('action', '/menus/' + id);
+      $('#formMenu #submitBtn').text('Update');
+      $('#formMenu #ModalLabel').text('Edit menu');
 
       // check _method
-      if (!$('#formmenu input[name="_method"]').length) {
-        $('#formmenu').append('<input type="hidden" name="_method" value="PUT">');
+      if (!$('#formMenu input[name="_method"]').length) {
+        $('#formMenu').append('<input type="hidden" name="_method" value="PUT">');
       } else {
-        $('#formmenu input[name="_method"]').val('PUT');
+        $('#formMenu input[name="_method"]').val('PUT');
       }
 
       $.ajax({
         url: '/menus/' + id + '/edit',
         method: 'GET',
-        success: function(response) {
+        success: function(resp) {
           
-          $('#formmenu #name').val(response.data.name);
-          $('#formmenu #description').val(response.data.description);
+          $('#formMenu #name').val(resp.data.name);
+          $('#formMenu #route').val(resp.data.route);
+          $('#formMenu #icon').val(resp.data.icon);
+          $('#formMenu #order').val(resp.data.order);
+          $('#formMenu #parent_id').val(resp.data.parent_id);
+          $('#formMenu #permission').val(resp.data.permission);
           $('#addModal').modal('show');
         },
         error: function(xhr) {
           alert('Gagal memuat data.');
-          console.error(xhr.responseText);
+          // console.error(xhr.responseText);
         }
       });
     });

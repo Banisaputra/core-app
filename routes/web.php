@@ -66,7 +66,7 @@ Route::middleware([LoginAuth::class])->group(function () {
         return Response::download($filePath);
     });
 
-    Route::get('/backup/download', [UserController::class, 'downloadDB'])->name('databases.backup');
+    Route::get('/backup/download', [UserController::class, 'downloadDB'])->name('databases.backup')->middleware('can:manage_databases');
     
     // storage link
     Route::get('/create-storage-link', [StorageLinkController::class, 'create']);
@@ -99,13 +99,13 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::delete('/permissions/{id}', [AdminPermissionController::class, 'destroy'])->name('permissions.destroy')->middleware('can:permission_delete');
     
     // menu
-    Route::get('/menu', [AdminMenuController::class, 'index'])->name('menus.index')->middleware('can:manage_menus');
-    Route::get('/menu/create', [AdminMenuController::class, 'create'])->name('menus.create')->middleware('can:menu_create');
-    Route::post('/menu', [AdminMenuController::class, 'store'])->name('menus.store')->middleware('can:menu_create');
-    Route::get('/menu/{id}', [AdminMenuController::class, 'show'])->name('menus.show')->middleware('can:menu_show');
-    Route::get('/menu/{id}/edit', [AdminMenuController::class, 'edit'])->name('menus.edit')->middleware('can:menu_edit');
-    Route::put('/menu/{id}', [AdminMenuController::class, 'update'])->name('menus.update')->middleware('can:menu_edit');
-    Route::delete('/menu/{id}', [AdminMenuController::class, 'destroy'])->name('menus.destroy')->middleware('can:menu_delete');
+    Route::get('/menus', [AdminMenuController::class, 'index'])->name('menus.index')->middleware('can:manage_menus');
+    Route::get('/menus/create', [AdminMenuController::class, 'create'])->name('menus.create')->middleware('can:menu_create');
+    Route::post('/menus', [AdminMenuController::class, 'store'])->name('menus.store')->middleware('can:menu_create');
+    Route::get('/menus/{id}', [AdminMenuController::class, 'show'])->name('menus.show')->middleware('can:menu_show');
+    Route::get('/menus/{id}/edit', [AdminMenuController::class, 'edit'])->name('menus.edit')->middleware('can:menu_edit');
+    Route::put('/menus/{id}', [AdminMenuController::class, 'update'])->name('menus.update')->middleware('can:menu_edit');
+    Route::delete('/menus/{id}', [AdminMenuController::class, 'destroy'])->name('menus.destroy')->middleware('can:menu_delete');
     
     
     // ====================================

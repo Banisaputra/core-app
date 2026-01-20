@@ -37,14 +37,19 @@ class Saving extends Model
         return $prefix . $dateCode . '-' . str_pad($counter, 4, '0', STR_PAD_LEFT);
     }
     
-    public static function generateCodeRev($periode = null)
+    public static function generateCodeRev($periode = null, $counter = null)
     {
         $prefix = 'SVN-';
         $dateCode = $periode ?? date('ym'); // ex: 2505
 
+        if ($counter !== null) {
+            return $prefix . $dateCode . '-' . str_pad($counter, 4, '0', STR_PAD_LEFT);
+        }
+
         // Ambil entri terakhir di bulan ini
         $last = self::whereRaw("DATE_FORMAT(sv_date, '%y%m') = ?", [$dateCode])
                     ->orderByDesc('sv_code')
+                    ->where('sv_code', 'SVN-2511-0045')
                     ->first();
         $counter = 1;
         

@@ -479,12 +479,13 @@ class SavingController extends Controller
         DB::beginTransaction();
         try {
             $count = 0;
+            $sv_count = 46;
             foreach ($ids as $id) {
                 $found = false;
                 $saving = Saving::with(['member'])->findOrFail($id);
                 if ($saving->sv_state <> 99 ) {
                     if ($saving->sv_date == 20251001) {
-                        $saving->sv_code = Saving::generateCodeRev('2511');
+                        $saving->sv_code = Saving::generateCodeRev('2511', $sv_count++);
                         $saving->sv_date = 20251102;
                         $found = true;
                         } else if ($saving->sv_date == 20251101) {

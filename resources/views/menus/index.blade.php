@@ -239,7 +239,7 @@
     });
 
     // edit
-    $('#menus tbody .btnEdit').on('click', function () {
+    $('#menus tbody').on('click', '.btnEdit', function () {
       var id = $(this).data('id');
       
       $('#formErrors').addClass('d-none').find('#errorList').empty();

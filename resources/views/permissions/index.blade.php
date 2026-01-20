@@ -210,7 +210,7 @@
     });
 
     // edit
-    $('#permissions tbody .btnEdit').on('click', function () {
+    $('#permissions tbody').on('click', '.btnEdit', function () {
       var id = $(this).data('id');
       
       $('#formErrors').addClass('d-none').find('#errorList').empty();
@@ -237,7 +237,7 @@
         },
         error: function(xhr) {
           alert('Gagal memuat data.');
-          console.error(xhr.responseText);
+          // console.error(xhr.responseText);
         }
       });
     });

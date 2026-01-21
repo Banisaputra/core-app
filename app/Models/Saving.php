@@ -16,7 +16,7 @@ class Saving extends Model
         return $this->belongsTo(Member::class);
     }
 
-    public function svType() 
+    public function svType()
     {
         return $this->belongsTo(SavingType::class, 'sv_type_id');
     }
@@ -25,17 +25,33 @@ class Saving extends Model
     {
         $prefix = 'SVN-';
         $dateCode = $periode ?? date('ym'); // ex: 2505
-
         // Ambil entri terakhir di bulan ini
-        $last = self::whereRaw("DATE_FORMAT(created_at, '%y%m') = ?", [$dateCode])
-                    ->orderByDesc('id')
+        $last = self::whereRaw("DATE_FORMAT(sv_date, '%y%m') = ?", [$dateCode])
+        ->orderByDesc('sv_code')
+        ->first();
+        $counter = 1;
+         
+        if ($last && preg_match('/\d{4}$/', $last->sv_code, $match)) {
+            $counter = intval($match[0]) + 1;
+        }
+        return $prefix . $dateCode . '-' . str_pad($counter, 4, '0', STR_PAD_LEFT);
+    }
+    
+    public static function generateCodeRev($periode = null, $p_count = null)
+    {
+        $prefix = 'SVN-';
+        $dateCode = $periode ?? date('ym'); // ex: 2505
+        
+        // Ambil entri terakhir di bulan ini
+        $last = self::whereRaw("DATE_FORMAT(sv_date, '%y%m') = ?", [$dateCode])
+                    ->orderByDesc('sv_code')
+                    ->where('sv_code', $prefix . $dateCode . '-' . str_pad($p_count, 4, '0', STR_PAD_LEFT))
                     ->first();
         $counter = 1;
         
         if ($last && preg_match('/\d{4}$/', $last->sv_code, $match)) {
             $counter = intval($match[0]) + 1;
         }
-
         return $prefix . $dateCode . '-' . str_pad($counter, 4, '0', STR_PAD_LEFT);
     }
 

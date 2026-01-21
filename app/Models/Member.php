@@ -64,7 +64,7 @@ class Member extends Model
         
         
         if ($selisihTahun < 1) {
-            $max_tenor = round((($loanPolicy['max_agunan_0_1']['value'] * 1) / $min_angsur)??0 ,0);
+            $max_tenor = round((($loanPolicy['max_agunan_0_1']['value'] * 1) / $min_angsur)?? 0 ,0);
             $tenor = round($loan / $min_angsur, 0);
             if($tenor > $max_tenor) $valid = false;
             $angsuran = $loan / $tenor;
@@ -122,7 +122,7 @@ class Member extends Model
         $maxBayar = 0;
         if (strtoupper($jabatan->name) == "STAFF") {
             $maxBayar = $loanPolicy['max_potong_gaji_staff']['value'];
-        } else if (strtoupper($jabatan->name) == "OPERATOR") {
+        } else if (strtoupper($jabatan->name) == "PRODUKSI") {
             $maxBayar = $loanPolicy['max_potong_gaji_operator']['value'];
         }
         

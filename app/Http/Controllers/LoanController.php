@@ -14,16 +14,295 @@ use App\Models\AgunanPolicy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class LoanController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $loans = Loan::with('member')->latest()->paginate();
-        return view('loans.index', compact('loans'));
+         if ($request->ajax()) {
+            $query = Loan::with('member');
+
+            // filter tanggal
+            if ($request->filled('date_start') && $request->filled('date_end')) {
+                $query->whereBetween('loan_date', [
+                    date('Ymd', strtotime($request->date_start)),
+                    date('Ymd', strtotime($request->date_end))
+                ]);
+            }
+            // filter status
+            if ($request->filled('status')) {
+                $query->where('loan_state', $request->status);
+            }
+    
+            // filter jenis
+            if ($request->filled('type')) {
+                $query->where('loan_type', $request->type);
+            }
+
+            $columns = [
+                'id',
+                'type',
+                'loan_date',
+                'member_id',
+                'loan_type',
+                'loan_value',
+            ];
+
+            $search = $request->input('search.value');
+            $orderColumnIndex = $request->order[0]['column'];
+            $orderColumn = $columns[$orderColumnIndex] ?? 'id';
+            $orderDir = $request->order[0]['dir'] ?? 'desc';
+
+            $all_count = $query->count();
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('loan_value', 'like', "%{$search}%")
+                    ->orWhere('loan_code', 'like', "%{$search}%")
+                    ->orWhere('loan_date', 'like', "%{$search}%")
+                    ->orWhere('loan_type', 'like', "%{$search}%")
+                    ->orWhereHas('member', function ($m) use ($search) {
+                        $m->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('member', function ($m) use ($search) {
+                        $m->where('nip', 'like', "%{$search}%");
+                    });
+                });
+            }
+
+            $totalFiltered = $query->count();
+
+            $data = $query
+                ->orderBy($orderColumn, $orderDir)
+                ->offset($request->start)
+                ->limit($request->length == -1 ? $all_count : $request->length)
+                ->get(); 
+                
+            $start = $request->start;
+            $formatted = [];
+            foreach ($data as $index => $loan) {
+
+                // state
+                $stateText = match($loan->loan_state) {
+                    99 => '<span class="text-danger">Ditolak</span>',
+                    3  => '<span class="text-success">Selesai</span>',
+                    2  => '<span class="text-success">Disetujui</span>',
+                    default => '<span class="text-info">Pengajuan</span>',
+                };
+
+                // Action button
+                $action = '
+                    <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="text-muted sr-only">Action</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="'.route('loans.show', $loan->id).'">View</a>
+                        <a class="dropdown-item" href="'.route('loans.edit', $loan->id).'">Edit</a>
+                    </div>
+                ';
+                
+                $formatted[] = [
+                    'id' => $loan->id,
+                    'rownum' => $start + $index + 1,
+                    'loan_code' => $loan->loan_code,
+                    'member' => [
+                        'nip' => $loan->member->nip ?? '-',
+                        'name' => $loan->member->name ?? '-',
+                    ],
+                    'loan_date' => date('d M Y', strtotime($loan->loan_date)),
+                    'due_date' => date('d M Y', strtotime($loan->due_date)),
+                    'type' => $loan->loan_type,
+                    'loan_value' => number_format($loan->loan_value),
+                    'state' => $stateText,
+                    'action' => $action,
+                ];
+            }
+
+            return response()->json([
+                "draw" => intval($request->draw),
+                "recordsTotal" => Loan::count(),
+                "recordsFiltered" => $totalFiltered,
+                "data" => $formatted,
+            ]);
+        }
+
+        // $loans = Loan::with('member')->orderBy('id','desc')->get();
+        return view('loans.index');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        $file = $request->file('file');
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+
+        $success = 0;
+        $failed = [];
+        $template_title = "";
+        foreach ($rows as $index => $row) {
+            // cek template
+            if ($index == 0) $template_title = strtoupper($row[0]);
+            if ($template_title !== "TEMPLATE INJECT PINJAMAN") {
+                $failed[] = ['row' => $index + 1, 'errors' => ["Template tidak valid"]];
+                break;
+            } 
+            if ($index <= 2) continue; // skip header and info 
+
+            $data = [
+                'nip' => $row[0] ?? null,
+                'loan_date' => $row[1] ?? null,
+                'loan_tenor' => $row[2] ?? null,
+                'loan_value' => $row[3] ?? null,
+                'interest_percent' => $row[4] ?? null,
+                'loan_payment' => $row[5] ?? null,
+                'with_agunan' => $row[6] ?? null,
+                'agunan_type' => $row[7] ?? null,
+                'agunan_docYear' => $row[8] ?? null,
+                'agunan_docNumber' => $row[9] ?? null,
+                'agunan_docDetail' => $row[10] ?? null,
+            ];
+
+            $arr_time = explode('.', $data['loan_date']);
+
+            if (count($arr_time) !== 3) {
+                $failed[] = ['row' => $index + 1, 'errors' => ["Format tanggal tidak valid!"]];
+                continue;
+            }
+
+            $timeStr = $arr_time[2] . '-' . $arr_time[1] . '-' . $arr_time[0];
+            
+            $loan_date = date('Ymd', strtotime($timeStr));
+            $member = Member::where('nip', $data['nip'])->first();
+
+            if ($member == null) {
+                $failed[] = ['row' => $index + 1, 'errors' => ["NIP tidak ditemukan"]];
+                continue;
+            }
+            // cek pinjaman(uang) exists
+            $loan_exists = Loan::where('member_id', $member->id)
+            ->where('loan_state', 2)->where('loan_type', 'UANG')->count();
+
+            if ($loan_exists > 0) {
+                $failed[] = ['row' => $index + 1, 'errors' => ["Pengguna memiliki pinjaman aktif yang belum diselesaikan"]];
+                continue;
+            }
+
+            DB::beginTransaction();
+            try {
+                if ($member) {
+                    $loan_code = Loan::generateCode();
+                    $loan_value = Loan::formatIdrToNumeric($data['loan_value']);
+                    
+                    $cutOff = Policy::where('doc_type', 'GENERAL')
+                    ->where('pl_name', 'cut_off_bulanan')->first();
+
+                    $firstAngsuran = Loan::hitungAngsuranPertama($loan_date, $cutOff->pl_value)->format('Ymd');
+
+                    // check due date
+                    $date = new DateTime($firstAngsuran);
+                    $date->add(new DateInterval('P' . $data['loan_tenor'] . 'M'));
+                    $dueDate = $date->format('Ymd');
+
+                     
+                    $is_agunan = strtoupper($data['with_agunan']) == "YA" ? true : false;
+                    
+                    if ($is_agunan) { 
+
+                        $typeAgunan = strtoupper($data['agunan_type']);
+                        $yearAgunan = (int) $data['agunan_docYear'];
+                        $numberAgunan = strtoupper($data['agunan_docNumber']);
+                        $detailAgunan = $data['agunan_docDetail'];
+                     
+                    }
+   
+                    //insert loan
+                    $loan = Loan::create([
+                        'member_id' => $member->id,
+                        'loan_type' => "UANG",
+                        'loan_code' => $loan_code,
+                        'loan_date' => $loan_date,
+                        'loan_tenor' => $data['loan_tenor']*1,
+                        'loan_value' => $loan_value,
+                        'cut_off_record' => $cutOff->pl_value,
+                        'interest_percent' => $data['interest_percent'],
+                        'due_date' => $dueDate,
+                        'loan_state' => 2,
+                        'created_by' => auth()->id() ?? 1,
+                        'updated_by' => auth()->id() ?? 1,
+                    ]);
+
+                    if ($loan && $is_agunan) {
+                        $lag = LoanAgunan::create([
+                            'loan_id' => $loan->id,
+                            'agunan_type' => $typeAgunan,
+                            'doc_year' => $yearAgunan,
+                            'doc_number' => $numberAgunan,
+                            'doc_detail' => $detailAgunan,
+                            'updated_by' => auth()->id() ?? 1,
+                            'created_by' => auth()->id() ?? 1,
+                        ]);
+
+                        $loan->ref_doc_id = $lag->id;
+                        $loan->save();
+                    }
+            
+                    // insert loan payment
+                    $pay_finish = $data['loan_payment']*1;
+
+                    $loan_total = $loan->loan_value;
+                    $ln_date = $firstAngsuran;
+                    for ($i=1; $i <= ($data['loan_tenor']*1) ; $i++) { 
+                        $lp_val = round($loan->loan_value / $data['loan_tenor'], 0);
+                        $lp_intr = round(($loan->loan_value*$loan->interest_percent)/100, 0);
+                        $ln_remain = round($loan_total - $lp_val);
+                        $pay_date = new DateTime($ln_date);
+                        $lp_date = $pay_date->add(new DateInterval('P1M'))->format('Ymd');
+                        LoanPayment::create([
+                            'lp_code' => LoanPayment::generateCode($lp_date),
+                            'loan_id' => $loan->id,
+                            'lp_date' => $lp_date,
+                            'lp_value' => $lp_val,
+                            'loan_interest' => $lp_intr,
+                            'loan_remaining' => $ln_remain,
+                            'lp_total' => ($lp_val+$lp_intr),
+                            'tenor_month' => $i,
+                            'lp_state' => $i <= $pay_finish ? 2 : 1,
+                            'remark' => '',
+                            'proof_of_payment' => '',
+                            'lp_forfeit' => 0,
+                            'created_by' => auth()->id() ?? 1,
+                            'updated_by' => auth()->id() ?? 1,
+                
+                        ]);
+                        $loan_total -= $lp_val;
+                        $ln_date = $lp_date;
+                        
+                    }
+                        
+                } else {
+                    $failed[] = ['row' => $index + 1, 'errors' => ["NIP tidak ditemukan"]];
+                    continue;
+                }
+                DB::commit();
+            } catch (\Throwable $th) {
+                DB::rollback();
+                $failed[] = ['row' => $index + 1, 'errors' => [" catch error: ".$th->getMessage()]];
+                continue;
+            }
+
+            $success++;
+        }
+
+        return redirect()->back()->with('success', "$success data berhasil diimport")->with('failed', $failed);
     }
 
     /**
@@ -179,7 +458,7 @@ class LoanController extends Controller
             ]);
 
             if ($loan && $is_agunan) {
-                LoanAgunan::create([
+                $lag = LoanAgunan::create([
                     'loan_id' => $loan->id,
                     'agunan_type' => $request->ln_agunan,
                     'doc_year' => $request->ln_docYear,
@@ -188,6 +467,9 @@ class LoanController extends Controller
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
+
+                $loan->ref_doc_id = $lag->id;
+                $loan->save();
             }
     
             // insert loan payment
@@ -195,7 +477,7 @@ class LoanController extends Controller
             $ln_date = $firstAngsuran;
             for ($i=1; $i <= $request->loan_tenor ; $i++) { 
                 $lp_val = round($loan->loan_value / $loan->loan_tenor, 0);
-                $lp_intr = round(($lp_val*$loan->interest_percent)/100, 0);
+                $lp_intr = round(($loan->loan_value*$loan->interest_percent)/100, 0);
                 $ln_remain = round($loan_total - $lp_val);
                 $pay_date = new DateTime($ln_date);
                 $lp_date = $pay_date->add(new DateInterval('P1M'))->format('Ymd');
@@ -236,7 +518,7 @@ class LoanController extends Controller
     public function show(string $id)
     {
         $data = [
-            "loan" => Loan::with('member','payments')->findOrFail($id),
+            "loan" => Loan::with('member','payments', 'loanAgunan')->findOrFail($id),
         ];
 
         return view('loans.view', $data);
@@ -244,7 +526,8 @@ class LoanController extends Controller
 
     public function edit(string $id)
     {
-        $loan = Loan::with('member')->findOrFail($id);
+        $loan = Loan::with('member', 'loanAgunan')->findOrFail($id);
+        // dd($loan);
         return view('loans.edit', compact('loan'));
     }
 

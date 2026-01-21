@@ -33,16 +33,17 @@ class PosController extends Controller
     {
         $request->validate([
             'payment_type' => 'required|in:CASH,DEBIT,CREDIT,TRANSFER,EWALLET',
+            'member_id' => 'required|integer|exists:members,id',
+            'items' => 'required|array|min:1',
+            'items.*.price' => 'required|numeric|min:0',
+            'items.*.qty' => 'required|integer|min:1',
+            'total' => 'required|numeric|min:0',
         ]);
+
         $payment_type = $request->payment_type;
 
         if ($payment_type == "CASH") {
             $request->validate([
-                'member_id' => 'required|integer|exists:members,id',
-                'items' => 'required|array|min:1',
-                'items.*.price' => 'required|numeric|min:0',
-                'items.*.qty' => 'required|integer|min:1',
-                'total' => 'required|numeric|min:0',
                 'received' => 'required|numeric|min:'.max($request->total, 0),
                 'change' => 'required|numeric|min:0',
             ]);
@@ -52,11 +53,6 @@ class PosController extends Controller
 
         } else if ($payment_type == "CREDIT") {
             $request->validate([
-                'member_id' => 'required|integer|exists:members,id',
-                'items' => 'required|array|min:1',
-                'items.*.price' => 'required|numeric|min:0',
-                'items.*.qty' => 'required|integer|min:1',
-                'total' => 'required|numeric|min:0',
                 'tenor' => 'required|numeric|min:1',
                 'crInterest' => 'required|numeric|min:0',
             ]);
@@ -65,12 +61,11 @@ class PosController extends Controller
             $tenor = $request->tenor;
         } 
 
-        $items = $request->items;
-        $total = $request->total;
-
-        $sa_code = POS::generateSalesCode();
         // Store the sale
         DB::beginTransaction();
+        $items = $request->items;
+        $total = $request->total;
+        $sa_code = POS::generateSalesCode();
 
         try {
             // Store the sale and get the ID
@@ -84,6 +79,7 @@ class PosController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
             // Insert sales details
             $salesDetails = [];
             foreach ($items as $item) {
@@ -118,18 +114,22 @@ class PosController extends Controller
                     ]);
                 }
 
-                if ($currentLoan['total_pokok'] > $currentLoan['maxPokok']) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Angsuran Pokok melebihi batas maksimal '.number_format((int) $currentLoan['maxPokok'],0).' per anggota',
-                        'receipt' => []
-                    ]);
-                }
+                // if ($currentLoan['total_pokok'] > $currentLoan['maxPokok']) {
+                //     return response()->json([
+                //         'success' => false,
+                //         'message' => 'Pinjaman Pokok melebihi batas maksimal '.number_format((int) $currentLoan['maxPokok'],0).' per anggota',
+                //         'receipt' => []
+                //     ]);
+                // }
 
                 $loan_code = Loan::generateCode();
                 $date = new DateTime(now());
                 $date->add(new DateInterval('P' . $request->tenor . 'M'));
                 $dueDate = $date->format('Ymd');
+
+                // if (Loan::where('ref_sale_id', $saleId)->exists()) {
+                //     throw new Exception('Pinjaman sudah ada untuk penjualan ini.');
+                // }
 
                 $loan = Loan::create([
                     'member_id' => $request->member_id,

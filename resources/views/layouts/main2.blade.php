@@ -28,6 +28,12 @@
     @yield('page_css')
   </head>
   <body class="vertical dark ">
+     <div id="loading-overlay" style="display:none;">
+      <div class="loading-box">
+        <div class="spinner"></div>
+        <p>Sedang memproses data…</p>
+      </div>
+    </div>
     <div class="wrapper">
       
       {{-- navabar --}}
@@ -91,6 +97,7 @@
     <script src="{{ asset('fedash/js/dropzone.min.js') }}"></script>
     <script src="{{ asset('fedash/js/uppy.min.js') }}"></script>
     <script src="{{ asset('fedash/js/quill.min.js') }}"></script>
+
     
     {{-- page script --}}
     @yield('page_script')

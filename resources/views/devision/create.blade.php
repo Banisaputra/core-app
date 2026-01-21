@@ -35,7 +35,7 @@
         </div>
       @endif
       
-      <form action={{ route('devisions.store') }} method="POST" id="form-category" enctype="multipart/form-data">
+      <form action={{ route('devision.store') }} method="POST" id="form-category" enctype="multipart/form-data">
         @csrf
         <div class="form-row">
           <div class="form-group col-md-6">

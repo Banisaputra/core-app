@@ -108,57 +108,55 @@
         </div>
         <hr class="my-4">
         <div class="row mb-2">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="ln_agunan">Jaminan Pinjaman</label>
-                  <select class="custom-select" name="ln_agunan" id="ln_agunan" disabled>
-                    <option value="">-- Pilih Jaminan</option>
-                    <option value="MOTOR">BPKB MOTOR</option>
-                    <option value="MOBIL">BPKB MOBIL</option>
-                    <option value="SERTIFIKAT">SERTIFIKAT</option>
-                  </select>
-              </div>
-              <div class="form-row">
-                  <div class="form-group col-md-6">
-                    <label for="ln_docYear">Tahun</label>
-                    <input type="number" class="form-control" id="ln_docYear" name="ln_docYear" value="{{ old('ln_docYear')}}" disabled>
-                  </div>
-                  <div class="form-group col-md-6">
-                    <label for="ln_docNumber">Nomor Dokumen</label>
-                    <input type="text" class="form-control" id="ln_docNumber" name="ln_docNumber" value="{{ old('ln_docNumber')}}" disabled>
-                  </div>
-              </div>
-              <div class="form-group">
-                <label for="ln_docDetail">Detail Dokumen</label>
-                <textarea class="form-control" id="ln_docDetail" name="ln_docDetail" rows="3" disabled>{{ old('ln_docDetail')}}</textarea>
-              </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="ln_agunan">Jaminan Pinjaman</label>
+                <select class="custom-select" name="ln_agunan" id="ln_agunan" disabled>
+                  <option value="">-- Pilih Jaminan</option>
+                  <option value="MOTOR">BPKB MOTOR</option>
+                  <option value="MOBIL">BPKB MOBIL</option>
+                  <option value="SERTIFIKAT">SERTIFIKAT</option>
+                </select>
             </div>
-            <div class="col-md-6">
-              <div class="custom-control custom-switch mb-3">
-                <input type="checkbox" class="custom-control-input" id="cbAgunan" name="cbAgunan">
-                <label class="custom-control-label" for="cbAgunan">Aktifkan jika menggunakan agunan</label>
-              </div>
-              <p class="mb-2">Syarat Pinjaman</p>
-              <p class="small text-muted mb-2"> pengajuan pinjaman tanpa agunan:</p>
-              <ul class="small text-muted pl-4 mb-2">
-                <li>Kepesertaan Anggota < 1 tahun max. 2.000.000,-</li>
-                <li>Kepesertaan Anggota < 5 tahun max. 3.500.000,-</li>
-                <li>Kepesertaan Anggota > 5 tahun max. 5.500.000,-</li>
-                <li>Maksimum angsuran 12x</li>
-              </ul>
-              <p class="small text-muted mb-2"> pengajuan pinjaman dengan agunan:</p>
-              <ul class="small text-muted pl-4 mb-0">
-                <li>BPKB motor tahun 2010-1025 max. 8.000.000,-</li>
-                <li>BPKB motor tahun 2016-2020 max. 10.000.000,-</li>
-                <li>BPKB motor tahun 2020-2022 max. 12.000.000,-</li>
-                <li>BPKB motor tahun 2023-2025 max. 15.000.000,-</li>
-                <li>Khusus BPKB mobil max. 15.000.000,-</li>
-                <li>Maksimum angsuran 36x</li>
-              </ul>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="ln_docYear">Tahun</label>
+                  <input type="number" class="form-control" id="ln_docYear" name="ln_docYear" value="{{ old('ln_docYear')}}" disabled>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="ln_docNumber">Nomor Dokumen</label>
+                  <input type="text" class="form-control" id="ln_docNumber" name="ln_docNumber" value="{{ old('ln_docNumber')}}" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+              <label for="ln_docDetail">Detail Dokumen</label>
+              <textarea class="form-control" id="ln_docDetail" name="ln_docDetail" rows="3" disabled>{{ old('ln_docDetail')}}</textarea>
             </div>
           </div>
-         
-
+          <div class="col-md-6">
+            <div class="custom-control custom-switch mb-3">
+              <input type="checkbox" class="custom-control-input" id="cbAgunan" name="cbAgunan">
+              <label class="custom-control-label" for="cbAgunan">Aktifkan jika menggunakan agunan</label>
+            </div>
+            <p class="mb-2">Syarat Pinjaman</p>
+            <p class="small text-muted mb-2"> pengajuan pinjaman tanpa agunan:</p>
+            <ul class="small text-muted pl-4 mb-2">
+              <li>Kepesertaan Anggota < 1 tahun max. 2.000.000,-</li>
+              <li>Kepesertaan Anggota < 5 tahun max. 3.500.000,-</li>
+              <li>Kepesertaan Anggota > 5 tahun max. 5.500.000,-</li>
+              <li>Maksimum angsuran 12x</li>
+            </ul>
+            <p class="small text-muted mb-2"> pengajuan pinjaman dengan agunan:</p>
+            <ul class="small text-muted pl-4 mb-0">
+              <li>BPKB motor tahun 2010-1025 max. 8.000.000,-</li>
+              <li>BPKB motor tahun 2016-2020 max. 10.000.000,-</li>
+              <li>BPKB motor tahun 2020-2022 max. 12.000.000,-</li>
+              <li>BPKB motor tahun 2023-2025 max. 15.000.000,-</li>
+              <li>Khusus BPKB mobil max. 15.000.000,-</li>
+              <li>Maksimum angsuran 36x</li>
+            </ul>
+          </div>
+        </div> 
         <hr class="my-4">
         <div class="form-row">
           <div class="col-md-6">

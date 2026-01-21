@@ -34,10 +34,13 @@ class WithdrawalController extends Controller
      */
     public function store(Request $request)
     {
+        $request->merge([
+            'wd_value' => preg_replace('/[^\d]/', '', $request->wd_value)
+        ]);
         $request->validate([
             'member_id' => 'required|integer|exists:members,id',
             'wd_date' => 'required|date',
-            'wd_value' => 'required|integer',
+            'wd_value' => ['required','numeric'],
             'remark' => 'required|string',
             'proof_of_withdrawal' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -168,14 +171,13 @@ class WithdrawalController extends Controller
         ]);
 
         $withdrawal = Withdrawal::with(['member'])->findOrFail($request->wd_id);
-        if ($withdrawal->wd_state != 1) return redirect()->back()->with('error', 'Dokumen Penarikan tidak valid, atau sudah pernah dikonfrimasi');
+        if ($withdrawal->wd_state != 1) return redirect()->back()->with('error', 'Dokumen Penarikan tidak valid, atau sudah pernah dikonfrimasi.');
         
         $loan = Loan::with(['payments' => function ($query) {
             $query->where('lp_state', 1);
         }])
         ->where('member_id', $withdrawal->member_id)
         ->get();
-
 
         foreach ($loan as $key => $pay) {
             foreach ($pay->payments as $key => $settle) {

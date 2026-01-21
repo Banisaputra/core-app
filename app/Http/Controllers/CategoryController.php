@@ -102,10 +102,13 @@ class CategoryController extends Controller
             $parent = $request->ct_parent;
         }
 
+        $ppn_percent = str_replace(",", ".", $request->ppn_percent ?? 0);
+        $margin_percent = str_replace(",", ".", $request->margin_percent ?? 0);
+
         $category->code = $request->code;
         $category->name = $request->name;
-        $category->ppn_percent = $request->ppn_percent ?? 0;
-        $category->margin_percent = $request->margin_percent ?? 0;
+        $category->ppn_percent = $ppn_percent;
+        $category->margin_percent = $margin_percent;
         $category->margin_price = $request->margin_price ?? 0;
         $category->is_parent = $is_parent;
         $category->parent_id = $parent;
@@ -174,11 +177,10 @@ class CategoryController extends Controller
         foreach ($rows as $index => $row) {
             // cek template
             if ($index == 0) $template_title = strtoupper($row[0]);
-            if ($template_title !== "TEMPLATE MASTER KATEGORI") {
+            if ($template_title !== "TEMPLATE MASTER ANGGOTA") {
                 $failed[] = ['row' => $index + 1, 'errors' => ["Template tidak valid"]];
                 break;
             } 
-
             if ($index <= 2) continue; // skip header and info 
             $data = [
                 'code' => $row[0] ?? null,

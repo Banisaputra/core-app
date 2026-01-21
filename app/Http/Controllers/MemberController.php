@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Log;
 use Exception;
+use App\Models\Loan;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Member;
@@ -30,7 +31,7 @@ class MemberController extends Controller
 {
     public function index()
     {
-        $members = Member::with('user', 'position', 'devision')->latest()->paginate();
+        $members = Member::with('user', 'position', 'devision')->get();
         return view('members.index', compact('members'));
     }
 
@@ -251,6 +252,8 @@ class MemberController extends Controller
 
     public function import(Request $request)
     {
+        ini_set('max_execution_time', 300); 
+
         $request->validate([
             'file' => 'required|mimes:xlsx,xls'
         ]);
@@ -271,6 +274,7 @@ class MemberController extends Controller
                 break;
             } 
             if ($index <= 2) continue; // skip header and info 
+
             $data = [
                 'nip' => $row[0] ?? null,
                 'position' => $row[1] ?? null,
@@ -287,6 +291,10 @@ class MemberController extends Controller
             ];
 
             $arr_time = explode('.', $data['date_joined']);
+            if (count($arr_time) !== 3) {
+                $failed[] = ['row' => $index + 1, 'errors' => ["Tanggal bergabung tidak valid"]];
+                continue;
+            }
             $joined = date('Ymd', strtotime($arr_time[0].$arr_time[1].$arr_time[2]));
 
             $mExists = Member::where('nip', $data['nip'])->first();
@@ -318,11 +326,10 @@ class MemberController extends Controller
             $email_verify = null;
             $is_active = 0;
             if($data['accountGenerate'] == "YA") {
-                $password = Hash::make($request->email);
+                $password = Hash::make($data['email']);
                 $email_verify = now();
                 $is_active = 1;
             }
-
             DB::beginTransaction();
             try {
                 if ($mExists) {
@@ -331,9 +338,10 @@ class MemberController extends Controller
                         'name' => $data['name'],
                         'email' => $data['email'],
                         'password' => $password,
-                        'email_verified_at' => $email_verify
+                        'email_verified_at' => $email_verify,
+                        'is_transactional' => $is_active
                     ]);
-
+    
                     $mExists->update([
                         'position_id' => $position->id,
                         'devision_id' => $devision->id,
@@ -343,7 +351,7 @@ class MemberController extends Controller
                         'no_kk' => $data['no_kk'],
                         'no_ktp' => $data['no_ktp'],
                         'address' => $data['address'],
-                        'date_joined' => $data['date_joined'],
+                        'date_joined' => $joined,
                         'updated_by' => auth()->id(),
                     ]);
                 } else {
@@ -351,9 +359,10 @@ class MemberController extends Controller
                         'name' => $data['name'],
                         'email' => $data['email'],
                         'password' => $password,
-                        'email_verified_at' => $email_verify
+                        'email_verified_at' => $email_verify,
+                        'is_transactional' => $is_active
                     ]);
-    
+        
                     $member = Member::create([
                         'user_id' => $user->id,
                         'nip' => $data['nip'],
@@ -374,6 +383,7 @@ class MemberController extends Controller
             } catch (\Throwable $th) {
                 DB::rollback();
             }
+
 
             $success++;
         }
@@ -487,6 +497,30 @@ class MemberController extends Controller
             DB::rollback();
             return back()->with('error', 'Gagal menyimpan akun! Hubungi Administrator.')->withInput();
         }
+
+    }
+
+    public function getBalance(Request $request) {
+        
+        $member = Member::findOrFail($request->member_id);
+
+        $loan = Loan::with(['payments' => function ($query) {
+            $query->where('lp_state', 1);
+        }])
+        ->where('member_id', $member->id)
+        ->get();
+
+        $saldo = $member->balance;
+        foreach ($loan as $key => $pay) {
+            foreach ($pay->payments as $key => $settle) {
+                $saldo -= $settle->lp_total;
+            }
+        }
+        // dd($balance->balance);
+        return response()->json([
+        'member_id' => $member->id,
+        'balance' => $saldo,
+    ]);
 
     }
 

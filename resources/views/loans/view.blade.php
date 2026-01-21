@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div class="text-center">
-                        <form action={{ route('reports.loanInfo') }} method="POST" id="form-report" enctype="multipart/form-data">
+                        <form action={{ route('reports.loanInfo') }} method="POST" id="form-report" enctype="multipart/form-data" target="_blank">
                             @csrf
                             <input type="hidden" name="loan_id" value="{{$loan->id}}">
                             <button type="submit" class="btn mb-2 btn-primary">
@@ -123,17 +123,29 @@
                         </div>
                     </div>
                     <div class="row">
+                        <p class="col-sm-3 text-right">Status Agunan</p>
+                        <div class="col-sm-9">
+                            <h5>{{ $loan->ref_doc_id != 0 ? "YA" : "TIDAK" }}</h5>
+                        </div>
+                    </div>
+                    <div class="row">
                         <p class="col-sm-3 text-right">Status Pinjaman</p>
                         <div class="col-sm-9">
                             <h5>@switch($loan->loan_state)
                                 @case(99)
                                     Ditolak
                                     @break
+                                @case(1)
+                                    Pengajuan
+                                    @break
                                 @case(2)
                                     Disetujui
                                     @break
+                                @case(3)
+                                    Selesai
+                                    @break
                                 @default
-                                    Pengajuan
+                                    invalid
                             @endswitch</h5>
                         </div>
                     </div>

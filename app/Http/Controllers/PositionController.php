@@ -77,7 +77,7 @@ class PositionController extends Controller
         }
         $position->save();
 
-        return redirect()->route('positions.edit', $position->id)->with('success', 'Data Jabatan berhasil diperbarui.');
+        return redirect()->route('position.edit', $position->id)->with('success', 'Data Jabatan berhasil diperbarui.');
 
     }
  
@@ -135,6 +135,7 @@ class PositionController extends Controller
                 $failed[] = ['row' => $index + 1, 'errors' => ["Template tidak valid"]];
                 break;
             } 
+
             if ($index <= 2) continue; // skip header and info 
             $data = [
                 'code' => $row[0] ?? null,
@@ -239,7 +240,5 @@ class PositionController extends Controller
             "Cache-Control" => "max-age=0",
         ]);
     }
-
-
-
+ 
 }

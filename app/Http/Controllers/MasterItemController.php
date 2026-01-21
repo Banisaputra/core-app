@@ -26,7 +26,7 @@ class MasterItemController extends Controller
      */
     public function index()
     {
-        $items = MasterItem::all();
+        $items = MasterItem::with('category')->get();
         return view('master_items.index', compact('items'));
     }
 
@@ -195,7 +195,6 @@ class MasterItemController extends Controller
 
         return response()->json($items);
     }
-
     
     public function import(Request $request)
     {
@@ -218,8 +217,8 @@ class MasterItemController extends Controller
                 $failed[] = ['row' => $index + 1, 'errors' => ["Template tidak valid"]];
                 break;
             } 
-
             if ($index <= 2) continue; // skip header and info 
+
             // check category
             $category = Category::where('code', $row[2])->first();
             $categoryId = $category ? $category->id : 0;
@@ -297,7 +296,7 @@ class MasterItemController extends Controller
         ]);
 
         // Header
-        $headers = ['Kode Barang', 'Nama Barang', 'Kode Kategori', 'HPP', 'Harga Jual'];
+        $headers = ['Kode Barang', 'Nama Barang', 'Kode Kategori', 'Harga Pembelian', 'Harga Jual'];
         $sheet->fromArray($headers, null, 'A2');
 
         // Style header

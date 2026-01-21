@@ -11,7 +11,7 @@
                 </div>
                 <div class="card-body">
                     {{-- syarat umum --}}
-                    <form action="{{ route('policies.loanUmum') }}" method="post">
+                    <form action="{{ route('policy.loanUmum') }}" method="post">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
@@ -71,7 +71,7 @@
                 </div>
                 <div class="card-body">
                     {{-- setting syarat khusus --}}
-                    <form action="{{ route('policies.loanKhusus')}}" method="post">
+                    <form action="{{ route('policy.loanKhusus')}}" method="post">
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
@@ -102,15 +102,15 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="maxAgunan01">Maksimal Pinjaman kurang dari 1 Tahun</label>
-                                    <input type="text" id="maxAgunan01" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_0_1']['value']??0),2) }}" readonly>
+                                    <input type="text" id="maxAgunan01" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_0_1']['value']??0)) }}" readonly>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="maxAgunan15">Maksimal Pinjaman kurang dari 5 Tahun</label>
-                                    <input type="text" id="maxAgunan15" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_1_5']['value']??0),2) }}" readonly>
+                                    <input type="text" id="maxAgunan15" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_1_5']['value']??0)) }}" readonly>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="maxAgunan50">Maksimal Pinjaman lebih dari 5 Tahun</label>
-                                    <input type="text" id="maxAgunan50" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_5_0']['value']??0),2) }}" readonly>
+                                    <input type="text" id="maxAgunan50" class="form-control" value="{{ number_format((float) ($loanPolicies['max_agunan_5_0']['value']??0)) }}" readonly>
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="maxTenorTA">Maksimal Tenor tanpa Agunan (bulan)</label>
@@ -132,7 +132,7 @@
                 <div class="card-body">
                     {{-- setting syarat agunan --}}
                     <div class="row">
-                        <form action="{{ route('policies.loanAgunan') }}" method="post">
+                        <form action="{{ route('policy.loanAgunan') }}" method="post">
                         <div class="col-md-12"> 
                             @csrf
                             <div class="form-row">
@@ -207,7 +207,7 @@
                                                     <td>{{ $agp->start_year . " - " . $agp->end_year}}</td>
                                                     <td>Rp {{ number_format($agp->agp_value, 0) }}</td>
                                                     <td>
-                                                    <form action="{{ route('policies.agDestroy', $agp->id) }}" method="POST" style="display: inline;" id="deleteForm">
+                                                    <form action="{{ route('policy.agDestroy', $agp->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn mb-2 btn-outline-danger" id="btnDelete"><span class="fe fe-trash-2 fe-16"></span></button>

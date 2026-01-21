@@ -19,6 +19,12 @@ function formatIDR(value, decimal) {
       minimumFractionDigits: decimal
    });
 }
+function showLoader() {
+   document.getElementById('loading-overlay').style.display = 'flex';
+}
+function hideLoader() {
+   document.getElementById('loading-overlay').style.display = 'none';
+}
  
 cashBtn.addEventListener('click', function () {
    if (cust_name == '') {
@@ -64,6 +70,7 @@ cashReceive.addEventListener('input', function () {
 
 // save sales
 creditPayment.addEventListener('click', function () {
+   creditPayment.disabled = true;
   const total = parseFloat(document.getElementById('crTotal').textContent.replace(/[^\d]/g, ''));
   const tenor = parseFloat(tenorReceive.value);
   const memberId = document.getElementById('memberSelect').value *1;
@@ -76,7 +83,7 @@ creditPayment.addEventListener('click', function () {
       alert('Pelanggan Harus Dipilih!');
       return;
    }
-
+   showLoader();
    // Collect cart data
    var cartItems = [];
    cartItems = Object.entries(cart).map((item) => {
@@ -93,7 +100,7 @@ creditPayment.addEventListener('click', function () {
          subtotal: function() { return (this.price - this.disc_price) * this.qty }
       };
    });
-
+   
   // Send to backend
   fetch('/submit-sale', {
     method: 'POST',
@@ -114,8 +121,9 @@ creditPayment.addEventListener('click', function () {
   .then(res => res.json())
   .then(response => {
     if (response.success) {
-        $('#creditModal .close').trigger('click');
-        alert('Payment successful!\nAngsuran: ' + formatIDR(total/tenor, 0) + ' selama '+ tenor +' bulan');
+      hideLoader();
+      $('#creditModal .close').trigger('click');
+      alert('Payment successful!\nAngsuran: ' + formatIDR(total/tenor, 0) + ' selama '+ tenor +' bulan');
       
       // Clear cart
       document.getElementById('cartBody').innerHTML = '';
@@ -133,6 +141,9 @@ creditPayment.addEventListener('click', function () {
   .catch(error => {
     console.error(error);
     alert('Error submitting sale.');
+  })
+  .finally(() => {
+      creditPayment.disabled = false;
   });
 });
 
@@ -153,6 +164,7 @@ cashPayment.addEventListener('click', function () {
       return;
    }
   
+   showLoader();
     // Collect cart data
    var cartItems = [];
    cartItems = Object.entries(cart).map((item) => {
@@ -169,7 +181,7 @@ cashPayment.addEventListener('click', function () {
          subtotal: function() { return (this.price - this.disc_price) * this.qty }
       };
    });
-
+ 
   // Send to backend
   fetch('/submit-sale', {
     method: 'POST',
@@ -189,6 +201,7 @@ cashPayment.addEventListener('click', function () {
   .then(res => res.json())
   .then(response => {
     if (response.success) {
+      hideLoader();
         $('#cashModal .close').trigger('click');
         alert('Payment successful!\nChange:' + formatIDR(received - total, 0));
       
@@ -221,7 +234,7 @@ async function loadProducts(query = '') {
       const data = await res.json();
       // Hide loading
       document.getElementById('productLoading').style.display = 'none';
-      renderProducts(data);
+      renderProducts(data);      
    } catch (err) {
       console.error("Failed to load products", err);
    }
@@ -233,6 +246,8 @@ function renderProducts(products) {
    if (products.length === 0) {
       productList.innerHTML = '<p class="text-muted">No products found.</p>';
       return;
+   } else if (products.length === 1) {
+      autoToCart(products[0]);
    }
 
    products.forEach(product => {
@@ -291,6 +306,25 @@ function updateCart() {
    }
    
    totalEl.textContent = formatIDR(total, 0);
+}
+
+function autoToCart(product) {
+   const id = product.id; 
+   const name = product.item_name;
+   const price = parseFloat(product.sales_price);
+   const stock = product.stock;
+   const ppn = product.effective_ppn;
+
+   if (stock == 0) return alert('stok barang kosong, restock barang diperlukan untuk transaksi!')
+   if (!cart[id]) {
+      cart[id] = { name: name, qty: 1, price: price, stock: stock, disc: 0, ppn: ppn};
+   } else {
+      if (cart[id].stock < (cart[id].qty + 1)) {
+         return alert("stock barang tidak cukup!")
+      }
+      cart[id].qty++;
+   }
+   updateCart();
 }
 
 document.addEventListener("click", e => {

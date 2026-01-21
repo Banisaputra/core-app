@@ -25,7 +25,7 @@
     <div class="center">
         <h3>Koperasi Karyawan</h3>
         <h4>Hardo Soloplast</h4>
-        <small>Jl. Raya No. 123</small>
+        {{-- <small>Jl. Raya No. 123</small> --}}
     </div>
 
     <div class="date">No. Transaksi: <br>{{ $loan->loan_code }}<br>
@@ -59,7 +59,7 @@
         </tr>
         <tr>
             <td>Angsuran</td>
-            <td>Rp {{ number_format($loan->payments[0]['lp_value']) }}</td>
+            <td>Rp {{ number_format($loan->payments[0]['lp_total']) }}</td>
         </tr>       
     </table>
     <div class="line"></div>

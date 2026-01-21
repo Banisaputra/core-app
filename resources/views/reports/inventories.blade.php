@@ -14,7 +14,7 @@
         @foreach ($filter as $key => $ft)
         <li>{{$key}} : {{ $ft }}</li>
         @endforeach
-    </ul></p>    
+    </ul></p>
     <table>
         <thead>
             <tr>

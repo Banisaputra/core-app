@@ -15,7 +15,6 @@
         <li>{{$key}} : {{ $ft }}</li>
         @endforeach
     </ul></p>
-
     <table>
         <thead>
             <tr>

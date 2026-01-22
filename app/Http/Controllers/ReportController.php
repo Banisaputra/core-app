@@ -643,7 +643,6 @@ class ReportController extends Controller
         return $pdf->stream('Bukti-stuk-pinjaman-'. date('dmY', strtotime($loan->created_at)).'.pdf');
     } 
  
-    // for PDF report type modified
     public function deduction(Request $request) 
     {
         ini_set('memory_limit', '1024M'); // 1GB
@@ -654,6 +653,16 @@ class ReportController extends Controller
         $current_day = (int)$today->format('d');
         $current_month = (int)$today->format('m');
         $current_year = (int)$today->format('Y');
+
+        // cek hari ini
+        // if ($current_day > $cut_off_day) {
+        //     // mundur ke bulan sebelumnya
+        //     $current_month += 1;
+        //     if ($current_month == 13) {
+        //         $current_month = 1;
+        //         $current_year += 1;
+        //     }
+        // }
 
         $periode_start = new DateTime("$current_year-$current_month-".($cut_off_day + 1)."");
         $periode_start->modify("-1 month");

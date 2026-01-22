@@ -64,12 +64,12 @@ Route::middleware([LoginAuth::class])->group(function () {
         }
 
         return Response::download($filePath);
-    });
+    })->middleware('can:manage_databases');
 
     Route::get('/backup/download', [UserController::class, 'downloadDB'])->name('databases.backup')->middleware('can:manage_databases');
     
     // storage link
-    Route::get('/create-storage-link', [StorageLinkController::class, 'create']);
+    Route::get('/create-storage-link', [StorageLinkController::class, 'create'])->middleware('can:manage_storage');
 
     // ============= Access Management ================
     // users
@@ -128,25 +128,25 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::delete('/supplier/{id}', [SupplierController::class, 'destroy'])->name('suppliers.destroy')->middleware('can:supplier_delete');
 
     // categories
-    Route::get('/category', [CategoryController::class, 'index'])->name('categories.index');
-    Route::get('/category/create', [CategoryController::class, 'create'])->name('categories.create');
-    Route::get('/category/import', [CategoryController::class, 'downloadTemplate'])->name('categories.template');
-    Route::post('/category/import', [CategoryController::class, 'import'])->name('categories.import');
-    Route::post('/category', [CategoryController::class, 'store'])->name('categories.store');
-    Route::get('/category/{id}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
-    Route::put('/category/{id}', [CategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::get('/category', [CategoryController::class, 'index'])->name('categories.index')->middleware('can:manage_categories');
+    Route::get('/category/create', [CategoryController::class, 'create'])->name('categories.create')->middleware('can:category_create');
+    Route::get('/category/import', [CategoryController::class, 'downloadTemplate'])->name('categories.template')->middleware('can:category_show');
+    Route::post('/category/import', [CategoryController::class, 'import'])->name('categories.import')->middleware('can:category_create');
+    Route::post('/category', [CategoryController::class, 'store'])->name('categories.store')->middleware('can:category_create');
+    Route::get('/category/{id}/edit', [CategoryController::class, 'edit'])->name('categories.edit')->middleware('can:category_edit');
+    Route::put('/category/{id}', [CategoryController::class, 'update'])->name('categories.update')->middleware('can:category_edit');
+    Route::delete('/category/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy')->middleware('can:category_delete');
     
     // devisions
-    Route::get('/devision', [DevisionController::class, 'index'])->name('devisions.index');
-    Route::get('/devision/create', [DevisionController::class, 'create'])->name('devisions.create');
-    Route::get('/devision/import', [DevisionController::class, 'downloadTemplate'])->name('devisions.template');
-    Route::post('/devision/import', [DevisionController::class, 'import'])->name('devisions.import');
-    Route::post('/devision', [DevisionController::class, 'store'])->name('devisions.store');
-    Route::get('/devision/{id}/edit', [DevisionController::class, 'edit'])->name('devisions.edit');
-    Route::put('/devision/{id}', [DevisionController::class, 'update'])->name('devisions.update');
-    Route::delete('/devision/{id}', [DevisionController::class, 'destroy'])->name('devisions.destroy');
-    
+    Route::get('/devision', [DevisionController::class, 'index'])->name('devisions.index')->middleware('can:manage_devisions');
+    Route::get('/devision/create', [DevisionController::class, 'create'])->name('devisions.create')->middleware('can:devision_create');
+    Route::get('/devision/import', [DevisionController::class, 'downloadTemplate'])->name('devisions.template')->middleware('can:devision_show');
+    Route::post('/devision/import', [DevisionController::class, 'import'])->name('devisions.import')->middleware('can:devision_create');
+    Route::post('/devision', [DevisionController::class, 'store'])->name('devisions.store')->middleware('can:devision_create');
+    Route::get('/devision/{id}/edit', [DevisionController::class, 'edit'])->name('devisions.edit')->middleware('can:devision_edit');
+    Route::put('/devision/{id}', [DevisionController::class, 'update'])->name('devisions.update')->middleware('can:devision_edit');
+    Route::delete('/devision/{id}', [DevisionController::class, 'destroy'])->name('devisions.destroy')->middleware('can:devision_delete');
+
     // positions
     Route::get('/position', [PositionController::class, 'index'])->name('positions.index');
     Route::get('/position/create', [PositionController::class, 'create'])->name('positions.create');

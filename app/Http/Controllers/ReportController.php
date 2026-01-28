@@ -58,6 +58,9 @@ class ReportController extends Controller
         $filter['Tgl. Batas'] = date('d-m-Y', strtotime($endDate));
         
         switch ($type) {
+            case 'DEDUCTION':
+                return $this->deduction($request);
+                break;
             case 'SVSUMMARY':
                 try {
                     $data = Member::select(
@@ -411,31 +414,31 @@ class ReportController extends Controller
                 break;
         }
 
-        if ($type == 'SVSUMMARY' || $type == 'LNSUMMARY') {
-            $pdf = PDF::loadView($file, [
-                'data' => $data,
-                'filter' => $filter,
-                'header' => $header
-            ])->setPaper('A4', 'landscape');
-        } else {
-            $pdf = PDF::loadView($file, [
-                'data' => $data,
-                'filter' => $filter,
-            ]);
-        }
+        if ($type !== 'DEDUCTION') {
+            if ($type == 'SVSUMMARY' || $type == 'LNSUMMARY') {
+                $pdf = PDF::loadView($file, [
+                    'data' => $data,
+                    'filter' => $filter,
+                    'header' => $header
+                ])->setPaper('A4', 'landscape');
+            } else {
+                $pdf = PDF::loadView($file, [
+                    'data' => $data,
+                    'filter' => $filter,
+                ]);
+            }
         
-        $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
-        if ($request->has('preview')) {
-            // return $pdf->stream($filename);
-            return response()->make($pdf->output(), 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="' . $filename . '"',
-            ]);
-        } else {
-            return $pdf->download($filename);
+            $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
+            if ($request->has('preview')) {
+                // return $pdf->stream($filename);
+                return response()->make($pdf->output(), 200, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="' . $filename . '"',
+                ]);
+            } else {
+                return $pdf->download($filename);
+            }
         }
-    
-
     }
 
     public function getMemberList(Request $request) 
@@ -654,13 +657,30 @@ class ReportController extends Controller
         $current_day = (int)$today->format('d');
         $current_month = (int)$today->format('m');
         $current_year = (int)$today->format('Y');
+        
+        // cek hari ini dengan cutoff
+        if ($current_day > $cut_off_day) {
+            // mundur ke bulan sebelumnya
+            $current_month += 1;
+            if ($current_month == 13) {
+                $current_month = 1;
+                $current_year += 1;
+            }
+        }
 
         $periode_start = new DateTime("$current_year-$current_month-".($cut_off_day + 1)."");
         $periode_start->modify("-1 month");
-        $periode_end = new DateTime("$current_year-$current_month-".($cut_off_day ?? 0)."");
-
-        // $members = Member::with(['position','devision','user'])->get();
+        $periode_end = new DateTime("$current_year-$current_month-".($cut_off_day ?? 1)."");
         
+        // jika ada input periode
+        if ($request->has('dateStart') && $request->has('dateEnd') && $request->dateStart != "" && $request->dateEnd != "") {
+            $input_start = new DateTime($request->dateStart);
+            $input_end = new DateTime($request->dateEnd);
+
+            $periode_start = $input_start;
+            $periode_end = $input_end;
+        }
+         
         $data = [];
 
         Member::with(['position','devision','user'])

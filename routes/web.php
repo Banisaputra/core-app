@@ -192,6 +192,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/api/category/{id}/margin', [CategoryController::class, 'getMargin']);
     Route::get('/api/supplier/search', [SupplierController::class, 'search']);
     Route::get('/api/saving-type/search', [SavingTypeController::class, 'search']);
+    Route::get('/api/member/balance', [MemberController::class, 'getBalance']);
 
     // profile
     Route::get('/setting/profile', [UserController::class, 'profile'])->name('setting.profile');
@@ -205,11 +206,11 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::post('/report/get2', [ReportController::class, 'getMemberList'])->name('reports.getMemberList');
     Route::post('/report/get3', [ReportController::class, 'getMemberDetail'])->name('reports.getMemberDetail');
     Route::post('/report/pdf-loanInfo', [ReportController::class, 'loanInfo'])->name('reports.loanInfo');
-
  
     // loans
     Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
     Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
+    Route::post('/loans/import', [LoanController::class, 'import'])->name('loans.import');
     Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
     Route::get('/loans/{id}', [LoanController::class, 'show'])->name('loans.show');
     Route::get('/loans/{id}/edit', [LoanController::class, 'edit'])->name('loans.edit');
@@ -233,6 +234,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::post('/savings/generate', [SavingController::class, 'generated'])->name('savings.generated');
     Route::post('/savings', [SavingController::class, 'store'])->name('savings.store');
     Route::post('/savings/confirm', [SavingController::class, 'confirmation'])->name('savings.confirm');
+    Route::post('/savings/bulk', [SavingController::class, 'bulkConfirmation'])->name('savings.bulk');
     Route::get('/savings/{id}', [SavingController::class, 'show'])->name('savings.show');
     Route::get('/savings/{id}/edit', [SavingController::class, 'edit'])->name('savings.edit');
     Route::put('/savings/{id}', [SavingController::class, 'update'])->name('savings.update');

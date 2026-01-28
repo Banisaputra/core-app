@@ -50,7 +50,8 @@
                 <option value="sales">Penjualan</option>
                 <option value="profitNlose">Laba Rugi</option>
                 <option value="inventory">Adjustment Stock</option>
-                {{-- <option value="svsummary">Summary Simpanan</option>
+                {{-- <option value="deduction">Potong Gaji</option>
+                <option value="svsummary">Summary Simpanan</option>
                 <option value="lnsummary">Summary Pinjaman</option> --}}
               </select>
           </div>

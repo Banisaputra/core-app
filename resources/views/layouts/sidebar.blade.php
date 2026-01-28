@@ -193,14 +193,14 @@
         </p>
         <ul class="navbar-nav flex-fill w-100 mb-2">
             
-            @if (auth()->user()->hasPermission('report_deduction'))
+            {{-- @if (auth()->user()->hasPermission('report_deduction'))
             <li class="nav-item w-100">
                 <a class="nav-link" target="_blank" href="{{ route('reports.deductionPdf')}}">
                     <i class="fe fe-file-text fe-16"></i>
                     <span class="ml-3 item-text">Potong Gaji Anggota</span>
                 </a>
             </li> 
-            @endif
+            @endif --}}
             @if (auth()->user()->hasPermission('report_general'))
             <li class="nav-item w-100">
                 <a class="nav-link" href="{{ route('reports.index')}}">

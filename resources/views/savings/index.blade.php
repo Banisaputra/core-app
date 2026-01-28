@@ -77,18 +77,14 @@
               @endforeach
             </select>
           </div>
-      </div>
-
+      </div> 
       {{-- <button id="btnFilter" class="btn btn-primary mb-2">
           Terapkan Filter
       </button>
       <button id="btnReset" class="btn btn-secondary mb-2">
           Reset Filter
       </button> --}}
-
-
- 
-
+  
         {{-- ajax data --}}
         <div class="row my-4">
           <!-- Small table -->
@@ -96,11 +92,9 @@
             <div class="card shadow">
               <div class="card-body">
                 <!-- table -->
-                <form id="bulkForm" method="POST" action="{{ route('savings.revision') }}">
+                <form id="bulkForm" method="POST" action="{{ route('savings.bulk') }}">
                   @csrf
-
                   <input type="hidden" name="ids" id="selectedIds">
-
                   <table class="table datatables" id="savings">
                     <thead>
                       <tr>
@@ -125,9 +119,6 @@
                   {{-- <button type="submit" class="btn btn-danger mt-2" id="bulkBtn" disabled>
                     Konfirmasi Data Terpilih
                   </button> --}}
-                  <button type="submit" class="btn btn-danger mt-2" id="bulkBtn" disabled>
-                    Revisi Data Terpilih
-                  </button>
                 </form>
               </div>
             </div>

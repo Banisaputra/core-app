@@ -464,53 +464,5 @@ class SavingController extends Controller
             return back()->with('error', 'Gagal menyimpan simpanan! Hubungi Administrator.')->withInput();
         }
     }
-
-    // hapus soon
-    public function savingRevision(Request $request) {
-        $request->validate([
-            'ids' => 'required|string'
-        ]);
-
-        $ids = array_map(
-            'intval',
-            json_decode($request->ids, true)
-        );
-
-        DB::beginTransaction();
-        try {
-            $count = 0;
-            $sv_count = 46;
-            foreach ($ids as $id) {
-                $found = false;
-                $saving = Saving::with(['member'])->findOrFail($id);
-                if ($saving->sv_state <> 99 ) {
-                    if ($saving->sv_date == 20251001) {
-                        $saving->sv_code = Saving::generateCodeRev('2511', $sv_count++);
-                        $saving->sv_date = 20251102;
-                        $found = true;
-                        } else if ($saving->sv_date == 20251101) {
-                            $saving->sv_code = Saving::generateCodeRev('2512');
-                            $saving->sv_date = 20251202;
-                            $found = true;
-                            } else if ($saving->sv_date == 20251201) {
-                                $saving->sv_code = Saving::generateCodeRev('2601');
-                                $saving->sv_date = 20260102;
-                                $found = true;
-                    }
-                }
-                if ($found) {
-                    $count++;
-                    $saving->update();
-                }
-                
-            }
-            
-            DB::commit();
-            return redirect()->back()->with('success', $count . ' Simpanan berhasil direvisi');
-        } catch (\Exception $e) {
-            DB::rollback();
-            return back()->with('error', 'Gagal menyimpan simpanan! Hubungi Administrator.'.$e->getmessage())->withInput();
-        }
-        
-    }
+    
 }

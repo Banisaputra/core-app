@@ -148,37 +148,37 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::delete('/devision/{id}', [DevisionController::class, 'destroy'])->name('devisions.destroy')->middleware('can:devision_delete');
 
     // positions
-    Route::get('/position', [PositionController::class, 'index'])->name('positions.index');
-    Route::get('/position/create', [PositionController::class, 'create'])->name('positions.create');
-    Route::get('/position/import', [PositionController::class, 'downloadTemplate'])->name('positions.template');
-    Route::post('/position/import', [PositionController::class, 'import'])->name('positions.import');
-    Route::post('/position', [PositionController::class, 'store'])->name('positions.store');
-    Route::get('/position/{id}/edit', [PositionController::class, 'edit'])->name('positions.edit');
-    Route::put('/position/{id}', [PositionController::class, 'update'])->name('positions.update');
-    Route::delete('/position/{id}', [PositionController::class, 'destroy'])->name('positions.destroy');
-    
+    Route::get('/position', [PositionController::class, 'index'])->name('positions.index')->middleware('can:manage_positions');
+    Route::get('/position/create', [PositionController::class, 'create'])->name('positions.create')->middleware('can:position_create');
+    Route::get('/position/import', [PositionController::class, 'downloadTemplate'])->name('positions.template')->middleware('can:position_show');
+    Route::post('/position/import', [PositionController::class, 'import'])->name('positions.import')->middleware('can:position_create');
+    Route::post('/position', [PositionController::class, 'store'])->name('positions.store')->middleware('can:position_create');
+    Route::get('/position/{id}/edit', [PositionController::class, 'edit'])->name('positions.edit')->middleware('can:position_edit');
+    Route::put('/position/{id}', [PositionController::class, 'update'])->name('positions.update')->middleware('can:position_edit');
+    Route::delete('/position/{id}', [PositionController::class, 'destroy'])->name('positions.destroy')->middleware('can:position_delete');
+
     // member
-    Route::get('/members', [MemberController::class, 'index'])->name('members.index');
-    Route::get('/members/create', [MemberController::class, 'create'])->name('members.create');
-    Route::get('/members/import', [MemberController::class, 'downloadTemplate'])->name('members.template');
-    Route::post('/members/import', [MemberController::class, 'import'])->name('members.import');
-    Route::post('/members', [MemberController::class, 'store'])->name('members.store');
-    Route::post('/members/account', [MemberController::class, 'account'])->name('members.account');
-    Route::get('/members/{id}', [MemberController::class, 'show'])->name('members.show');
-    Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit');
-    Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');
-    Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('members.destroy');
+    Route::get('/members', [MemberController::class, 'index'])->name('members.index')->middleware('can:manage_members');
+    Route::get('/members/create', [MemberController::class, 'create'])->name('members.create')->middleware('can:member_create');
+    Route::get('/members/import', [MemberController::class, 'downloadTemplate'])->name('members.template')->middleware('can:member_show');
+    Route::post('/members/import', [MemberController::class, 'import'])->name('members.import')->middleware('can:member_create');
+    Route::post('/members', [MemberController::class, 'store'])->name('members.store')->middleware('can:member_create');
+    Route::post('/members/account', [MemberController::class, 'account'])->name('members.account')->middleware('can:member_create');
+    Route::get('/members/{id}', [MemberController::class, 'show'])->name('members.show')->middleware('can:member_show');
+    Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit')->middleware('can:member_edit');
+    Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update')->middleware('can:member_edit');
+    Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('members.destroy')->middleware('can:member_delete');
     
     // items
-    Route::get('/items', [MasterItemController::class, 'index'])->name('items.index');
-    Route::get('/items/create', [MasterItemController::class, 'create'])->name('items.create');
-    Route::post('/items', [MasterItemController::class, 'store'])->name('items.store');
-    Route::get('/items/import', [MasterItemController::class, 'downloadTemplate'])->name('items.template');
-    Route::post('/items/import', [MasterItemController::class, 'import'])->name('items.import');
-    Route::get('/items/{id}', [MasterItemController::class, 'show'])->name('items.show');
-    Route::get('/items/{id}/edit', [MasterItemController::class, 'edit'])->name('items.edit');
-    Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update');
-    Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy');   
+    Route::get('/items', [MasterItemController::class, 'index'])->name('items.index')->middleware('can:manage_items');
+    Route::get('/items/create', [MasterItemController::class, 'create'])->name('items.create')->middleware('can:item_create');
+    Route::post('/items', [MasterItemController::class, 'store'])->name('items.store')->middleware('can:item_create');
+    Route::get('/items/import', [MasterItemController::class, 'downloadTemplate'])->name('items.template')->middleware('can:item_show');
+    Route::post('/items/import', [MasterItemController::class, 'import'])->name('items.import')->middleware('can:item_create');
+    Route::get('/items/{id}', [MasterItemController::class, 'show'])->name('items.show')->middleware('can:item_show');
+    Route::get('/items/{id}/edit', [MasterItemController::class, 'edit'])->name('items.edit')->middleware('can:item_edit');
+    Route::put('/items/{id}', [MasterItemController::class, 'update'])->name('items.update')->middleware('can:item_edit');
+    Route::delete('/items/{id}', [MasterItemController::class, 'destroy'])->name('items.destroy')->middleware('can:item_delete');
 
     Route::get('/', [UserController::class, 'dashboard'])->name('dashboard')->middleware('can:dashboard_show');
 

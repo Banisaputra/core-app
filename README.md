@@ -10,6 +10,4 @@
 - simpanan
 - pinjaman
 - policy syarat & ketentuan
-
-# unfinish 
-- edit flow (loans)
+- laporan

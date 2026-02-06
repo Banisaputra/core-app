@@ -114,7 +114,8 @@ class ReportController extends Controller
                         'members.id',
                         'members.nip',
                         'members.name',
-                        'positions.name'
+                        'positions.name',
+                        'devisions.name'
                     )
                     ->orderBy('members.id', 'ASC') 
                     ->get();

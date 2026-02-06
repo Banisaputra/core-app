@@ -144,21 +144,21 @@ class ReportController extends Controller
 
                 } catch (\Throwable $e) {
 
-                    // \Log::error('PDF REAL ERROR', [
-                    //     'msg'  => $e->getMessage(),
-                    //     'file' => $e->getFile(),
-                    //     'line' => $e->getLine(),
-                    //     'trace' => $e->getTraceAsString(),
-                    // ]);
+                    \Log::error('PDF REAL ERROR', [
+                        'msg'  => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
 
-                    // // 🔴 PENTING: KIRIM ERROR ASLI KE RESPONSE
-                    // return response()->json([
-                    //     'real_error' => $e->getMessage(),
-                    //     'file' => $e->getFile(),
-                    //     'line' => $e->getLine(),
-                    // ], 500);
+                    // 🔴 PENTING: KIRIM ERROR ASLI KE RESPONSE
+                    return response()->json([
+                        'real_error' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ], 500);
 
-                    abort(500, 'Terjadi kesalahan saat generate laporan. Silakan hubungi administrator.');
+                    // abort(500, 'Terjadi kesalahan saat generate laporan. Silakan hubungi administrator.');
 
                 }
 

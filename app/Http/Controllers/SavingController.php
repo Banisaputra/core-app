@@ -22,7 +22,7 @@ class SavingController extends Controller
 
             // filter tanggal
             if ($request->filled('date_start') && $request->filled('date_end')) {
-                $query->whereBetween('created_at', [
+                $query->whereBetween('sv_date', [
                     date('Ymd', strtotime($request->date_start)),
                     date('Ymd', strtotime($request->date_end))
                 ]);

@@ -80,12 +80,12 @@
             </select>
           </div>
         </div>
-      {{-- <button id="btnFilter" class="btn btn-primary mb-2">
+      <button id="btnFilter" class="btn btn-primary mb-2">
           Terapkan Filter
       </button>
       <button id="btnReset" class="btn btn-secondary mb-2">
           Reset Filter
-      </button> --}}
+      </button>
 
         <div class="row my-4">
           <div class="col-md-12">
@@ -117,9 +117,9 @@
                       </tr>
                     </thead>
                   </table>
-                   {{-- <button type="submit" class="btn btn-danger mt-2" id="bulkBtn" disabled>
+                   <button type="submit" class="btn btn-danger mt-2" id="bulkBtn" disabled>
                     Konfirmasi Data Terpilih
-                  </button> --}}
+                  </button>
                 </form>
               </div>
             </div>

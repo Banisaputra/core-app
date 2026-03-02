@@ -62,6 +62,10 @@ class RolePermissionSeeder extends Seeder
             'permission_edit' => 'Dapat mengedit izin',
             'permission_delete' => 'Dapat menghapus izin',
             'permission_show' => 'Dapat melihat detail izin',
+            'menu_create' => 'Dapat membuat menu baru',
+            'menu_edit' => 'Dapat mengedit menu',
+            'menu_delete' => 'Dapat menghapus menu',
+            'menu_show' => 'Dapat melihat detail menu',
         ];
 
         foreach ($permissions as $permission => $description) {

@@ -659,6 +659,7 @@ class ReportController extends Controller
         $cut_off_day = Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value');
         $today = new DateTime();
         $current_day = (int)$today->format('d');
+        $current_month = (int)$today->format('m');
         $current_year = (int)$today->format('Y');
 
         // cek hari ini dengan cutoff

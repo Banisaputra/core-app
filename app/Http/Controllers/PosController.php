@@ -201,7 +201,7 @@ class PosController extends Controller
     {
         $sale = Sale::with('saDetail.item')->findOrFail($id);
 
-        $pdf = Pdf::loadView('reports.receipt58', compact('sale'))
+        $pdf = PDF::loadView('reports.receipt58', compact('sale'))
                     ->setPaper([0,0,164.36,600], 'portrait'); 
                     // ukuran thermal 80mm (226.77 point)
                     // ukuran thermal 58mm (164.36 point)

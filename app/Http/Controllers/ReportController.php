@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use DateTime;
-use DateInterval;
 use Throwable;
 use App\Models\Loan;
 use App\Models\Sale;
@@ -14,13 +13,12 @@ use App\Models\Category;
 use App\Models\Purchase;
 use App\Models\Inventory;
 use App\Models\MasterItem;
-use App\Models\SavingType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Barryvdh\Snappy\Facades\SnappyPdf as SnappyPDF;
+// use Barryvdh\Snappy\Facades\SnappyPdf as SnappyPDF;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller

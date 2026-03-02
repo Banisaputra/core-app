@@ -24,7 +24,7 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-              <a href="{{ route('repayments.create') }}" class="btn mb-2 btn-primary mr-3">
+              <a href="{{ route('repayments.create') }}" class="btn mb-2 btn-success mr-3">
                 <span class="fe fe-plus fe-16 mr-1"></span> Pelunasan Cepat
               </a>
             </div>

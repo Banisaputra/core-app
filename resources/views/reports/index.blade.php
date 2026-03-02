@@ -58,12 +58,10 @@
           <div class="form-group mb-3 col-md-3">
               <label for="dateStart">Mulai</label>
               <input class="form-control" id="dateStart" type="date" name="dateStart">
-              <small>*Kosongkan untuk mengambil semua data</small>
           </div>
           <div class="form-group mb-3 col-md-3">
               <label for="dateEnd">Sampai</label>
               <input class="form-control" id="dateEnd" type="date" name="dateEnd">
-              <small>*Kosongkan untuk mengambil semua data</small>
           </div>
         </div>
         <div class="form-row">
@@ -83,13 +81,21 @@
               <option value="0">Stok Kosong</option>
             </select>
           </div>
+          <div class="form-group col-md-3">
+            <label for="typeLoan">Jenis Pinjaman</label>
+            <select id="typeLoan" name="typeLoan" class="form-control" disabled>
+              <option value="all">SEMUA</option>
+              <option value="uang">UANG</option>
+              <option value="barang">BARANG</option>
+            </select>
+          </div>
            
         </div>
 
         <hr class="my-4">
          <div class="form-row">
            <div class="col-md-6">
-            <small>Note:laporan berdasarkan tanggal dibuatnya dokumen.</small>
+            <small>Note:laporan berdasarkan tanggal dokumen.</small>
            </div>
            <div class="col-md-6 text-right">
             <button type="button" id="preview-btn" class="btn btn-info mr-2">
@@ -120,15 +126,23 @@
         case "SALES":
           $('#typeSales').prop('disabled', false);
           $('#typeStock').val("all").prop('disabled', true);
+          $('#typeLoan').val("all").prop('disabled', true);
           break;
         case "ITEMSTOCK":
           $('#typeStock').prop('disabled', false);
           $('#typeSales').val("all").prop('disabled', true);
+          $('#typeLoan').val("all").prop('disabled', true);
+          break;
+        case "LOAN":
+          $('#typeLoan').prop('disabled', false);
+          $('#typeSales').val("all").prop('disabled', true);
+          $('#typeStock').val("all").prop('disabled', true);
           break;
       
         default:
           $('#typeSales').val('all').prop('disabled', true);
           $('#typeStock').val('all').prop('disabled', true);
+          $('#typeLoan').val('all').prop('disabled', true);
           break;
       }
       

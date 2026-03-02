@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use App\Models\Loan;
 use App\Models\User;
-use App\Models\LoanPayment;
-use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+use DateInterval;
+use DateTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Member extends Model
 {
@@ -100,22 +101,34 @@ class Member extends Model
 
     }
 
-    public function getTotalLoan(): array
+    public function getTotalLoan($loan_date, $tenor): array
     {
         $loanPolicy = Policy::getLoanPolicies();
-        $YM = Carbon::now()->addMonth()->format('Ym');
+
+        // cek cut off
+        $cutOff = Policy::where('doc_type', 'GENERAL')
+        ->where('pl_name', 'cut_off_bulanan')->first();
+
+        $periode = Policy::getPeriodeActive($cutOff->pl_value);
+        $firstAngsuran = Loan::hitungAngsuranPertama($loan_date, $cutOff->pl_value)->format('Ymd');
+
+        // check due date
+        $date = new DateTime($firstAngsuran);
+        $date->add(new DateInterval('P' . $tenor . 'M'));
+        $dueDate = $date->format('Ymd');
+
         $jabatan = Position::where('id', $this->position_id)->first();
         $totalPokok = Loan::join('loan_payments', 'loan_payments.loan_id', '=', 'loans.id')
             ->where('loans.member_id', $this->id)
             ->where('loans.loan_state', 2)
-            ->whereRaw('LEFT(loan_payments.lp_date, 6) = ?', [$YM])
+            ->whereRaw('loan_payments.lp_date > ? AND loan_payments.lp_date < ?', [date('Ymd', strtotime($periode['start'])), date('Ymd', strtotime($periode['end']))])
             ->sum('loan_payments.lp_value');
 
         // include bunga
         $totalBayar = Loan::join('loan_payments', 'loan_payments.loan_id', '=', 'loans.id')
             ->where('loans.member_id', $this->id)
             ->where('loans.loan_state', 2)
-            ->whereRaw('LEFT(loan_payments.lp_date, 6) = ?', [$YM])
+            ->whereRaw('loan_payments.lp_date > ? AND loan_payments.lp_date < ?', [date('Ymd', strtotime($periode['start'])), date('Ymd', strtotime($periode['end']))])
             ->sum('loan_payments.lp_total');
 
         // 
@@ -130,7 +143,8 @@ class Member extends Model
             'total_pokok' => $totalPokok,
             'maxPokok' => $loanPolicy['max_pokok_angsuran']['value'],
             'total_bayar' => $totalBayar,
-            'maxBayar' => $maxBayar
+            'maxBayar' => $maxBayar,
+            'due_date' => $dueDate
         ];
     }
 

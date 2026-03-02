@@ -19,6 +19,8 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>NIP</th>
+                <th>Nama</th>
                 <th>Kode</th>
                 <th>Tanggal</th>
                 <th>Jenis</th>
@@ -31,6 +33,8 @@
                 @foreach($data as $i => $row)
                 <tr>
                     <td>{{ $i + 1 }}</td>
+                    <td>{{ $row['member_nip'] }}</td>
+                    <td>{{ $row['member_name'] }}</td>
                     <td>{{ $row['loan_code'] }}</td>
                     <td>{{ date('d M Y', strtotime($row['loan_date']))}}</td>
                     <td>{{ $row['loan_type'] }}</td>
@@ -39,12 +43,12 @@
                 <?php $subtotal += $row['loan_value'] ?>
                 @endforeach
                 <tr>
-                    <td colspan="4" style="text-align: right"><b>Total</b></td>
-                    <td style="text-align: right"><b>{{ number_format($subtotal,0,',','.')}}</b></td>
+                    <td colspan="5" style="text-align: right"><b>Total</b></td>
+                    <td colspan="2" style="text-align: right"><b>{{ number_format($subtotal,0,',','.')}}</b></td>
                 </tr>
             @else
                 <tr>
-                    <td colspan=5 style="text-align: center">Tidak ada data</td>
+                    <td colspan="7" style="text-align: center">Tidak ada data</td>
                 </tr>
             @endif
         </tbody>

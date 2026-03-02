@@ -144,6 +144,7 @@ creditPayment.addEventListener('click', function () {
   })
   .finally(() => {
       creditPayment.disabled = false;
+      hideLoader();
   });
 });
 

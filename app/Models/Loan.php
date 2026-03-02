@@ -58,13 +58,13 @@ class Loan extends Model
         $tanggal = Carbon::parse($loanDate);
         
         if ($tanggal->day <= $cutoffDay) {
-            // Angsuran pertama = 1 bulan depan
+            // Angsuran pertama = 1 bulan kedepan
             return $tanggal->copy()
                 ->addMonths(0)
                 ->firstOfMonth()
                 ->addDay(1); // Tanggal 2
         } else {
-            // Angsuran pertama = 2 bulan depan
+            // Angsuran pertama = 2 bulan kedepan
             return $tanggal->copy()
                 ->addMonths(1)
                 ->firstOfMonth()

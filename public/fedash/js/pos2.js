@@ -136,6 +136,7 @@ creditPayment.addEventListener('click', function () {
       window.open('/sales/' + response.receipt.id + '/print', '_blank');
     } else {
       alert('Failed to submit sale.\nNote: '+ response.message);
+      
     }
   })
   .catch(error => {
@@ -144,6 +145,7 @@ creditPayment.addEventListener('click', function () {
   })
   .finally(() => {
       creditPayment.disabled = false;
+      hideLoader();
   });
 });
 

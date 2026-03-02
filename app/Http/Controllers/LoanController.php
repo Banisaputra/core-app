@@ -369,7 +369,7 @@ class LoanController extends Controller
         $member = Member::findOrFail($request->member_id);
         $maxLoan = $member->maxLoanAmount();
         $tenor = $member->tenorAmount($loan_value);
-        $currentLoan = $member->getTotalLoan();
+        $currentLoan = $member->getTotalLoan($request->loan_date, $request->loan_tenor*1);
         $is_agunan = isset($request->cbAgunan) ? true : false;
         // check policy max loan non agunan
         if ($loan_value > $maxLoan && $is_agunan === false)

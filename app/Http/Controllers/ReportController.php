@@ -269,7 +269,7 @@ class ReportController extends Controller
                 break;
             case 'SAVING':
                 $savings = Saving::with(['member','svType'])
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('sv_date', [$startDate, $endDate])
                 ->get();
 
                 foreach ($savings as $key => $sv) {
@@ -285,12 +285,18 @@ class ReportController extends Controller
                 break;
 
             case 'LOAN':
+                $typeLoan = $request->typeLoan ?? "all";
                 $loans = Loan::with(['member','payments'])
                 ->whereBetween('loan_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                ->when($typeLoan != "all", function ($query) use ($typeLoan) {
+                    return $query->where('loan_type', $typeLoan);
+                })
                 ->get();
 
                 foreach ($loans as $key => $loan) {
                     $data[] = [
+                        'member_nip' => $loan->member->nip,
+                        'member_name' => $loan->member->name,
                         'loan_code' => $loan->loan_code,
                         'loan_date' => $loan->loan_date,
                         'loan_type' => $loan->loan_type,
@@ -301,7 +307,7 @@ class ReportController extends Controller
                 break;
             case 'PURCHASE':
                 $purchases = Purchase::with(['supplier','prDetails'])
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('pr_date', [$startDate, $endDate])
                 ->get();
 
                 foreach ($purchases as $key => $pr) {
@@ -322,7 +328,7 @@ class ReportController extends Controller
                     $where = "payment_type='".strtoupper($pay_type)."'";
                 }
                 $sales = Sale::with(['saDetail'])
-                ->whereBetween('created_at', [$startDate, $endDate." 23:59:59"])
+                ->whereBetween('sa_date', [$startDate, $endDate])
                 ->whereRaw($where)
                 ->get();
 
@@ -342,7 +348,7 @@ class ReportController extends Controller
                 $totalSales = 0;
 
                 $purchases = Purchase::with(['supplier','prDetails'])
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('pr_date', [$startDate, $endDate])
                 ->get();
 
                 foreach ($purchases as $key => $pr) {
@@ -350,7 +356,7 @@ class ReportController extends Controller
                 }
 
                 $sales = Sale::with(['saDetail'])
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('sa_date', [$startDate, $endDate])
                 ->get();
 
                 foreach ($sales as $key => $sa) {
@@ -365,7 +371,7 @@ class ReportController extends Controller
             
             case 'INVENTORY':
                 $inventories = Inventory::with(['invDetails'])
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('inv_date', [$startDate, $endDate])
                 ->get();
 
                 foreach ($inventories as $key => $inv) {
@@ -703,7 +709,7 @@ class ReportController extends Controller
                 ->whereIn('member_id', $memberIds)
                 ->whereIn('loan_state', [2])
                 ->get()
-                ->groupBy('member_id');
+                ->groupBy('member_id','loan_type');
 
             foreach ($members as $member) {
                 if ($member->is_transactional != 1) {
@@ -724,7 +730,7 @@ class ReportController extends Controller
                         $firstPay = $loan->payments->first();
                         if (!$firstPay) continue;
                         $tenor_month = $firstPay->tenor_month;
-                        if (strtoupper($loan->type) === "BARANG") {
+                        if (strtoupper($loan->loan_type) === "BARANG") {
                             $cicilanBarang += $firstPay->lp_total;
                         } else {
                             $angsuranPinjaman += $firstPay->lp_total;

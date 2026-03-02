@@ -66,12 +66,13 @@ class PosController extends Controller
         $items = $request->items;
         $total = $request->total;
         $sa_code = POS::generateSalesCode();
+        $now = now()->format('Ymd');
 
         try {
             // Store the sale and get the ID
             $saleId = DB::table('sales')->insertGetId([
                 'sa_code' => $sa_code,
-                'sa_date' => now()->format('Ymd'),
+                'sa_date' => $now,
                 'member_id' => $request->member_id,
                 'sub_total' => $total,
                 'created_by' => auth()->id(),
@@ -95,7 +96,7 @@ class PosController extends Controller
                 MasterItem::where('id', $item['id'])->decrement('stock', $item['qty']);
             }
 
-            // Batch insert for better performance
+            // Batch insert
             DB::table('sale_detail')->insert($salesDetails);
 
             // insert loan
@@ -103,7 +104,7 @@ class PosController extends Controller
                 // cek limit
                 $member = Member::findOrFail($request->member_id);
                 $monthlySaving = SavingType::getMonthlySaving();
-                $currentLoan = $member->getTotalLoan();
+                $currentLoan = $member->getTotalLoan($now, $request->tenor*1);
                 $totalBayar = ($currentLoan['total_bayar']*1) + ($total / $request->tenor*1) + ($monthlySaving*1);
 
                 if ($totalBayar > $currentLoan['maxBayar']) {
@@ -123,10 +124,7 @@ class PosController extends Controller
                 // }
 
                 $loan_code = Loan::generateCode();
-                $date = new DateTime(now());
-                $date->add(new DateInterval('P' . $request->tenor . 'M'));
-                $dueDate = $date->format('Ymd');
-
+                
                 // if (Loan::where('ref_sale_id', $saleId)->exists()) {
                 //     throw new Exception('Pinjaman sudah ada untuk penjualan ini.');
                 // }
@@ -135,11 +133,11 @@ class PosController extends Controller
                     'member_id' => $request->member_id,
                     'loan_type' => 'BARANG',
                     'loan_code' => $loan_code,
-                    'loan_date' => now()->format('Ymd'),
+                    'loan_date' => $now,
                     'loan_tenor' => $request->tenor,
                     'loan_value' => $total,
                     'interest_percent' => 0,
-                    'due_date' => $dueDate,
+                    'due_date' => $currentLoan['dueDate'],
                     'loan_state' => 2,
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),

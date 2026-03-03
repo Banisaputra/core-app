@@ -215,7 +215,7 @@
           data: function (params) {
               return {
                   q: params.term,
-                  active: 1
+                  active: 2 // 2 for all member, 1 for active only, 0 for nonactive only
               };
           },
           processResults: function (data) {

@@ -734,11 +734,11 @@ class ReportController extends Controller
                     if ($loan->payments->isNotEmpty()) {
                         $firstPay = $loan->payments->first();
                         if (!$firstPay) continue;
-                        $tenor_month = $firstPay->tenor_month;
                         if (strtoupper($loan->loan_type) === "BARANG") {
                             $cicilanBarang += $firstPay->lp_total;
                         } else {
                             $angsuranPinjaman += $firstPay->lp_total;
+                            $tenor_month = $firstPay->tenor_month;
                         }
                     }
                 }

@@ -449,7 +449,7 @@ class ReportController extends Controller
     public function getMemberList(Request $request) 
     {
         ini_set('memory_limit', '1024M'); // 1GB
-        ini_set('max_execution_time', 300);
+        ini_set('max_execution_time', 0);
 
         $request->validate([
             "typeReport" => "required",
@@ -511,9 +511,72 @@ class ReportController extends Controller
                 $file = 'reports.member';
                 break;
 
-            default:
-                // report not found or not implemented
+            case 'MEMBER_new':
+                $query = DB::table('members as m')
+                    ->select(
+                        'm.nip', 
+                        'm.name as mb_name', 
+                        'u.email', 
+                        'm.no_ktp', 
+                        'm.no_kk', 
+                        'm.telphone', 
+                        'm.address', 
+                        'm.date_joined', 
+                        'p.name as ps_name', 
+                        'd.name as dv_name', 
+                        'm.is_transactional as mb_active'
+                    )
+                    ->join('users as u', 'm.user_id', '=', 'u.id')
+                    ->join('positions as p', 'm.position_id', '=', 'p.id')
+                    ->join('devisions as d', 'm.devision_id', '=', 'd.id');
+
+                // Filter logic sama seperti di atas...
+                if ($request->activate == 2) {
+                    $filter['Status'] = "SEMUA"; 
+                    $query->where('m.is_transactional', '<', 2);
+                } else {
+                    $filter['Status'] = $request->activate == 1 ? "AKTIF" : "NONAKTIF"; 
+                    $query->where('m.is_transactional', '=', (int)$request->activate);
+                }
+                
+                if ($request->startJoined) {
+                    $filter['Tgl. Bergabung'] = $request->startJoined;
+                    $query->where('m.date_joined', '>=', $request->startJoined);
+                }
+                if ($request->endJoined) {
+                    $filter['Tgl. Batas Bergabung'] = $request->endJoined;
+                    $query->where('m.date_joined', '<=', $request->endJoined);
+                }
+
+                // Gunakan pagination jika untuk tampilan web
+                $members = $query->paginate(50); // 50 per halaman
+                
+                // Atau gunakan lazy loading untuk memory efficient
+                $members = $query->lazy(); // Laravel 8+
+                
+                // Transform data
+                $members->transform(function($mb) {
+                    return [
+                        'nip' => $mb->nip,
+                        'name' => $mb->mb_name,
+                        'email' => $mb->email,
+                        'position' => $mb->ps_name,
+                        'devision' => $mb->dv_name,
+                        'no_ktp' => $mb->no_ktp,
+                        'no_kk' => $mb->no_kk,
+                        'phone' => $mb->telphone,
+                        'address' => $mb->address,
+                        'date_joined' => $mb->date_joined,
+                        'status' => $mb->mb_active,
+                    ];
+                });
+
+                $file = 'reports.member';
                 break;
+
+            default:
+            // report not found or not implemented
+            break;
         }
 
         $pdf = PDF::loadView($file, [

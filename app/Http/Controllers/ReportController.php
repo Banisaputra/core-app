@@ -465,7 +465,7 @@ class ReportController extends Controller
             case 'MEMBER':
 
                 $query = "
-                    SELECT m.nip, m.name mb_name, p.name ps_name, d.name dv_name, m.is_transactional mb_active
+                    SELECT m.nip, m.name mb_name, u.email, m.no_ktp, m.no_kk, m.telphone, m.address, m.date_joined, p.name ps_name, d.name dv_name, m.is_transactional mb_active
                     FROM members m
                     JOIN users u ON m.user_id = u.id 
                     JOIN positions p ON m.position_id = p.id 
@@ -491,13 +491,19 @@ class ReportController extends Controller
                 }
 
                 $members = DB::select($query);
-
+                
                 foreach ($members as $key => $mb) {
                     $data[] = [
                         'nip' => $mb->nip,
                         'name' => $mb->mb_name,
+                        'email' => $mb->email,
                         'position' => $mb->ps_name,
                         'devision' => $mb->dv_name,
+                        'no_ktp' => $mb->no_ktp,
+                        'no_kk' => $mb->no_kk,
+                        'phone' => $mb->telphone,
+                        'address' => $mb->address,
+                        'date_joined' => $mb->date_joined,
                         'status' => $mb->mb_active,
                     ];
                 }
@@ -506,14 +512,14 @@ class ReportController extends Controller
                 break;
 
             default:
-                # code...
+                // report not found or not implemented
                 break;
         }
 
         $pdf = PDF::loadView($file, [
                 'data' => $data,
-                'filter' => $filter,
-            ]);
+                'filter' => $filter
+            ])->setPaper('A4', 'landscape');
         
         $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
 

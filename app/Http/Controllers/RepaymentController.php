@@ -282,13 +282,13 @@ class RepaymentController extends Controller
                 if (in_array($payment->loan->member_id, $memberIds)) {
                     continue; // skip jika member nonaktif
                 }
-                
+
                 if ($payment->lp_state == 1) {
                     $payment->update([
                         'lp_state' => 2,
                         'updated_by' => auth()->id()
                     ]);
-                    Member::where('id', $payment->loan->member_id)->increment('balance', $payment->lp_value);
+                    
                     $count++;
                     $loanArr[] = $payment->loan_id;
                 }

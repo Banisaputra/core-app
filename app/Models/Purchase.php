@@ -25,7 +25,7 @@ class Purchase extends Model
         $dateCode = $periode ?? date('ym'); // ex: 2505
 
         // Ambil entri terakhir di bulan ini
-        $last = self::whereRaw("DATE_FORMAT(pr_date, '%y%m') = ?", [$dateCode])
+        $last = self::whereRaw("DATE_FORMAT(created_at, '%y%m') = ?", [$dateCode])
                     ->orderByDesc('id')
                     ->first();
         $counter = 1;

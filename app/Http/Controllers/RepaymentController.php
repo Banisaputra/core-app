@@ -269,11 +269,20 @@ class RepaymentController extends Controller
         );
 
         DB::beginTransaction();
+        // get member nonaktif
+        $memberIds = Member::where('is_transactional', 0)->pluck('id')->toArray();
+        
         try {
             $count = 0;
             $loanArr = [];
             foreach ($ids as $id) {
                 $payment = LoanPayment::with(['loan', 'loan.member'])->findOrFail($id);
+
+                // cek member nonaktif
+                if (in_array($payment->loan->member_id, $memberIds)) {
+                    continue; // skip jika member nonaktif
+                }
+                
                 if ($payment->lp_state == 1) {
                     $payment->update([
                         'lp_state' => 2,

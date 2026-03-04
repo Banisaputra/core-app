@@ -236,7 +236,7 @@ class SavingController extends Controller
         ]);
 
         // loop member
-        $members = Member::where('is_transactional', 1)->pluck('id')->toArray();;
+        $members = Member::where('is_transactional', 1)->whereNotIn('id', $request->member_id ?? [])->pluck('id')->toArray();;
         $pokok = SavingType::where('name', 'like', 'Pokok')->first();
         $month = date('m', strtotime($request->periode));
         $year = date('Y', strtotime($request->periode));
@@ -256,13 +256,15 @@ class SavingController extends Controller
 
         DB::beginTransaction();
         try {
-            $exists = Saving::whereIn('member_id', $members)
-                ->where('sv_type_id', $pokok->id)
-                ->where('sv_state', '<>', 99) 
-                ->exists();
-
-            if ($exists) {
-                throw new \Exception('Ada anggota yang sudah melakukan simpanan pokok.');
+            if ($pokok->id == $request->sv_type_id) {
+                $pokokExists = Saving::whereIn('member_id', $members)
+                    ->where('sv_type_id', $pokok->id)
+                    ->where('sv_state', '<>', 99) 
+                    ->exists();
+    
+                if ($pokokExists) {
+                    throw new \Exception('Ada anggota yang sudah melakukan simpanan pokok.');
+                }
             }
 
             $exists = Saving::whereIn('member_id', $members)

@@ -268,7 +268,7 @@ class ReportController extends Controller
                 break;
             case 'SAVING':
                 $savings = Saving::with(['member','svType'])
-                ->whereBetween('sv_date', [$startDate, $endDate])
+                ->whereBetween('sv_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
                 ->get();
 
                 foreach ($savings as $key => $sv) {
@@ -306,7 +306,7 @@ class ReportController extends Controller
                 break;
             case 'PURCHASE':
                 $purchases = Purchase::with(['supplier','prDetails'])
-                ->whereBetween('pr_date', [$startDate, $endDate])
+                ->whereBetween('pr_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
                 ->get();
 
                 foreach ($purchases as $key => $pr) {
@@ -370,7 +370,7 @@ class ReportController extends Controller
             
             case 'INVENTORY':
                 $inventories = Inventory::with(['invDetails'])
-                ->whereBetween('inv_date', [$startDate, $endDate])
+                ->whereBetween('inv_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
                 ->get();
 
                 foreach ($inventories as $key => $inv) {

@@ -307,6 +307,7 @@ class ReportController extends Controller
             case 'PURCHASE':
                 $purchases = Purchase::with(['supplier','prDetails'])
                 ->whereBetween('pr_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                ->where('pr_state', 2)
                 ->get();
 
                 foreach ($purchases as $key => $pr) {

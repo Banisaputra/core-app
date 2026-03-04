@@ -220,52 +220,47 @@
           'X-CSRF-TOKEN': '{{ csrf_token() }}'
       }
     })
-    .then(response => response.blob())
-    .then(blob => {
-      const reader = new FileReader();
-      reader.onload = function() {
-        const base64 = reader.result;
-          
-        if (isPreview) {
-          // Buat tab baru dengan PDF viewer
-          const newWindow = window.open('', '_blank');
-          newWindow.document.write(`
-              <!DOCTYPE html>
-              <html>
-              <head>
-                  <title>Preview Laporan</title>
-                  <style>
-                      body { margin: 0; }
-                      iframe { width: 100%; height: 100vh; border: none; }
-                  </style>
-              </head>
-              <body>
-                  <iframe src="data:application/pdf;base64,${base64.split(',')[1]}"></iframe>
-              </body>
-              </html>
-          `);
-          newWindow.document.close();
-        } else {
-          // Download seperti biasa
-          const now = new Date();
-          const formattedDate = 
-            now.getFullYear() +
-            String(now.getMonth() + 1).padStart(2, '0') +
-            String(now.getDate()).padStart(2, '0') +
-            String(now.getHours()).padStart(2, '0') +
-            String(now.getMinutes()).padStart(2, '0') +
-            String(now.getSeconds()).padStart(2, '0');
+    .then(response => {
+        const contentType = response.headers.get('Content-Type') || '';
 
-          const blobUrl = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = blobUrl;
-          link.download = `Laporan-${reportType}-${formattedDate}.pdf`;
-          link.click();
-          URL.revokeObjectURL(blobUrl);
+        // 🚨 BUKAN PDF = ERROR
+        if (!contentType.includes('application/pdf')) {
+            return response.text().then(text => {
+              console.log('===== RESPONSE BUKAN PDF =====');
+              console.log(text);
+              console.log('==============================');
+              throw new Error('Response bukan PDF');
+            });
         }
-      };
-      reader.readAsDataURL(blob);
+
+        return response.blob();
+    })
+    .then(blob => {
+      const blobUrl = URL.createObjectURL(blob);
+
+        if (isPreview) {
+            window.open(blobUrl, '_blank');
+        } else {
+            const now = new Date();
+            const filename = `Laporan-${reportType}-${now.getTime()}.pdf`;
+
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        URL.revokeObjectURL(blobUrl);
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Gagal generate PDF');
+    })
+    .finally(() => {
       hideLoader();
+      // Reset UI
       if (isPreview) {
         previewBtn.disabled = false;
         previewText.textContent = 'Preview';
@@ -275,7 +270,7 @@
         submitText.textContent = 'Download';
         downloadSpinner.classList.add('d-none');
       }
-    })
+    });
   }
 
   // Event listeners

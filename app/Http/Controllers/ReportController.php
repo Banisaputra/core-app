@@ -269,6 +269,7 @@ class ReportController extends Controller
             case 'SAVING':
                 $savings = Saving::with(['member','svType'])
                 ->whereBetween('sv_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                ->where('sv_state', 2)
                 ->get();
 
                 foreach ($savings as $key => $sv) {
@@ -287,6 +288,7 @@ class ReportController extends Controller
                 $typeLoan = $request->typeLoan ?? "all";
                 $loans = Loan::with(['member','payments'])
                 ->whereBetween('loan_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                ->where('loan_state', 2)
                 ->when($typeLoan != "all", function ($query) use ($typeLoan) {
                     return $query->where('loan_type', $typeLoan);
                 })
@@ -328,7 +330,7 @@ class ReportController extends Controller
                     $where = "payment_type='".strtoupper($pay_type)."'";
                 }
                 $sales = Sale::with(['saDetail'])
-                ->whereBetween('sa_date', [$startDate, $endDate." 23:59:59"])
+                ->whereBetween('sa_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
                 ->whereRaw($where)
                 ->get();
 
@@ -348,7 +350,8 @@ class ReportController extends Controller
                 $totalSales = 0;
 
                 $purchases = Purchase::with(['supplier','prDetails'])
-                ->whereBetween('pr_date', [$startDate, $endDate])
+                ->whereBetween('pr_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                ->where('pr_state', 2)
                 ->get();
 
                 foreach ($purchases as $key => $pr) {
@@ -356,7 +359,7 @@ class ReportController extends Controller
                 }
 
                 $sales = Sale::with(['saDetail'])
-                ->whereBetween('sa_date', [$startDate, $endDate])
+                ->whereBetween('sa_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
                 ->get();
 
                 foreach ($sales as $key => $sa) {
@@ -416,7 +419,6 @@ class ReportController extends Controller
             
             default:
                 // invalid report type
-
                 break;
         }
 
@@ -449,7 +451,7 @@ class ReportController extends Controller
 
     public function getMemberList(Request $request) 
     {
-        ini_set('memory_limit', '1024M'); // 1GB
+        ini_set('memory_limit', '2048M');
         ini_set('max_execution_time', 0);
 
         $request->validate([
@@ -463,57 +465,10 @@ class ReportController extends Controller
         $file = 'reports';
 
         switch ($type) {
+             
             case 'MEMBER':
-
-                $query = "
-                    SELECT m.nip, m.name mb_name, u.email, m.no_ktp, m.no_kk, m.telphone, m.address, m.date_joined, p.name ps_name, d.name dv_name, m.is_transactional mb_active
-                    FROM members m
-                    JOIN users u ON m.user_id = u.id 
-                    JOIN positions p ON m.position_id = p.id 
-                    JOIN devisions d ON m.devision_id = d.id 
-                    WHERE 1=1
-                ";
-
-                if ($request->activate == 2) {
-                    $filter['Status'] = "SEMUA"; 
-                    $query .= " AND m.is_transactional < 2";
-                } else {
-                    $filter['Status'] = $request->activate == 1 ? "AKTIF" : "NONAKTIF"; 
-                    $query .= " AND m.is_transactional =". $request->activate ."";
-                }
-                
-                if ($request->startJoined) {
-                    $filter['Tgl. Bergabung'] = $request->startJoined;
-                    $query .= " AND m.date_joined >='".$request->startJoined."'";
-                }
-                if ($request->endJoined) {
-                    $filter['Tgl. Batas Bergabung'] = $request->endJoined;
-                    $query .= " AND m.date_joined <='".$request->endJoined."'";
-                }
-
-                $members = DB::select($query);
-                
-                foreach ($members as $key => $mb) {
-                    $data[] = [
-                        'nip' => $mb->nip,
-                        'name' => $mb->mb_name,
-                        'email' => $mb->email,
-                        'position' => $mb->ps_name,
-                        'devision' => $mb->dv_name,
-                        'no_ktp' => $mb->no_ktp,
-                        'no_kk' => $mb->no_kk,
-                        'phone' => $mb->telphone,
-                        'address' => $mb->address,
-                        'date_joined' => $mb->date_joined,
-                        'status' => $mb->mb_active,
-                    ];
-                }
-
-                $file = 'reports.member';
-                break;
-
-            case 'MEMBER_new':
-                $query = DB::table('members as m')
+                try {
+                    $query = DB::table('members as m')
                     ->select(
                         'm.nip', 
                         'm.name as mb_name', 
@@ -531,47 +486,92 @@ class ReportController extends Controller
                     ->join('positions as p', 'm.position_id', '=', 'p.id')
                     ->join('devisions as d', 'm.devision_id', '=', 'd.id');
 
-                // Filter logic sama seperti di atas...
-                if ($request->activate == 2) {
-                    $filter['Status'] = "SEMUA"; 
-                    $query->where('m.is_transactional', '<', 2);
-                } else {
-                    $filter['Status'] = $request->activate == 1 ? "AKTIF" : "NONAKTIF"; 
-                    $query->where('m.is_transactional', '=', (int)$request->activate);
-                }
-                
-                if ($request->startJoined) {
-                    $filter['Tgl. Bergabung'] = $request->startJoined;
-                    $query->where('m.date_joined', '>=', $request->startJoined);
-                }
-                if ($request->endJoined) {
-                    $filter['Tgl. Batas Bergabung'] = $request->endJoined;
-                    $query->where('m.date_joined', '<=', $request->endJoined);
-                }
+                    // Filter logic sama seperti di atas...
+                    if ($request->activate == 2) {
+                        $filter['Status'] = "SEMUA"; 
+                        $query->where('m.is_transactional', '<', 2);
+                    } else {
+                        $filter['Status'] = $request->activate == 1 ? "AKTIF" : "NONAKTIF"; 
+                        $query->where('m.is_transactional', '=', (int)$request->activate);
+                    }
+                    
+                    if ($request->startJoined) {
+                        $filter['Tgl. Bergabung'] = $request->startJoined;
+                        $query->where('m.date_joined', '>=', $request->startJoined);
+                    }
+                    if ($request->endJoined) {
+                        $filter['Tgl. Batas Bergabung'] = $request->endJoined;
+                        $query->where('m.date_joined', '<=', $request->endJoined);
+                    }
+  
+                    // Buat file temporary
+                    $tempFile = tempnam(sys_get_temp_dir(), 'report_');
+                    $handle = fopen($tempFile, 'w');
+                     
+                    // Chunk processing - 500 per batch
+                    $query->orderBy('m.id')->chunk(500, function($members) use ($handle) {
+                        foreach ($members as $mb) {
+                            fputcsv($handle, [
+                                $mb->nip,
+                                $mb->mb_name,
+                                $mb->email,
+                                $mb->ps_name,
+                                $mb->dv_name,
+                                $mb->no_ktp,
+                                $mb->no_kk,
+                                $mb->telphone,
+                                $mb->address,
+                                $mb->date_joined,
+                                $mb->mb_active,
+                            ]);
+                        }
+                    });
+                    
+                    fclose($handle);
+                    
+                    // Baca kembali jika perlu (untuk di-pass ke view)
+                    $data = [];
+                    if (($handle = fopen($tempFile, 'r')) !== FALSE) {
+                        while (($row = fgetcsv($handle)) !== FALSE) {
+                            $data[] = [
+                                'nip' => $row[0],
+                                'name' => $row[1],
+                                'email' => $row[2],
+                                'position' => $row[3],
+                                'devision' => $row[4],
+                                'no_ktp' => $row[5],
+                                'no_kk' => $row[6],
+                                'phone' => $row[7],
+                                'address' => $row[8],
+                                'date_joined' => $row[9],
+                                'status' => $row[10],
+                            ];
+                        }
+                        fclose($handle);
+                    }
+                    
+                    unlink($tempFile); // Hapus file temporary
+                    
 
-                // Gunakan pagination jika untuk tampilan web
-                $members = $query->paginate(50); // 50 per halaman
-                
-                // Atau gunakan lazy loading untuk memory efficient
-                $members = $query->lazy(); // Laravel 8+
-                
-                // Transform data
-                $members->transform(function($mb) {
-                    return [
-                        'nip' => $mb->nip,
-                        'name' => $mb->mb_name,
-                        'email' => $mb->email,
-                        'position' => $mb->ps_name,
-                        'devision' => $mb->dv_name,
-                        'no_ktp' => $mb->no_ktp,
-                        'no_kk' => $mb->no_kk,
-                        'phone' => $mb->telphone,
-                        'address' => $mb->address,
-                        'date_joined' => $mb->date_joined,
-                        'status' => $mb->mb_active,
-                    ];
-                });
+                } catch (\Throwable $e) {
+                    // \Log::error('PDF REAL ERROR', [
+                    //     'msg'  => $e->getMessage(),
+                    //     'file' => $e->getFile(),
+                    //     'line' => $e->getLine(),
+                    //     'trace' => $e->getTraceAsString(),
+                    // ]);
 
+                    // // 🔴 PENTING: KIRIM ERROR ASLI KE RESPONSE
+                    // return response()->json([
+                    //     'real_error' => $e->getMessage(),
+                    //     'file' => $e->getFile(),
+                    //     'line' => $e->getLine(),
+                    // ], 500);
+
+                    abort(500, 'Terjadi kesalahan saat generate laporan. Silakan hubungi administrator.');
+
+                }
+                
                 $file = 'reports.member';
                 break;
 
@@ -588,7 +588,11 @@ class ReportController extends Controller
         $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
 
         if ($request->has('preview')) {
-            return $pdf->stream($filename);
+            // return $pdf->stream($filename);
+            return response()->make($pdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            ]);
         }
     
         return $pdf->download($filename); 
@@ -724,7 +728,7 @@ class ReportController extends Controller
     public function deduction(Request $request) 
     {
         ini_set('memory_limit', '1024M'); // 1GB
-        ini_set('max_execution_time', '300'); // 5 menit
+        ini_set('max_execution_time', '600'); // 10 menit
 
         $cut_off_day = Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value');
         $today = new DateTime();

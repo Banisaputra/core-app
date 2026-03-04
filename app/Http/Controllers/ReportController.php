@@ -20,6 +20,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // use Barryvdh\Snappy\Facades\SnappyPdf as SnappyPDF;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Elibyy\TCPDF\TCPDF;
 
 class ReportController extends Controller
 {
@@ -466,7 +467,7 @@ class ReportController extends Controller
 
         switch ($type) {
              
-            case 'MEMBER':
+            case 'MEMBER_old':
                 try {
                     $query = DB::table('members as m')
                     ->select(
@@ -575,28 +576,32 @@ class ReportController extends Controller
                 $file = 'reports.member';
                 break;
 
+            case 'MEMBER':
+                // direct ke function generateMemberListReport
+                return $this->generateMemberListReport($request);
             default:
             // report not found or not implemented
             break;
         }
 
-        $pdf = PDF::loadView($file, [
+        if ($type !== 'MEMBER') {
+            $pdf = PDF::loadView($file, [
                 'data' => $data,
                 'filter' => $filter
             ])->setPaper('A4', 'landscape');
         
-        $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
+            $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
 
-        if ($request->has('preview')) {
-            // return $pdf->stream($filename);
-            return response()->make($pdf->output(), 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="' . $filename . '"',
-            ]);
+            if ($request->has('preview')) {
+                // return $pdf->stream($filename);
+                return response()->make($pdf->output(), 200, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="' . $filename . '"',
+                ]);
+            }
+        
+            return $pdf->download($filename); 
         }
-    
-        return $pdf->download($filename); 
-
     }
 
     public function getMemberDetail(Request $request) 
@@ -712,6 +717,244 @@ class ReportController extends Controller
     
         return $pdf->download($filename); 
 
+    }
+
+    public function generateMemberListReport(Request $request)
+    {
+        // Base query
+        $query = DB::table('members as m')
+            ->select(
+                'm.nip', 
+                'm.name as mb_name', 
+                'u.email', 
+                'm.no_ktp', 
+                'm.no_kk',
+                'm.telphone', 
+                'm.address', 
+                'm.date_joined', 
+                'p.name as ps_name',
+                'd.name as dv_name', 
+                'm.is_transactional as mb_active'
+            )
+            ->join('users as u', 'm.user_id', '=', 'u.id')
+            ->join('positions as p', 'm.position_id', '=', 'p.id')
+            ->join('devisions as d', 'm.devision_id', '=', 'd.id');
+
+        // Filter logic
+        $filter = [];
+        
+        if ($request->activate == 2) {
+            $filter['Status'] = "SEMUA"; 
+            $query->where('m.is_transactional', '<', 2);
+        } else {
+            $filter['Status'] = $request->activate == 1 ? "AKTIF" : "NONAKTIF"; 
+            $query->where('m.is_transactional', '=', (int)$request->activate);
+        }
+        
+        if ($request->startJoined) {
+            $filter['Tgl. Bergabung Start'] = $request->startJoined;
+            $query->where('m.date_joined', '>=', $request->startJoined);
+        }
+        if ($request->endJoined) {
+            $filter['Tgl. Bergabung End'] = $request->endJoined;
+            $query->where('m.date_joined', '<=', $request->endJoined);
+        }
+
+        // Hitung total data untuk informasi
+        $totalData = $query->count();
+        
+        // Cek action yang diminta
+        if ($request->has('preview')) {
+            // Untuk preview dengan DomPDF - kasih peringatan untuk download
+            return $this->previewWithDomPdf($query, $filter, $totalData, 'Anggota');
+        } else {
+            // Untuk download dengan TCPDF
+            return $this->downloadWithTcpdf($query, $filter);
+        }
+    }
+
+    /**
+     * Preview dengan DomPDF - kasih pesan untuk download
+     */
+    private function previewWithDomPdf($query, $filter, $totalData, $reportType)
+    {
+        // Batasi data untuk preview (hanya 100 data)
+        $previewData = $query->limit(100)->get();
+        
+        $data = [];
+        foreach ($previewData as $mb) {
+            $data[] = [
+                'nip' => $mb->nip,
+                'name' => $mb->mb_name,
+                'email' => $mb->email,
+                'position' => $mb->ps_name,
+                'devision' => $mb->dv_name,
+                'no_ktp' => $mb->no_ktp,
+                'no_kk' => $mb->no_kk,
+                'phone' => $mb->telphone,
+                'address' => $mb->address,
+                'date_joined' => $mb->date_joined,
+                'status' => $mb->mb_active,
+            ];
+        }
+        
+        // Generate preview PDF dengan pesan
+        $pdf = PDF::loadView('reports.member_preview', [
+            'data' => $data,
+            'filter' => $filter,
+            'totalData' => $totalData,
+            'previewCount' => count($data)
+        ])->setPaper('A4', 'landscape');
+        $filename = 'Laporan-'.ucwords(strtolower($reportType)).'-' . now()->format('Ymd') . '.pdf';
+        
+        return response()->make($pdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+        ]);
+    }
+    
+    /**
+     * Download dengan TCPDF untuk data besar
+     */
+    private function downloadWithTcpdf($query, $filter)
+    {
+        // Buat PDF dengan TCPDF
+        $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
+        $pdf->SetPageOrientation('L');
+        
+        // Set document information
+        $pdf->SetCreator('mvtech');
+        $pdf->SetAuthor('mvtech');
+        $pdf->SetTitle('Laporan Member');
+        
+        // Remove default header/footer
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        
+        // Set margins
+        $pdf->SetMargins(5, 5, 5);
+        $pdf->SetAutoPageBreak(true, 10);
+        
+        // Add page
+        $pdf->AddPage();
+        
+        // Title
+        $pdf->SetFont('helvetica', 'B', 14);
+        $pdf->Cell(0, 10, 'LAPORAN DATA MEMBER', 0, 1, 'C');
+        $pdf->Ln(2);
+        
+        // Filter info
+        if (!empty($filter)) {
+            $pdf->SetFont('helvetica', '', 10);
+            $filterText = 'Filter: ';
+            foreach ($filter as $key => $value) {
+                $filterText .= $key . ': ' . $value . ' | ';
+            }
+            $pdf->Cell(0, 5, rtrim($filterText, ' | '), 0, 1, 'L');
+            $pdf->Ln(2);
+        }
+        
+        // Table header
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->SetFillColor(230, 230, 230);
+         
+        // Column widths - diatur agar muat di landscape A4
+        $w = [10, 25, 40, 35, 20, 20, 20, 20, 20, 40, 22, 15];
+        
+        $pdf->Cell($w[0], 8, 'No', 1, 0, 'C', 1);
+        $pdf->Cell($w[1], 8, 'NIP', 1, 0, 'C', 1);
+        $pdf->Cell($w[2], 8, 'Nama', 1, 0, 'C', 1);
+        $pdf->Cell($w[3], 8, 'Email', 1, 0, 'C', 1);
+        $pdf->Cell($w[4], 8, 'Jabatan', 1, 0, 'C', 1);
+        $pdf->Cell($w[5], 8, 'Divisi', 1, 0, 'C', 1);
+        $pdf->Cell($w[6], 8, 'No KTP', 1, 0, 'C', 1);
+        $pdf->Cell($w[7], 8, 'No KK', 1, 0, 'C', 1);
+        $pdf->Cell($w[8], 8, 'Telepon', 1, 0, 'C', 1);
+        $pdf->Cell($w[9], 8, 'Alamat', 1, 0, 'C', 1);
+        $pdf->Cell($w[10], 8, 'Bergabung', 1, 0, 'C', 1);
+        $pdf->Cell($w[11], 8, 'Status', 1, 1, 'C', 1);
+        
+        // Table body dengan chunk processing
+        $pdf->SetFont('helvetica', '', 9);
+        $no = 1;
+        $page = 1;
+        $fill = false;
+        $contentTinggi = $pdf->GetY();
+        $rowPadding = 2;
+        
+        $query->orderBy('m.id')->chunk(200, function($members) use ($pdf, $w, $rowPadding, &$no, &$fill, &$contentTinggi, &$page) {
+            foreach ($members as $mb) {
+                // Hitung tinggi
+                $tinggi = [
+                    $pdf->getStringHeight($w[0], $no."."),
+                    $pdf->getStringHeight($w[1], $mb->nip),
+                    $pdf->getStringHeight($w[2], $mb->mb_name),
+                    $pdf->getStringHeight($w[3], $mb->email),
+                    $pdf->getStringHeight($w[4], $mb->ps_name),
+                    $pdf->getStringHeight($w[5], $mb->dv_name),
+                    $pdf->getStringHeight($w[6], $mb->no_ktp),
+                    $pdf->getStringHeight($w[7], $mb->no_kk),
+                    $pdf->getStringHeight($w[8], $mb->telphone),
+                    $pdf->getStringHeight($w[9], $mb->address),
+                    $pdf->getStringHeight($w[10], date('d/m/Y', strtotime($mb->date_joined))),
+                    $pdf->getStringHeight($w[11], $mb->mb_active == 1 ? 'Aktif' : 'Nonaktif')
+                ];
+                
+                $maxTinggi = max($tinggi) + $rowPadding;
+
+
+                // Cek apakah perlu page baru
+                if ($contentTinggi + $maxTinggi >= $pdf->getPageHeight() - 25) {
+                    // line penutup page sebelumnya
+                    $pdf->Cell(array_sum($w), 0, '', 'T');
+
+                    $pdf->AddPage();
+                    $page++;
+
+                    // Ulangi header di halaman baru
+                    $pdf->SetFont('helvetica', 'B', 10);
+                    $pdf->SetFillColor(230, 230, 230);
+                    $pdf->Cell($w[0], 8, 'No', 1, 0, 'C', 1);
+                    $pdf->Cell($w[1], 8, 'NIP', 1, 0, 'C', 1);
+                    $pdf->Cell($w[2], 8, 'Nama', 1, 0, 'C', 1);
+                    $pdf->Cell($w[3], 8, 'Email', 1, 0, 'C', 1);
+                    $pdf->Cell($w[4], 8, 'Jabatan', 1, 0, 'C', 1);
+                    $pdf->Cell($w[5], 8, 'Divisi', 1, 0, 'C', 1);
+                    $pdf->Cell($w[6], 8, 'No KTP', 1, 0, 'C', 1);
+                    $pdf->Cell($w[7], 8, 'No KK', 1, 0, 'C', 1);
+                    $pdf->Cell($w[8], 8, 'Telepon', 1, 0, 'C', 1);
+                    $pdf->Cell($w[9], 8, 'Alamat', 1, 0, 'C', 1);
+                    $pdf->Cell($w[10], 8, 'Bergabung', 1, 0, 'C', 1);
+                    $pdf->Cell($w[11], 8, 'Status', 1, 1, 'C', 1);
+                    
+                    $pdf->SetFont('helvetica', '', 9);
+                    $contentTinggi = $pdf->GetY();
+                }
+ 
+                $pdf->MultiCell($w[0], $maxTinggi, $no++ . ".", 'LR', 'L', $fill, 0);
+                $pdf->MultiCell($w[1], $maxTinggi, $mb->nip, 'LR', 'L', $fill, 0);
+                $pdf->MultiCell($w[2], $maxTinggi, $mb->mb_name, 'LR', 'L', $fill, 0);
+                $pdf->MultiCell($w[3], $maxTinggi, $mb->email   , 'LR', 'L', $fill, 0);
+                $pdf->MultiCell($w[4], $maxTinggi, $mb->ps_name, 'LR', 'L', $fill, 0);
+                $pdf->MultiCell($w[5], $maxTinggi, $mb->dv_name, 'LR', 'L', $fill, 0);
+                $pdf->MultiCell($w[6], $maxTinggi, $mb->no_ktp, 'LR', 'L', $fill, 0);
+                $pdf->MultiCell($w[7], $maxTinggi, $mb->no_kk, 'LR', 'L', $fill, 0);
+                $pdf->MultiCell($w[8], $maxTinggi, $mb->telphone, 'LR', 'L', $fill, 0);
+                $pdf->MultiCell($w[9], $maxTinggi, $mb->address, 'LR', 'L', $fill, 0);
+                $pdf->MultiCell($w[10], $maxTinggi, date('d/m/Y', strtotime($mb->date_joined)), 'LR', 'C', $fill, 0);
+                $pdf->MultiCell($w[11], $maxTinggi, $mb->mb_active == 1 ? 'Aktif' : 'Nonaktif', 'LR', 'C', $fill, 1);
+
+                $fill = !$fill;
+                $contentTinggi = $contentTinggi + $maxTinggi;
+            }
+        }); 
+
+        // Line bottom
+        $pdf->Line(5, $pdf->GetY(), 292, $pdf->GetY());
+        
+        // Output PDF untuk download
+        $pdf->Output('laporan_member_' . date('Ymd_His') . '.pdf', 'D');
+        exit;
     }
 
     public function loanInfo(Request $request) 

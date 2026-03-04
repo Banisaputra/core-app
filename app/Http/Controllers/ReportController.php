@@ -450,7 +450,7 @@ class ReportController extends Controller
     public function getMemberList(Request $request) 
     {
         ini_set('memory_limit', '1024M'); // 1GB
-        ini_set('max_execution_time', 300);
+        ini_set('max_execution_time', 0);
 
         $request->validate([
             "typeReport" => "required",
@@ -729,11 +729,11 @@ class ReportController extends Controller
                     if ($loan->payments->isNotEmpty()) {
                         $firstPay = $loan->payments->first();
                         if (!$firstPay) continue;
-                        $tenor_month = $firstPay->tenor_month;
                         if (strtoupper($loan->loan_type) === "BARANG") {
                             $cicilanBarang += $firstPay->lp_total;
                         } else {
                             $angsuranPinjaman += $firstPay->lp_total;
+                            $tenor_month = $firstPay->tenor_month;
                         }
                     }
                 }

@@ -203,6 +203,7 @@
       submitText.textContent = 'Mengunduh...';
       downloadSpinner.classList.remove('d-none');
     }
+    showLoader();
     
     // Get form data
     const formData = new FormData(form);
@@ -264,6 +265,7 @@
         }
       };
       reader.readAsDataURL(blob);
+      hideLoader();
       if (isPreview) {
         previewBtn.disabled = false;
         previewText.textContent = 'Preview';

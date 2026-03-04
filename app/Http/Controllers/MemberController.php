@@ -500,7 +500,8 @@ class MemberController extends Controller
 
     }
 
-    public function getBalance(Request $request) {
+    public function getBalance(Request $request) 
+    {
         
         $member = Member::findOrFail($request->member_id);
 
@@ -518,10 +519,8 @@ class MemberController extends Controller
         }
         // dd($balance->balance);
         return response()->json([
-        'member_id' => $member->id,
-        'balance' => $saldo,
-    ]);
-
+            'member_id' => $member->id,
+            'balance' => $saldo,
+        ]);
     }
-
 }

@@ -48,9 +48,11 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-                <a href="{{ route('loans.create') }}" class="btn mb-2 btn-success">
-                    <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
-                </a>
+            @can('loan_create')
+            <a href="{{ route('loans.create') }}" class="btn mb-2 btn-success">
+              <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
+            </a>
+            @endif
             </div>
             <div class="col-auto">
                 {{-- other button --}}
@@ -124,13 +126,12 @@
           </div>
       </div>
 
-      {{-- <button id="btnFilter" class="btn btn-primary mb-2">
+      <button id="btnFilter" class="btn btn-primary mb-2">
           Terapkan Filter
       </button>
       <button id="btnReset" class="btn btn-secondary mb-2">
           Reset Filter
-      </button> --}}
-
+      </button>
 
         <div class="row my-4">
           <div class="col-md-12">

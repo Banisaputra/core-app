@@ -43,12 +43,14 @@
                 <h2 class="h3 mb-0 page-title">Jenis Simpanan</h2>
             </div>
             <div class="row align-items-center my-4">
-                <div class="col">
-                    <button class="btn btn-primary mb-3" id="btnAdd">Tambah Data</button>
-                </div>
-                <div class="col-auto">
-                    {{-- other button --}}
-                </div>
+              @can('savingTypes_create')
+              <div class="col">
+                  <button class="btn btn-primary mb-3" id="btnAdd">Tambah Data</button>
+              </div>
+              @endcan
+              <div class="col-auto">
+                  {{-- other button --}}
+              </div>
             </div>
         
             <div class="row my-4"> 
@@ -78,12 +80,16 @@
                               <span class="text-muted sr-only">Action</span>
                               </button>
                               <div class="dropdown-menu dropdown-menu-right">
+                                  @can('savingType_edit')
                                   <button class="dropdown-item btn-edit">Edit</button>
+                                  @endcan
+                                  @can('savingType_delete')
                                   <form action="{{ route('saving-types.destroy', $svt->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                       @csrf
                                       @method('DELETE')
                                       <button type="submit" id="btnDelete" class="dropdown-item">{{ $svt->is_transactional==1 ? "Nonaktifkan" : "Aktifkan"}}</button>
                                   </form>
+                                  @endcan
                               </div>
                             </td> 
                           </tr>

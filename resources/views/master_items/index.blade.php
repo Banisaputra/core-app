@@ -48,15 +48,19 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-                <a href="{{ route('items.create') }}" class="btn mb-2 btn-primary">
-                    <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
-                </a>
+              @can('item_create') 
+              <a href="{{ route('items.create') }}" class="btn mb-2 btn-primary">
+                  <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
+              </a>
+              @endcan
             </div>
             <div class="col-auto">
               <div class="dropdown">
+                @can('item_create') 
                 <button class="btn btn-sm btn-success more-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown">
                   <span class="fe fe-24 fe-download"></span>Import file
                 </button>
+                @endcan
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style="">
                   <a class="dropdown-item" href="{{ route('items.template')}}"><small>Download Template</small></a>
                   <button class="dropdown-item" data-toggle="modal" data-target="#importModal"><small>Upload data</small></button>
@@ -123,13 +127,19 @@
                                 <span class="text-muted sr-only">Action</span>
                               </button>
                               <div class="dropdown-menu dropdown-menu-right">
+                                @can('item_show')
                                 <a class="dropdown-item" href="{{ route('items.show', $item->id) }}">View</a>
+                                @endcan
+                                @can('item_edit')
                                 <a class="dropdown-item" href="{{ route('items.edit', $item->id) }}">Edit</a>
+                                @endcan
+                                @can('item_delete')
                                 <form action="{{ route('items.destroy', $item->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" id="btnDelete" class="dropdown-item">{{ $item->is_transactional==1 ? "Nonaktifkan" : "Aktifkan"}}</button>
                                 </form>
+                                @endcan
                               </div>
                             </td> 
                         </tr>

@@ -1,5 +1,6 @@
 @php
 use App\Models\Menu;
+use Illuminate\Support\Facades\Route;
 $parentMenus = Menu::whereNull('parent_id')->orderBy('order')->get();
 @endphp
 
@@ -21,17 +22,17 @@ $parentMenus = Menu::whereNull('parent_id')->orderBy('order')->get();
     </p> --}}
     <ul class="navbar-nav flex-fill w-100 mb-2">
         @if($parent->children->count())
-            <li class="nav-item dropdown"> 
-                <a href="{{ $parent->route ? route($parent->route) : '#'.$parent->permission }}"
+            <li class="nav-item dropdown">
+                <a href="{{ $parent->route ? route($parent->route) : '#'.str_replace(' ', '-', strtolower($parent->name)) }}"
                     data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
                     <i class="fe {{ $parent->icon }} fe-16"></i>
                     <span class="ml-3 item-text"> {{ $parent->name }} </span>
                 </a>
-                <ul class="collapse list-unstyled pl-4 w-100" id="{{ $parent->permission }}">
+                <ul class="collapse list-unstyled pl-4 w-100" id="{{ str_replace(' ', '-', strtolower($parent->name)) }}">
                     @foreach ($parent->children as $child)
                     @if(!$child->permission || auth()->user()->can($child->permission))
                         <li class="nav-item">
-                            <a class="nav-link pl-3" href="{{ route($child->route) }}"> 
+                            <a class="nav-link pl-3" href="{{ Route::has($child->route) ? route($child->route) : '#' }}"> 
                                 <i class="fe {{ $child->icon ?? 'fe-grid' }}"></i>
                                 <span class="ml-1 item-text">{{ $child->name }}</span>
                             </a>

@@ -19,7 +19,7 @@ class MenuController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:100|unique:menus,name',
-            'route' => 'required|string|max:100|unique:menus,route',
+            'route' => 'nullable|string|max:100|unique:menus,route',
             'permission' => 'required|string|max:100|unique:menus,permission',
         ]);
 
@@ -52,10 +52,18 @@ class MenuController extends Controller
                     if (!$request->order) {
                         $request->order = $lastOrder ? $lastOrder + 1 : 1;
                     } else {
-                        // geser order menu lain jika ada yang sama
-                        Menu::where('parent_id', $request->parent_id)
-                            ->where('order', '>=', $request->order)
-                            ->increment('order');
+                        $existingOrder = Menu::where('parent_id', $request->parent_id)
+                            ->where('order', $request->order)
+                            ->first();
+                        if ($existingOrder) {
+                            if ($existingOrder->order == $request->order) {
+                                // geser order menu lain jika ada yang sama
+                                Menu::where('parent_id', $request->parent_id)
+                                    ->where('order', '>=', $existingOrder->order)
+                                    ->increment('order');
+                            }
+                            
+                        }
                     }
                 }
             } else {
@@ -64,10 +72,18 @@ class MenuController extends Controller
                 if (!$request->order) {
                     $request->order = $lastOrder ? $lastOrder + 1 : 1;
                 } else {
-                    // geser order menu lain jika ada yang sama
-                    Menu::whereNull('parent_id')
-                        ->where('order', '>=', $request->order)
-                        ->increment('order');
+                    $existingOrder = Menu::where('parent_id', $request->parent_id)
+                        ->where('order', $request->order)
+                        ->first();
+                    if ($existingOrder) {
+                        if ($existingOrder->order == $request->order) {
+                            // geser order menu lain jika ada yang sama
+                            Menu::where('parent_id', $request->parent_id)
+                                ->where('order', '>=', $existingOrder->order)
+                                ->increment('order');
+                        }
+                        
+                    }
                 }
             }
          
@@ -109,7 +125,7 @@ class MenuController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:100|unique:menus,name,'.$id,
-            'route' => 'required|string|max:100|unique:menus,route,'.$id,
+            'route' => 'nullable|string|max:100|unique:menus,route,'.$id,
             'permission' => 'required|string|max:100|unique:menus,permission,'.$id,
         ]);
 
@@ -141,10 +157,23 @@ class MenuController extends Controller
                     if (!$request->order) {
                         $request->order = $lastOrder ? $lastOrder + 1 : 1;
                     } else {
-                        // geser order menu lain jika ada yang sama
-                        Menu::where('parent_id', $request->parent_id)
-                            ->where('order', '>=', $request->order)
-                            ->increment('order');
+                        $existingOrder = Menu::where('parent_id', $request->parent_id)
+                            ->where('order', $request->order)
+                            ->where('id', '!=', $id)
+                            ->first();
+                        $oldOrder = Menu::where('id', $id)->value('order');
+                        if ($existingOrder) {
+                            if ($oldOrder == $request->order) {
+                                // geser order menu lain jika ada yang sama
+                                Menu::where('parent_id', $request->parent_id)
+                                    ->where('order', '>=', $oldOrder)
+                                    ->increment('order');
+                            } else {
+                                // tukar dengan existing order
+                                Menu::where('id', $existingOrder->id)->update(['order' => $oldOrder]);
+                            }
+                            
+                        }
                     }
                 }
             } else {
@@ -153,10 +182,23 @@ class MenuController extends Controller
                 if (!$request->order) {
                     $request->order = $lastOrder ? $lastOrder + 1 : 1;
                 } else {
-                    // geser order menu lain jika ada yang sama
-                    Menu::whereNull('parent_id')
-                        ->where('order', '>=', $request->order)
-                        ->increment('order');
+                    $existingOrder = Menu::where('parent_id', $request->parent_id)
+                        ->where('order', $request->order)
+                        ->where('id', '!=', $id)
+                        ->first();
+                    $oldOrder = Menu::where('id', $id)->value('order');
+                    if ($existingOrder) {
+                        if ($oldOrder == $request->order) {
+                            // geser order menu lain jika ada yang sama
+                            Menu::where('parent_id', $request->parent_id)
+                                ->where('order', '>=', $oldOrder)
+                                ->increment('order');
+                        } else {
+                            // tukar dengan existing order
+                            Menu::where('id', $existingOrder->id)->update(['order' => $oldOrder]);
+                        }
+                        
+                    }
                 }
             }
 

@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('title')
-    <title>Pengaturan Koperasi</title>
+    <title>Pengaturan Umum</title>
 @endsection
 @section('page_css')
     <link rel="stylesheet" href="{{ asset('fedash/css/dataTables.bootstrap4.css') }}">
@@ -34,16 +34,25 @@
                     {{-- menu --}}
                     <div class="col-2">
                         <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                            <a class="nav-link active" id="v-pills-terms-tab" data-toggle="pill" href="#v-pills-terms" role="tab" aria-controls="v-pills-terms" aria-selected="true">Syarat Ketentuan</a>
+                            @can('policy_term')
+                            <a class="nav-link" id="v-pills-terms-tab" data-toggle="pill" href="#v-pills-terms" role="tab" aria-controls="v-pills-terms" aria-selected="true">Syarat Ketentuan</a>
+                            @endcan
+                            @can('policy_general')
                             <a class="nav-link" id="v-pills-general-tab" data-toggle="pill" href="#v-pills-general" role="tab" aria-controls="v-pills-general" aria-selected="true">General</a>
+                            @endcan
+                            @can('policy_saving')
                             <a class="nav-link" id="v-pills-saving-tab" data-toggle="pill" href="#v-pills-saving" role="tab" aria-controls="v-pills-saving" aria-selected="false">Simpanan</a>
+                            @endcan
+                            @can('policy_loan')
                             <a class="nav-link" id="v-pills-loan-tab" data-toggle="pill" href="#v-pills-loan" role="tab" aria-controls="v-pills-loan" aria-selected="false">Pinjaman</a>
+                            @endcan
                         </div>
                     </div>
                     {{-- content --}}
                     <div class="col-10">
                         <div class="tab-content mb-4" id="v-pills-tabContent">
-                            <div class="tab-pane fade active show" id="v-pills-terms" role="tabpanel" aria-labelledby="v-pills-terms-tab">
+                            @can('policy_term')
+                            <div class="tab-pane fade mb-4" id="v-pills-terms" role="tabpanel" aria-labelledby="v-pills-terms-tab">
                                 <form action="{{ route('policies.upload') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="form-group">
@@ -68,15 +77,22 @@
                                     </div>
                                 @endif
                             </div>
+                            @endcan
+                            @can('policy_general')
                             <div class="tab-pane fade mb-4" id="v-pills-general" role="tabpanel" aria-labelledby="v-pills-general-tab">
                                 @include('policies.general')
                             </div>
+                            @endcan
+                            @can('policy_saving')
                             <div class="tab-pane fade mb-4" id="v-pills-saving" role="tabpanel" aria-labelledby="v-pills-saving-tab">
                                 @include('policies.saving')
                             </div>
+                            @endcan
+                            @can('policy_loan')
                             <div class="tab-pane fade mb-4" id="v-pills-loan" role="tabpanel" aria-labelledby="v-pills-loan-tab"> 
                                 @include('policies.loan')
                             </div>
+                            @endcan
                         </div>
                     </div>
                 </div>

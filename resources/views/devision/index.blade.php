@@ -12,7 +12,7 @@
 <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalTitle" style="display: none;" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
-      <form action="{{ route('devision.import') }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('devisions.import') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="modal-header">
           <h5 class="modal-title" id="importModalTitle">Upload file</h5>
@@ -46,17 +46,21 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-                <a href="{{ route('devision.create') }}" class="btn mb-2 btn-primary">
-                    <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
+              @can('devision_create')
+                <a href="{{ route('devisions.create') }}" class="btn mb-2 btn-primary">
+                  <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
                 </a>
+              @endcan
             </div>
             <div class="col-auto">
               <div class="dropdown">
+                @can('devision_create')
                 <button class="btn btn-sm btn-success more-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown">
                   <span class="fe fe-24 fe-download"></span>Import file
                 </button>
+                @endcan
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style="">
-                  <a class="dropdown-item" href="{{ route('devision.template')}}"><small>Download Template</small></a>
+                  <a class="dropdown-item" href="{{ route('devisions.template')}}"><small>Download Template</small></a>
                   <button class="dropdown-item" data-toggle="modal" data-target="#importModal"><small>Upload data</small></button>
                 </div>
               </div>
@@ -115,12 +119,16 @@
                             <span class="text-muted sr-only">Action</span>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="{{ route('devision.edit', $dvs->id) }}">Edit</a>
-                            <form action="{{ route('devision.destroy', $dvs->id) }}" method="POST" style="display: inline;" id="deleteForm">
+                            @can('devision_edit')
+                            <a class="dropdown-item" href="{{ route('devisions.edit', $dvs->id) }}">Edit</a>
+                            @endcan
+                            @can('devision_delete')
+                            <form action="{{ route('devisions.destroy', $dvs->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" id="btnDelete" class="dropdown-item">{{ $dvs->is_transactional==1 ? "Nonaktifkan" : "Aktifkan"}}</button>
                             </form>
+                            @endcan
                           </div>
                         </td> 
                       </tr>

@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use DateTime;
-use DateInterval;
+use App\Models\AgunanPolicy;
 use App\Models\Loan;
+use App\Models\LoanAgunan;
+use App\Models\LoanPayment;
 use App\Models\Member;
 use App\Models\Policy;
-use App\Models\LoanAgunan;
 use App\Models\SavingType;
-use App\Models\LoanPayment;
-use App\Models\AgunanPolicy;
+use DateInterval;
+use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -95,15 +96,17 @@ class LoanController extends Controller
                 };
 
                 // Action button
-                $action = '
-                    <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                $action = '<button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="text-muted sr-only">Action</span>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="'.route('loans.show', $loan->id).'">View</a>
-                        <a class="dropdown-item" href="'.route('loans.edit', $loan->id).'">Edit</a>
-                    </div>
-                ';
+                    <div class="dropdown-menu dropdown-menu-right">';
+ 
+                    if (Auth::user()->can('loan_show'))
+                        $action .= '<a class="dropdown-item" href="'.route('loans.show', $loan->id).'">View</a>';
+                    if (Auth::user()->can('loan_edit'))
+                       $action .= '<a class="dropdown-item" href="'.route('loans.edit', $loan->id).'">Edit</a>';
+                         
+                $action .= '</div>';
                 
                 $formatted[] = [
                     'id' => $loan->id,
@@ -313,7 +316,7 @@ class LoanController extends Controller
         $data = [
             "loan_policies" => Policy::getLoanPolicies(),
             "loan_code" => Loan::generateCode(),
-            "cut_off_day" => Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value')
+            "cut_off_day" => Policy::where('pl_name', 'cut_off_bulanan')->value('pl_value') ?? 1
         ];
 
         // get file terms pdf

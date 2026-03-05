@@ -99,13 +99,14 @@
                       <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $role->name }}</td>
-                        <td><button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <td> 
+                          @can('permission_management_access')
+                          <a href="{{ route('permissions.asign', $role->id) }}"><button class="btn btn-sm btn-warning">Izin Akses</button></a>
+                          @endcan
+                          <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="text-muted sr-only">Action</span>
                           </button>
-                          <div class="dropdown-menu dropdown-menu-right">
-                            @can('permission_management_access')
-                            <a href="{{ route('permissions.asign', $role->id) }}" class="dropdown-item btnPermission">Izin Akses</a>
-                            @endcan
+                          <div class="dropdown-menu dropdown-menu-right"> 
                             @can('role_edit')
                             <button class="dropdown-item btnEdit" data-id="{{ $role->id }}">Edit</button>
                             @endcan

@@ -270,7 +270,8 @@ class ReportController extends Controller
                 break;
             case 'SAVING':
                 $savings = Saving::with(['member','svType'])
-                ->whereBetween('sv_date', [$startDate, $endDate])
+                ->whereBetween('sv_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                ->where('sv_state', 2)
                 ->get();
 
                 foreach ($savings as $key => $sv) {
@@ -289,6 +290,7 @@ class ReportController extends Controller
                 $typeLoan = $request->typeLoan ?? "all";
                 $loans = Loan::with(['member','payments'])
                 ->whereBetween('loan_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                ->where('loan_state', 2)
                 ->when($typeLoan != "all", function ($query) use ($typeLoan) {
                     return $query->where('loan_type', $typeLoan);
                 })
@@ -308,7 +310,8 @@ class ReportController extends Controller
                 break;
             case 'PURCHASE':
                 $purchases = Purchase::with(['supplier','prDetails'])
-                ->whereBetween('pr_date', [$startDate, $endDate])
+                ->whereBetween('pr_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                ->where('pr_state', 2)
                 ->get();
 
                 foreach ($purchases as $key => $pr) {
@@ -329,7 +332,7 @@ class ReportController extends Controller
                     $where = "payment_type='".strtoupper($pay_type)."'";
                 }
                 $sales = Sale::with(['saDetail'])
-                ->whereBetween('sa_date', [$startDate, $endDate])
+                ->whereBetween('sa_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
                 ->whereRaw($where)
                 ->get();
 
@@ -349,7 +352,8 @@ class ReportController extends Controller
                 $totalSales = 0;
 
                 $purchases = Purchase::with(['supplier','prDetails'])
-                ->whereBetween('pr_date', [$startDate, $endDate])
+                ->whereBetween('pr_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
+                ->where('pr_state', 2)
                 ->get();
 
                 foreach ($purchases as $key => $pr) {
@@ -357,7 +361,7 @@ class ReportController extends Controller
                 }
 
                 $sales = Sale::with(['saDetail'])
-                ->whereBetween('sa_date', [$startDate, $endDate])
+                ->whereBetween('sa_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
                 ->get();
 
                 foreach ($sales as $key => $sa) {
@@ -372,7 +376,7 @@ class ReportController extends Controller
             
             case 'INVENTORY':
                 $inventories = Inventory::with(['invDetails'])
-                ->whereBetween('inv_date', [$startDate, $endDate])
+                ->whereBetween('inv_date', [date('Ymd', strtotime($startDate)), date('Ymd', strtotime($endDate))])
                 ->get();
 
                 foreach ($inventories as $key => $inv) {
@@ -416,8 +420,7 @@ class ReportController extends Controller
                 break;
             
             default:
-                // invalid report type
-
+                // invalid report type 
                 break;
         }
 
@@ -465,43 +468,109 @@ class ReportController extends Controller
 
         switch ($type) {
             case 'MEMBER_old':
+                try {
+                    $query = DB::table('members as m')
+                    ->select(
+                        'm.nip', 
+                        'm.name as mb_name', 
+                        'u.email', 
+                        'm.no_ktp', 
+                        'm.no_kk', 
+                        'm.telphone', 
+                        'm.address', 
+                        'm.date_joined', 
+                        'p.name as ps_name', 
+                        'd.name as dv_name', 
+                        'm.is_transactional as mb_active'
+                    )
+                    ->join('users as u', 'm.user_id', '=', 'u.id')
+                    ->join('positions as p', 'm.position_id', '=', 'p.id')
+                    ->join('devisions as d', 'm.devision_id', '=', 'd.id');
 
-                $query = "
-                    SELECT m.nip, m.name mb_name, p.name ps_name, d.name dv_name, m.is_transactional mb_active
-                    FROM members m
-                    JOIN users u ON m.user_id = u.id 
-                    JOIN positions p ON m.position_id = p.id 
-                    JOIN devisions d ON m.devision_id = d.id 
-                    WHERE 1=1
-                ";
+                    // Filter logic sama seperti di atas...
+                    if ($request->activate == 2) {
+                        $filter['Status'] = "SEMUA"; 
+                        $query->where('m.is_transactional', '<', 2);
+                    } else {
+                        $filter['Status'] = $request->activate == 1 ? "AKTIF" : "NONAKTIF"; 
+                        $query->where('m.is_transactional', '=', (int)$request->activate);
+                    }
+                    
+                    if ($request->startJoined) {
+                        $filter['Tgl. Bergabung'] = $request->startJoined;
+                        $query->where('m.date_joined', '>=', $request->startJoined);
+                    }
+                    if ($request->endJoined) {
+                        $filter['Tgl. Batas Bergabung'] = $request->endJoined;
+                        $query->where('m.date_joined', '<=', $request->endJoined);
+                    }
+  
+                    // Buat file temporary
+                    $tempFile = tempnam(sys_get_temp_dir(), 'report_');
+                    $handle = fopen($tempFile, 'w');
+                     
+                    // Chunk processing - 500 per batch
+                    $query->orderBy('m.id')->chunk(500, function($members) use ($handle) {
+                        foreach ($members as $mb) {
+                            fputcsv($handle, [
+                                $mb->nip,
+                                $mb->mb_name,
+                                $mb->email,
+                                $mb->ps_name,
+                                $mb->dv_name,
+                                $mb->no_ktp,
+                                $mb->no_kk,
+                                $mb->telphone,
+                                $mb->address,
+                                $mb->date_joined,
+                                $mb->mb_active,
+                            ]);
+                        }
+                    });
+                    
+                    fclose($handle);
+                    
+                    // Baca kembali jika perlu (untuk di-pass ke view)
+                    $data = [];
+                    if (($handle = fopen($tempFile, 'r')) !== FALSE) {
+                        while (($row = fgetcsv($handle)) !== FALSE) {
+                            $data[] = [
+                                'nip' => $row[0],
+                                'name' => $row[1],
+                                'email' => $row[2],
+                                'position' => $row[3],
+                                'devision' => $row[4],
+                                'no_ktp' => $row[5],
+                                'no_kk' => $row[6],
+                                'phone' => $row[7],
+                                'address' => $row[8],
+                                'date_joined' => $row[9],
+                                'status' => $row[10],
+                            ];
+                        }
+                        fclose($handle);
+                    }
+                    
+                    unlink($tempFile); // Hapus file temporary
+                    
 
-                if ($request->activate == 2) {
-                    $filter['Status'] = "SEMUA"; 
-                    $query .= " AND m.is_transactional < 2";
-                } else {
-                    $filter['Status'] = $request->activate == 1 ? "AKTIF" : "NONAKTIF"; 
-                    $query .= " AND m.is_transactional =". $request->activate ."";
-                }
-                
-                if ($request->startJoined) {
-                    $filter['Tgl. Bergabung'] = $request->startJoined;
-                    $query .= " AND m.date_joined >='".$request->startJoined."'";
-                }
-                if ($request->endJoined) {
-                    $filter['Tgl. Batas Bergabung'] = $request->endJoined;
-                    $query .= " AND m.date_joined <='".$request->endJoined."'";
-                }
+                } catch (\Throwable $e) {
+                    // \Log::error('PDF REAL ERROR', [
+                    //     'msg'  => $e->getMessage(),
+                    //     'file' => $e->getFile(),
+                    //     'line' => $e->getLine(),
+                    //     'trace' => $e->getTraceAsString(),
+                    // ]);
 
-                $members = DB::select($query);
+                    // // 🔴 PENTING: KIRIM ERROR ASLI KE RESPONSE
+                    // return response()->json([
+                    //     'real_error' => $e->getMessage(),
+                    //     'file' => $e->getFile(),
+                    //     'line' => $e->getLine(),
+                    // ], 500);
 
-                foreach ($members as $key => $mb) {
-                    $data[] = [
-                        'nip' => $mb->nip,
-                        'name' => $mb->mb_name,
-                        'position' => $mb->ps_name,
-                        'devision' => $mb->dv_name,
-                        'status' => $mb->mb_active,
-                    ];
+                    abort(500, 'Terjadi kesalahan saat generate laporan. Silakan hubungi administrator.');
+
                 }
 
                 $file = 'reports.member';
@@ -525,10 +594,14 @@ class ReportController extends Controller
             $filename = 'Laporan-'.ucwords(strtolower($type)).'-' . now()->format('Ymd') . '.pdf';
 
             if ($request->has('preview')) {
-                return $pdf->stream($filename);
+                // return $pdf->stream($filename);
+                return response()->make($pdf->output(), 200, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="' . $filename . '"',
+                ]);
             }
         
-            return $pdf->download($filename);
+            return $pdf->download($filename); 
         }
 
     }
@@ -949,6 +1022,7 @@ class ReportController extends Controller
             // Ambil loan & payments per batch
             $loansAll = Loan::with(['payments' => function($q) use ($periode_start, $periode_end) {
                     $q->whereBetween('lp_date', [$periode_start->format('Ymd'), $periode_end->format('Ymd')])
+
                     ->where('lp_state', 1);
                 }])
                 ->whereIn('member_id', $memberIds)

@@ -31,7 +31,7 @@
           </div>
           <div class="form-group mb-3">
             <label for="route">Route</label>
-            <input type="text" id="route" name="route" class="form-control" required>
+            <input type="text" id="route" name="route" class="form-control">
           </div>
           <div class="form-group mb-3">
             <label for="icon">Icon</label>
@@ -70,8 +70,8 @@
     <div class="row justify-content-center">
       <div class="col-12">
         <div class="col">
-            <h2 class="h3 mb-0 page-title">Daftar Menu</h2>
-            <p class="card-text">Menu yang dapat diakses</p>
+          <h2 class="h3 mb-0 page-title">Daftar Menu</h2>
+          <p class="card-text">Menu yang dapat diakses</p>
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
@@ -227,7 +227,7 @@
             // Show the alert
             $('#formErrors').removeClass('d-none');
           } else {
-            alert('Something went wrong. Please try again.');
+            alert(xhr.responseJSON.message + '\n' + (xhr.responseJSON.errors ? JSON.stringify(xhr.responseJSON.errors) : 'empty response'));
           }
         },
         complete: function() {

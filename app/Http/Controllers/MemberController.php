@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Log;
-use Exception;
 use App\Models\Loan;
 use App\Models\Role;
 use App\Models\User;
@@ -19,7 +17,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Font;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Color;
@@ -33,6 +30,119 @@ class MemberController extends Controller
     {
         $members = Member::with('user', 'position', 'devision')->get();
         return view('members.index', compact('members'));
+    }
+
+    public function index_new(Request $request)
+    {        
+        if ($request->ajax()) {
+            $query = Member::with('user', 'position', 'devision');
+
+            // filter tanggal
+            if ($request->filled('date_start') && $request->filled('date_end')) {
+                $query->whereBetween('date_joined', [
+                    date('Y-m-d', strtotime($request->date_start)),
+                    date('Y-m-d', strtotime($request->date_end))
+                ]);
+            }
+            // filter status
+            if ($request->filled('status')) {
+                $query->where('sv_state', $request->status);
+            }
+    
+            // filter jenis
+            if ($request->filled('type')) {
+                $query->where('sv_type_id', $request->type);
+            }
+
+            $columns = [
+                'id',
+                'nip',
+                'sv_date',
+                'member_id',
+                'sv_type_id',
+                'sv_value',
+            ];
+
+            $search = $request->input('search.value');
+            $orderColumnIndex = $request->order[0]['column'];
+            $orderColumn = $columns[$orderColumnIndex] ?? 'id';
+            $orderDir = $request->order[0]['dir'] ?? 'desc';
+
+            $all_count = $query->count();
+            
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('sv_value', 'like', "%{$search}%")
+                    ->orWhere('sv_code', 'like', "%{$search}%")
+                    ->orWhere('sv_date', 'like', "%{$search}%")
+                    ->orWhereHas('member', function ($m) use ($search) {
+                        $m->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('member', function ($m) use ($search) {
+                        $m->where('nip', 'like', "%{$search}%");
+                    });
+                });
+            }
+
+            $totalFiltered = $query->count();
+
+            $data = $query
+                ->orderBy($orderColumn, $orderDir)
+                ->offset($request->start)
+                ->limit($request->length == -1 ? $all_count : $request->length)
+                ->get(); 
+                
+            $start = $request->start;
+            $formatted = [];
+            foreach ($data as $index => $saving) {
+
+                // state
+                $stateText = match($saving->sv_state) {
+                    99 => '<span class="text-danger">Dibatalkan</span>',
+                    2  => '<span class="text-success">Dikonfirmasi</span>',
+                    default => '<span class="text-info">Pengajuan</span>',
+                };
+
+                // Action button
+                $action = '
+                    <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="text-muted sr-only">Action</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="'.route('savings.show', $saving->id).'">View</a>
+                        <a class="dropdown-item" href="'.route('savings.edit', $saving->id).'">Edit</a>
+                        <form action="'.route('savings.destroy', $saving->id).'" method="POST" style="display:inline;" onsubmit="return confirm(\'Yakin batal?\')">
+                            '.csrf_field().method_field('DELETE').'
+                            <button type="submit" class="dropdown-item">Batalkan</button>
+                        </form>
+                    </div>
+                ';
+                
+                $formatted[] = [
+                    'id' => $saving->id,
+                    'rownum' => $start + $index + 1,
+                    'sv_code' => $saving->sv_code,
+                    'member' => [
+                        'nip' => $saving->member->nip ?? '-',
+                        'name' => $saving->member->name ?? '-',
+                    ],
+                    'sv_date' => date('d M Y', strtotime($saving->sv_date)),
+                    'type' => $saving->svType->name ?? '-',
+                    'sv_value' => number_format($saving->sv_value),
+                    'sv_state' => $stateText,
+                    'action' => $action,
+                ];
+            }
+
+            return response()->json([
+                "draw" => intval($request->draw),
+                "recordsTotal" => Member::count(),
+                "recordsFiltered" => $totalFiltered,
+                "data" => $formatted,
+            ]);
+        }
+        
+        return view('members.index');
     }
 
     public function create()

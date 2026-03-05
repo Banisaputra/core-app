@@ -44,7 +44,6 @@
         <div class="col">
           <h2 class="h3 mb-0 page-title">Tambah Pinjaman</h2>
         </div>
-        
       </div>
       <form action="{{ route('loans.store')}}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -148,7 +147,7 @@
             </ul>
             <p class="small text-muted mb-2"> pengajuan pinjaman dengan agunan:</p>
             <ul class="small text-muted pl-4 mb-0">
-              <li>BPKB motor tahun 2010-1025 max. 8.000.000,-</li>
+              <li>BPKB motor tahun 2010-2015 max. 8.000.000,-</li>
               <li>BPKB motor tahun 2016-2020 max. 10.000.000,-</li>
               <li>BPKB motor tahun 2020-2022 max. 12.000.000,-</li>
               <li>BPKB motor tahun 2023-2025 max. 15.000.000,-</li>
@@ -174,7 +173,7 @@
 
 @section('page_script')
 <script>
-  const cut_off_day = {{ $cut_off_day }};
+  const cut_off_day = {{ $cut_off_day ?? 1 }};
 
   function hitungTanggalAngsuranPertama(tanggalPinjam, cutoffDay = 1) {
     const tanggal = new Date(tanggalPinjam);

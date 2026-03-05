@@ -197,11 +197,13 @@
                                         <span class="text-muted sr-only">Action</span>
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-right"> 
+                                        @can('loanPayment_settle')
                                         <form action="{{ route('loanPayments.settle') }}" method="POST" style="display: inline;">
                                             @csrf
                                             <input type="hidden" name="lp_id" value="{{$pay->id}}">
                                             <button type="submit" id="btnSettle" class="dropdown-item">Pelunasan</button>
                                         </form>
+                                        @endcan
                                     </div>
                                     </td> 
                                 </tr>

@@ -14,7 +14,7 @@ class MemberSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 1025; $i++) {
 
             $userId = DB::table('users')->insertGetId([
                 'name' => $faker->name,

@@ -49,15 +49,19 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
-                <a href="{{ route('members.create') }}" class="btn mb-2 btn-primary">
-                    <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
-                </a>
+              @can('member_create')
+              <a href="{{ route('members.create') }}" class="btn mb-2 btn-primary">
+                <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
+              </a>
+              @endcan
             </div>
             <div class="col-auto">
               <div class="dropdown">
+                @can('member_create')
                 <button class="btn btn-sm btn-success more-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown">
                   <span class="fe fe-24 fe-download"></span>Import file
                 </button>
+                @endcan
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style="">
                   <a class="dropdown-item" href="{{ route('members.template')}}"><small>Download Template</small></a>
                   <button class="dropdown-item" data-toggle="modal" data-target="#importModal"><small>Upload data</small></button>
@@ -125,13 +129,19 @@
                             <span class="text-muted sr-only">Action</span>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">
+                            @can('member_show')
                             <a class="dropdown-item" href="{{ route('members.show', $member->id) }}">View</a>
+                            @endcan
+                            @can('member_edit')
                             <a class="dropdown-item" href="{{ route('members.edit', $member->id) }}">Edit</a>
+                            @endcan
+                            @can('member_delete')
                             <form action="{{ route('members.destroy', $member->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" id="btnDelete" class="dropdown-item">{{ $member->is_transactional==1 ? "Nonaktifkan" : "Aktifkan"}}</button>
                             </form>
+                            @endcan
                           </div>
                         </td> 
                       </tr>

@@ -46,15 +46,19 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
+              @can('supplier_create')
                 <a href="{{ route('suppliers.create') }}" class="btn mb-2 btn-primary">
-                    <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
+                  <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
                 </a>
+              @endcan
             </div>
             <div class="col-auto">
               <div class="dropdown">
+                @can('supplier_create')
                 <button class="btn btn-sm btn-success more-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown">
                   <span class="fe fe-24 fe-download"></span>Import file
                 </button>
+                @endcan
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" style="">
                   <a class="dropdown-item" href="{{ route('suppliers.template')}}"><small>Download Template</small></a>
                   <button class="dropdown-item" data-toggle="modal" data-target="#importModal"><small>Upload data</small></button>
@@ -87,12 +91,10 @@
           @endforeach
         </div>
       @endif
-        <div class="row my-4">
-          <!-- Small table -->
+        <div class="row my-4"> 
           <div class="col-md-12">
             <div class="card shadow">
-              <div class="card-body">
-                <!-- table -->
+              <div class="card-body"> 
                 <table class="table datatables" id="supplier">
                   <thead>
                     <tr>
@@ -104,7 +106,6 @@
                     </tr>
                   </thead>
                   <tbody>
-                    
                     @foreach ($supplier as $spl)
                       <tr>
                         <td>{{ $loop->iteration }}</td>
@@ -115,12 +116,16 @@
                             <span class="text-muted sr-only">Action</span>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">
+                            @can('supplier_edit')
                             <a class="dropdown-item" href="{{ route('suppliers.edit', $spl->id) }}">Edit</a>
+                            @endcan
+                            @can('supplier_delete')
                             <form action="{{ route('suppliers.destroy', $spl->id) }}" method="POST" style="display: inline;" id="deleteForm">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" id="btnDelete" class="dropdown-item">{{ $spl->is_active==1 ? "Nonaktifkan" : "Aktifkan"}}</button>
                             </form>
+                            @endcan
                           </div>
                         </td> 
                       </tr>

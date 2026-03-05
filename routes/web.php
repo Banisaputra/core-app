@@ -64,7 +64,7 @@ Route::middleware([LoginAuth::class])->group(function () {
         }
 
         return Response::download($filePath);
-    })->middleware('can:manage_databases');
+    })->name('databases.backup2')->middleware('can:manage_databases');
 
     Route::get('/backup/download', [UserController::class, 'downloadDB'])->name('databases.backup')->middleware('can:manage_databases');
     
@@ -108,11 +108,11 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::delete('/menus/{id}', [AdminMenuController::class, 'destroy'])->name('menus.destroy')->middleware('can:menu_delete');
     
     
-    // ==#===============================#===
+    // ==#================ start delete ===============#===
 
     // info
     Route::get('/access/info', [RoleController::class, 'info'])->name('access.info');
-    // ==#===============================#===
+    // ==#================ end delete ===============#===
 
     // ============== Master Data =======================
     
@@ -207,42 +207,43 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::post('/report/get3', [ReportController::class, 'getMemberDetail'])->name('reports.getMemberDetail');
     Route::post('/report/pdf-loanInfo', [ReportController::class, 'loanInfo'])->name('reports.loanInfo');
  
+    // ============= Cooperative =======================
     // loans
-    Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
-    Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
-    Route::post('/loans/import', [LoanController::class, 'import'])->name('loans.import');
-    Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
-    Route::get('/loans/{id}', [LoanController::class, 'show'])->name('loans.show');
-    Route::get('/loans/{id}/edit', [LoanController::class, 'edit'])->name('loans.edit');
-    Route::put('/loans/{id}', [LoanController::class, 'update'])->name('loans.update');
-    Route::delete('/loans/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
+    Route::get('/loans', [LoanController::class, 'index'])->name('loans.index')->middleware('can:manage_loans');
+    Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create')->middleware('can:loan_create');
+    Route::post('/loans/import', [LoanController::class, 'import'])->name('loans.import')->middleware('can:loan_create');
+    Route::post('/loans', [LoanController::class, 'store'])->name('loans.store')->middleware('can:loan_create');
+    Route::get('/loans/{id}', [LoanController::class, 'show'])->name('loans.show')->middleware('can:loan_show');
+    Route::get('/loans/{id}/edit', [LoanController::class, 'edit'])->name('loans.edit')->middleware('can:loan_edit');
+    Route::put('/loans/{id}', [LoanController::class, 'update'])->name('loans.update')->middleware('can:loan_edit');
+    Route::delete('/loans/{id}', [LoanController::class, 'destroy'])->name('loans.destroy')->middleware('can:loan_delete');
 
     // saving_type
     Route::prefix('saving-types')->name('saving-types.')->group(function () {
-        Route::get('/', [SavingTypeController::class, 'index'])->name('index');
-        Route::post('/', [SavingTypeController::class, 'store'])->name('store');
-        Route::post('/schedule', [SavingTypeController::class, 'schedule'])->name('schedule');
-        Route::get('/{id}/edit', [SavingTypeController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [SavingTypeController::class, 'update'])->name('update');
-        Route::delete('/{id}', [SavingTypeController::class, 'destroy'])->name('destroy');
+        Route::get('/', [SavingTypeController::class, 'index'])->name('index')->middleware('can:manage_savingTypes');
+        Route::post('/', [SavingTypeController::class, 'store'])->name('store')->middleware('can:savingType_create');
+        Route::post('/schedule', [SavingTypeController::class, 'schedule'])->name('schedule')->middleware('can:savingType_create');
+        Route::get('/{id}/edit', [SavingTypeController::class, 'edit'])->name('edit')->middleware('can:savingType_edit');
+        Route::put('/{id}', [SavingTypeController::class, 'update'])->name('update')->middleware('can:savingType_edit');
+        Route::delete('/{id}', [SavingTypeController::class, 'destroy'])->name('destroy')->middleware('can:savingType_delete');
     });
 
     // savings
-    Route::get('/savings', [SavingController::class, 'index'])->name('savings.index');
-    Route::get('/savings/create', [SavingController::class, 'create'])->name('savings.create');
-    Route::get('/savings/generate', [SavingController::class, 'generate'])->name('savings.generate');
-    Route::post('/savings/generate', [SavingController::class, 'generated'])->name('savings.generated');
-    Route::post('/savings', [SavingController::class, 'store'])->name('savings.store');
-    Route::post('/savings/confirm', [SavingController::class, 'confirmation'])->name('savings.confirm');
-    Route::post('/savings/bulk', [SavingController::class, 'bulkConfirmation'])->name('savings.bulk');
-    Route::get('/savings/{id}', [SavingController::class, 'show'])->name('savings.show');
-    Route::get('/savings/{id}/edit', [SavingController::class, 'edit'])->name('savings.edit');
-    Route::put('/savings/{id}', [SavingController::class, 'update'])->name('savings.update');
-    Route::delete('/savings/{id}', [SavingController::class, 'destroy'])->name('savings.destroy');
+    Route::get('/savings', [SavingController::class, 'index'])->name('savings.index')->middleware('can:manage_savings');
+    Route::get('/savings/create', [SavingController::class, 'create'])->name('savings.create')->middleware('can:saving_create');
+    Route::get('/savings/generate', [SavingController::class, 'generate'])->name('savings.generate')->middleware('can:saving_create');
+    Route::post('/savings/generate', [SavingController::class, 'generated'])->name('savings.generated')->middleware('can:saving_create');
+    Route::post('/savings', [SavingController::class, 'store'])->name('savings.store')->middleware('can:saving_create');
+    Route::post('/savings/confirm', [SavingController::class, 'confirmation'])->name('savings.confirm')->middleware('can:saving_edit');
+    Route::post('/savings/bulk', [SavingController::class, 'bulkConfirmation'])->name('savings.bulk')->middleware('can:saving_edit');
+    Route::get('/savings/{id}', [SavingController::class, 'show'])->name('savings.show')->middleware('can:saving_show');
+    Route::get('/savings/{id}/edit', [SavingController::class, 'edit'])->name('savings.edit')->middleware('can:saving_edit');
+    Route::put('/savings/{id}', [SavingController::class, 'update'])->name('savings.update')->middleware('can:saving_edit');
+    Route::delete('/savings/{id}', [SavingController::class, 'destroy'])->name('savings.destroy')->middleware('can:saving_delete');
 
     // loan_payment
-    Route::get('/loanPayments/create', [LoanPaymentController::class, 'create'])->name('loanPayments.create');
-    Route::post('/loanPayments', [LoanPaymentController::class, 'settle'])->name('loanPayments.settle');
+    Route::get('/loanPayments/create', [LoanPaymentController::class, 'create'])->name('loanPayments.create')->middleware('can:loanPayment_create');
+    Route::post('/loanPayments', [LoanPaymentController::class, 'settle'])->name('loanPayments.settle')->middleware('can:loanPayment_settle');
     
     // repayments
     Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index');
@@ -264,17 +265,17 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::delete('/withdrawals/{id}', [WithdrawalController::class, 'destroy'])->name('withdrawals.destroy');
 
     // policy
-    Route::get('/policy', [PolicyController::class, 'index'])->name('policies.index');
-    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policies.upload');
-    Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policies.loanUmum');
-    Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policies.loanKhusus');
-    Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policies.loanAgunan');
-    Route::post('/policy-general', [PolicyController::class, 'general'])->name('policies.general');
-    Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policies.agDestroy');
+    Route::get('/policy', [PolicyController::class, 'index'])->name('policies.index')->middleware('can:manage_policies');
+    Route::post('/policy', [PolicyController::class, 'uploadTerms'])->name('policies.upload')->middleware('can:policy_term');
+    Route::post('/policy-loanUmum', [PolicyController::class, 'loanUmum'])->name('policies.loanUmum')->middleware('can:policy_loan');
+    Route::post('/policy-loanKhusus', [PolicyController::class, 'loanKhusus'])->name('policies.loanKhusus')->middleware('can:policy_loan');
+    Route::post('/policy-loanAgunan', [PolicyController::class, 'loanAgunan'])->name('policies.loanAgunan')->middleware('can:policy_loan');
+    Route::post('/policy-general', [PolicyController::class, 'general'])->name('policies.general')->middleware('can:policy_general');
+    Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policies.agDestroy')->middleware('can:policy_loan');
 
-  
+    // ============== Usaha =======================
     // pos
-    Route::get('/pos', [PosController::class, 'index2'])->name('pos.index');
+    Route::get('/pos', [PosController::class, 'index2'])->name('pos.index')->middleware('can:manage_categories');
     Route::post('/submit-sale', [PosController::class, 'store']);
     Route::get('/sales/{id}/print', [PosController::class, 'printReceipt'])->name('sales.print');
 

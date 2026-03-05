@@ -17,12 +17,14 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
+              @can('saving_create')
                 <a href="{{ route('savings.create') }}" class="btn mb-2 btn-primary mr-3">
                     <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
                 </a>
                 <a href="{{ route('savings.generate') }}" class="btn mb-2 btn-warning">
                     <span class="fe fe-plus fe-16 mr-1"></span> Generate
                 </a>
+              @endcan
             </div>
             <div class="col-auto">
               {{-- other button --}}
@@ -77,20 +79,18 @@
             </select>
           </div>
       </div> 
-      {{-- <button id="btnFilter" class="btn btn-primary mb-2">
+      <button id="btnFilter" class="btn btn-primary mb-2">
           Terapkan Filter
       </button>
       <button id="btnReset" class="btn btn-secondary mb-2">
           Reset Filter
-      </button> --}}
+      </button>
   
         {{-- ajax data --}}
-        <div class="row my-4">
-          <!-- Small table -->
+        <div class="row my-4"> 
           <div class="col-md-12">
             <div class="card shadow">
-              <div class="card-body">
-                <!-- table -->
+              <div class="card-body"> 
                 <form id="bulkForm" method="POST" action="{{ route('savings.bulk') }}">
                   @csrf
                   <input type="hidden" name="ids" id="selectedIds">
@@ -115,9 +115,11 @@
                       </tr>
                     </thead> 
                   </table>
-                  {{-- <button type="submit" class="btn btn-danger mt-2" id="bulkBtn" disabled>
+                  @can('saving_edit')
+                  <button type="submit" class="btn btn-danger mt-2" id="bulkBtn" disabled>
                     Konfirmasi Data Terpilih
-                  </button> --}}
+                  </button>
+                  @endcan
                 </form>
               </div>
             </div>
@@ -156,10 +158,10 @@
             searchable: false,
             render: function (data) {
               return `
-                      <div class="custom-control custom-checkbox">
-                        <input type="checkbox" id="check-${data}" class="custom-control-input row-check" value="${data}">
-                        <label class="custom-control-label" for="check-${data}"></label>
-                      </div>
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" id="check-${data}" class="custom-control-input row-check" value="${data}">
+                    <label class="custom-control-label" for="check-${data}"></label>
+                  </div>
               `;
             }
         },

@@ -99,11 +99,14 @@
       "lengthMenu": [
         [10, 25, 50, -1],
         [10, 25, 50, "All"]
+      ],
+      "columnDefs": [
+        { "orderable": false, "targets": 3 },
+        { "searchable": false, "targets": [3] }
       ]
     });
 
     $('#actAll').on('click', function() {
-      console.log("all check");
       var checkAll = $(this).is(":checked");
       var type = $(this).is(":checked") ? "given" : "revoke";
       saveRowData("all", type, 0);      

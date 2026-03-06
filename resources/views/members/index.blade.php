@@ -113,7 +113,7 @@
                       <th width="5%">Action</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  {{-- <tbody>
                     
                     @foreach ($members as $member)
                       <tr>
@@ -146,7 +146,7 @@
                         </td> 
                       </tr>
                     @endforeach
-                  </tbody>
+                  </tbody> --}}
                 </table>
               </div>
             </div>
@@ -161,8 +161,35 @@
 <script src="{{ asset('fedash/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('fedash/js/dataTables.bootstrap4.min.js') }}"></script>
 <script>
-    $('#members').DataTable(
-    {
+    // $('#members').DataTable(
+    // {
+    //   autoWidth: true,
+    //   "lengthMenu": [
+    //     [10, 25, 50, -1],
+    //     [10, 25, 50, "All"]
+    //   ]
+    // });
+
+    $('#members').DataTable({
+      processing: true,
+      serverSide: true,
+      ajax: {
+        url: "{{ route('members.index') }}",
+        type: 'GET',
+      },
+      columns: [
+        { data: 'rownum', name: 'rownum', orderable: false, searchable: false},
+        { data: 'nip', name: 'nip' },
+        { data: 'name', name: 'name' },
+        { data: 'position', name: 'position' },
+        { data: 'devision', name: 'devision' },
+        { data: 'telphone', name: 'telphone' },
+        { data: 'status', name: 'status', orderable: false, searchable: false },
+        { data: 'action', name: 'action', orderable: false, searchable: false },
+      ],
+      rowCallback: function (row, data) {
+        // 
+      },
       autoWidth: true,
       "lengthMenu": [
         [10, 25, 50, -1],

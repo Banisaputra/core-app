@@ -2,65 +2,47 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Devision;
 use App\Models\Loan;
+use App\Models\Member;
+use App\Models\Position;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\Member;
-use App\Models\Saving;
-use App\Models\Devision;
-use App\Models\Position;
-use App\Models\SavingType;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Color;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MemberController extends Controller
 {
-    public function index()
+    public function index_old()
     {
         $members = Member::with('user', 'position', 'devision')->get();
         return view('members.index', compact('members'));
     }
 
-    public function index_new(Request $request)
+    public function index(Request $request)
     {        
         if ($request->ajax()) {
             $query = Member::with('user', 'position', 'devision');
 
-            // filter tanggal
-            if ($request->filled('date_start') && $request->filled('date_end')) {
-                $query->whereBetween('date_joined', [
-                    date('Y-m-d', strtotime($request->date_start)),
-                    date('Y-m-d', strtotime($request->date_end))
-                ]);
-            }
-            // filter status
-            if ($request->filled('status')) {
-                $query->where('sv_state', $request->status);
-            }
-    
-            // filter jenis
-            if ($request->filled('type')) {
-                $query->where('sv_type_id', $request->type);
-            }
-
             $columns = [
                 'id',
                 'nip',
-                'sv_date',
-                'member_id',
-                'sv_type_id',
-                'sv_value',
+                'nama',
+                'position',
+                'devision',
+                'telphone'
             ];
 
             $search = $request->input('search.value');
@@ -72,14 +54,13 @@ class MemberController extends Controller
             
             if ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('sv_value', 'like', "%{$search}%")
-                    ->orWhere('sv_code', 'like', "%{$search}%")
-                    ->orWhere('sv_date', 'like', "%{$search}%")
-                    ->orWhereHas('member', function ($m) use ($search) {
+                    $q->where('nip', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%")
+                    ->orWhereHas('position', function ($m) use ($search) {
                         $m->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('member', function ($m) use ($search) {
-                        $m->where('nip', 'like', "%{$search}%");
+                    ->orWhereHas('devision', function ($m) use ($search) {
+                        $m->where('name', 'like', "%{$search}%");
                     });
                 });
             }
@@ -94,42 +75,40 @@ class MemberController extends Controller
                 
             $start = $request->start;
             $formatted = [];
-            foreach ($data as $index => $saving) {
+            foreach ($data as $index => $member) {
 
                 // state
-                $stateText = match($saving->sv_state) {
-                    99 => '<span class="text-danger">Dibatalkan</span>',
-                    2  => '<span class="text-success">Dikonfirmasi</span>',
-                    default => '<span class="text-info">Pengajuan</span>',
+                $stateText = match($member->is_transactional) {
+                    1 => "<span class='dot dot-lg bg-success mr-1'></span>Aktif",
+                    default => "<span class='dot dot-lg bg-secondary mr-1'></span>Tidak Aktif"
+
                 };
 
                 // Action button
-                $action = '
-                    <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                $action = '<button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="text-muted sr-only">Action</span>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="'.route('savings.show', $saving->id).'">View</a>
-                        <a class="dropdown-item" href="'.route('savings.edit', $saving->id).'">Edit</a>
-                        <form action="'.route('savings.destroy', $saving->id).'" method="POST" style="display:inline;" onsubmit="return confirm(\'Yakin batal?\')">
+                    <div class="dropdown-menu dropdown-menu-right">';
+                    if (Auth::user()->can('member_show'))
+                        $action .= '<a class="dropdown-item" href="'.route('members.show', $member->id).'">View</a>';
+                    if (Auth::user()->can('member_edit'))
+                        $action .= '<a class="dropdown-item" href="'.route('members.edit', $member->id).'">Edit</a>';
+                    if (Auth::user()->can('member_delete'))
+                        $action .= '<form action="'.route('members.destroy', $member->id).'" method="POST" style="display:inline;" onsubmit="return confirm(\'Yakin batal?\')">
                             '.csrf_field().method_field('DELETE').'
                             <button type="submit" class="dropdown-item">Batalkan</button>
-                        </form>
-                    </div>
-                ';
+                        </form>';
+                $action .= '</div>';
                 
                 $formatted[] = [
-                    'id' => $saving->id,
+                    'id' => $member->id,
                     'rownum' => $start + $index + 1,
-                    'sv_code' => $saving->sv_code,
-                    'member' => [
-                        'nip' => $saving->member->nip ?? '-',
-                        'name' => $saving->member->name ?? '-',
-                    ],
-                    'sv_date' => date('d M Y', strtotime($saving->sv_date)),
-                    'type' => $saving->svType->name ?? '-',
-                    'sv_value' => number_format($saving->sv_value),
-                    'sv_state' => $stateText,
+                    'nip' => $member->nip,
+                    'name' => $member->name,
+                    'position' => $member->position->name ?? '-',
+                    'devision' => $member->devision->name ?? '-',
+                    'telphone' => $member->telphone,
+                    'status' => $stateText,
                     'action' => $action,
                 ];
             }
@@ -208,10 +187,10 @@ class MemberController extends Controller
             "updated_by" => auth()->id(),
         ]);
 
-        $svn_code = Saving::generateCode();
-        $pokok = SavingType::where('name', 'like', 'Pokok')->first();
+        $svn_code = member::generateCode();
+        $pokok = memberType::where('name', 'like', 'Pokok')->first();
         if ($pokok) {
-            $svp=Saving::create([
+            $svp=member::create([
                 "sv_code" => $svn_code,
                 'sv_date' => now()->format('Ymd'),
                 'member_id' => $member->id,

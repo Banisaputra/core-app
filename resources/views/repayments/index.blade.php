@@ -24,9 +24,11 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
+              @can('repayment_create')
               <a href="{{ route('repayments.create') }}" class="btn mb-2 btn-success mr-3">
                 <span class="fe fe-plus fe-16 mr-1"></span> Pelunasan Cepat
               </a>
+              @endcan
             </div>
             <div class="col-auto">
               {{-- other button --}}
@@ -80,12 +82,12 @@
             </select>
           </div>
         </div>
-      {{-- <button id="btnFilter" class="btn btn-primary mb-2">
-          Terapkan Filter
-      </button>
-      <button id="btnReset" class="btn btn-secondary mb-2">
-          Reset Filter
-      </button> --}}
+        <button id="btnFilter" class="btn btn-primary mb-2">
+            Terapkan Filter
+        </button>
+        <button id="btnReset" class="btn btn-secondary mb-2">
+            Reset Filter
+        </button>
 
         <div class="row my-4">
           <div class="col-md-12">
@@ -117,9 +119,11 @@
                       </tr>
                     </thead>
                   </table>
-                   {{-- <button type="submit" class="btn btn-danger mt-2" id="bulkBtn" disabled>
+                  @can('repayment_edit')
+                  <button type="submit" class="btn btn-danger mt-2" id="bulkBtn" disabled>
                     Konfirmasi Data Terpilih
-                  </button> --}}
+                  </button>
+                  @endcan
                 </form>
               </div>
             </div>
@@ -138,7 +142,6 @@
     // checkbox per baris
     $('#loanDetails').on('change', '.row-check', function () {
         const id = $(this).val();
-  
         if (this.checked) {
             if (!selectedIds.includes(id)) {
               selectedIds.push(id);
@@ -146,14 +149,12 @@
         } else {
           selectedIds = selectedIds.filter(item => item !== id);
         }
-  
         updateBulkState();
     });
 
     // select all (halaman aktif saja)
     $('#checkAll').on('change', function () {
         const checked = this.checked;
-  
         $('#loanDetails .row-check').each(function () {
             $(this).prop('checked', checked).trigger('change');
         });
@@ -163,8 +164,8 @@
     $('#btnFilter').on('click', function () {
       table.ajax.reload();
       $(this).blur();
-
     });
+
     // tombol reset
     $('#btnReset').on('click', function () {
         $('#date_start, #date_end, #status, #type').val('');
@@ -173,8 +174,8 @@
 
     // update hidden input & button
     function updateBulkState() {
-        $('#selectedIds').val(JSON.stringify(selectedIds));
-        $('#bulkBtn').prop('disabled', selectedIds.length === 0);
+      $('#selectedIds').val(JSON.stringify(selectedIds));
+      $('#bulkBtn').prop('disabled', selectedIds.length === 0);
     }
 
     let selectedIds = [];
@@ -186,10 +187,10 @@
         url: "{{ route('repayments.index') }}",
         type: 'GET',
         data: function (d) {
-            d.date_start = $('#date_start').val();
-            d.date_end   = $('#date_end').val();
-            d.status     = $('#status').val();
-            d.type       = $('#type').val();
+          d.date_start = $('#date_start').val();
+          d.date_end = $('#date_end').val();
+          d.status = $('#status').val();
+          d.type = $('#type').val();
         }
       },
       columns: [
@@ -231,9 +232,9 @@
 
     $('#btnPaid').on('click', function (e) {
         if (!confirm('Apakah anda yakin ingin melunasi cicilan ini?')) {
-            e.preventDefault();
+          e.preventDefault();
         } else {
-            $('#paidForm').submit();
+          $('#paidForm').submit();
         }
     });
   })

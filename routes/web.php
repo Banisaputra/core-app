@@ -4,7 +4,6 @@ use App\Http\Middleware\LoginAuth;
 use App\Http\Middleware\SqlRunnerKey;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PosController;
-use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoanController;
@@ -18,13 +17,11 @@ use App\Http\Controllers\SavingController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DevisionController;
-use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\RepaymentController;
-use App\Http\Middleware\PermissionMiddleware;
 use App\Http\Controllers\MasterItemController;
 use App\Http\Controllers\SavingTypeController;
 use App\Http\Controllers\WithdrawalController;
@@ -251,6 +248,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::get('/repayment/generate', [RepaymentController::class, 'generate'])->name('repayments.generate')->middleware('can:repayment_create');
     Route::post('/repayment/generate', [RepaymentController::class, 'generated'])->name('repayments.generated')->middleware('can:repayment_create');
     Route::post('/repayment', [RepaymentController::class, 'settle'])->name('repayments.settle')->middleware('can:repayment_edit');
+    Route::post('/repayment/bulk', [RepaymentController::class, 'bulkConfirmation'])->name('repayments.bulk')->middleware('can:repayment_edit');
     Route::post('/repayment/settle', [RepaymentController::class, 'getSettle'])->name('repayments.getSettle')->middleware('can:repayment_edit');
     Route::post('/repayment/settle-confirm', [RepaymentController::class, 'settleConfirm'])->name('repayments.settleConfirm')->middleware('can:repayment_edit');
 
@@ -275,29 +273,29 @@ Route::middleware([LoginAuth::class])->group(function () {
 
     // ============== Usaha =======================
     // pos
-    Route::get('/pos', [PosController::class, 'index2'])->name('pos.index')->middleware('can:manage_categories');
-    Route::post('/submit-sale', [PosController::class, 'store']);
-    Route::get('/sales/{id}/print', [PosController::class, 'printReceipt'])->name('sales.print');
+    Route::get('/pos', [PosController::class, 'index'])->name('pos.index')->middleware('can:manage_pos');
+    Route::post('/submit-sale', [PosController::class, 'store'])->middleware('can:pos_create');
+    Route::get('/sales/{id}/print', [PosController::class, 'printReceipt'])->name('sales.print')->middleware('can:pos_create');
 
     // purchase
-    Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index');
-    Route::get('/purchase/create', [PurchaseController::class, 'create'])->name('purchases.create');
-    Route::post('/purchase', [PurchaseController::class, 'store'])->name('purchases.store');
-    Route::post('/purchase/confirm', [PurchaseController::class, 'confirmation'])->name('purchases.confirm');
-    Route::get('/purchase/{id}', [PurchaseController::class, 'show'])->name('purchases.show');
-    Route::get('/purchase/{id}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit');
-    Route::put('/purchase/{id}', [PurchaseController::class, 'update'])->name('purchases.update');
-    Route::delete('/purchase/{id}', [PurchaseController::class, 'destroy'])->name('purchases.destroy');
+    Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index')->middleware('can:manage_purchases');
+    Route::get('/purchase/create', [PurchaseController::class, 'create'])->name('purchases.create')->middleware('can:purchase_create');
+    Route::post('/purchase', [PurchaseController::class, 'store'])->name('purchases.store')->middleware('can:purchase_create');
+    Route::post('/purchase/confirm', [PurchaseController::class, 'confirmation'])->name('purchases.confirm')->middleware('can:purchase_edit');
+    Route::get('/purchase/{id}', [PurchaseController::class, 'show'])->name('purchases.show')->middleware('can:purchase_show');
+    Route::get('/purchase/{id}/edit', [PurchaseController::class, 'edit'])->name('purchases.edit')->middleware('can:purchase_edit');
+    Route::put('/purchase/{id}', [PurchaseController::class, 'update'])->name('purchases.update')->middleware('can:purchase_edit');
+    Route::delete('/purchase/{id}', [PurchaseController::class, 'destroy'])->name('purchases.destroy')->middleware('can:purchase_delete');
 
     // inventories
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inv.index');
-    Route::get('/inventory/create', [InventoryController::class, 'create'])->name('inv.create');
-    Route::post('/inventory', [InventoryController::class, 'store'])->name('inv.store');
-    Route::post('/inventory/confirm', [InventoryController::class, 'confirmation'])->name('inv.confirm');
-    Route::get('/inventory/{id}', [InventoryController::class, 'show'])->name('inv.show');
-    Route::get('/inventory/{id}/edit', [InventoryController::class, 'edit'])->name('inv.edit');
-    Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inv.update');
-    Route::delete('/inventory/{id}', [InventoryController::class, 'destroy'])->name('inv.destroy');
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inv.index')->middleware('can:manage_inventories');
+    Route::get('/inventory/create', [InventoryController::class, 'create'])->name('inv.create')->middleware('can:inventory_create');
+    Route::post('/inventory', [InventoryController::class, 'store'])->name('inv.store')->middleware('can:inventory_create');
+    Route::post('/inventory/confirm', [InventoryController::class, 'confirmation'])->name('inv.confirm')->middleware('can:inventory_edit');
+    Route::get('/inventory/{id}', [InventoryController::class, 'show'])->name('inv.show')->middleware('can:inventory_show');
+    Route::get('/inventory/{id}/edit', [InventoryController::class, 'edit'])->name('inv.edit')->middleware('can:inventory_edit');
+    Route::put('/inventory/{id}', [InventoryController::class, 'update'])->name('inv.update')->middleware('can:inventory_edit');
+    Route::delete('/inventory/{id}', [InventoryController::class, 'destroy'])->name('inv.destroy')->middleware('can:inventory_delete');
 
     // setting 
     Route::get('/business', [BusinessController::class, 'index'])->name('business.index');

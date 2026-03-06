@@ -17,9 +17,11 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
+              @can('purchase_create')
                 <a href="{{ route('purchases.create') }}" class="btn mb-2 btn-primary">
-                    <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
+                  <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
                 </a>
+              @endcan
             </div>
             <div class="col-auto">
               {{-- other button --}}
@@ -83,8 +85,12 @@
                             <span class="text-muted sr-only">Action</span>
                           </button>
                           <div class="dropdown-menu dropdown-menu-right">
+                            @can('purchase_show')
                             <a class="dropdown-item" href="{{ route('purchases.show', $purchase->id) }}">View</a>
+                            @endcan
+                            @can('purchase_edit')
                             <a class="dropdown-item" href="{{ $purchase->pr_state == 1 ? route('purchases.edit', $purchase->id) : "javascript:void(0)" }}">Edit</a>
+                            @endcan
                           </div>
                         </td> 
                       </tr>

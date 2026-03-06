@@ -19,6 +19,7 @@
         </div>
         <div class="row align-items-center my-4">
             <div class="col">
+              @can('inv')
               <a href="{{ route('inv.create') }}" class="btn mb-2 btn-primary">
                   <span class="fe fe-plus fe-16 mr-1"></span> Tambah Data
               </a>

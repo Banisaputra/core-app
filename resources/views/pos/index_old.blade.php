@@ -1,4 +1,4 @@
-@extends('layouts.main2')
+@extends('layouts.main')
 
 @section('title')
     <title>POINT OF SALES - Sistem Informasi Koperasi dan Usaha</title>
@@ -8,36 +8,9 @@
     .product-card {
       cursor: pointer;
     }
-    .product-item {
-        display: flex;
-        align-items: center;
-        padding: 12px 15px;
-        border-bottom: 1px solid #eee;
-        transition: background-color 0.2s;
-    }
-    .product-item:last-child {
-        border-bottom: none;
-    }
-    .product-item:hover {
-        background-color: rgba(156, 156, 156, 0.381);
-    }
-    .product-info {
-        /* flex-grow: 1; */
-        display: flex;
-    }
-    .product-name {
-        font-weight: 600;
-        margin-bottom: 5px;
-    }
-    .product-price {
-        color: #28a745;
-        font-weight: 600;
-    }
-    .product-stock {
-        font-size: 0.85rem;
-        color: #6c757d;
-    }
 
+    /* Scrollable product list */
+    
     #productList {
       max-height: 80vh;
       overflow-y: auto;
@@ -60,21 +33,40 @@
     #productList::-webkit-scrollbar-thumb:hover {
     background: #d4d4d4; /* Color on hover */
     }
+       
+    .cart-table {
+        display: block;
+    }
+    .cart-table td, .cart-table th {
+        vertical-align: middle;
+        width: 100%;
+    }
 
-    .cart-items {
+    .cart-table thead,
+    .cart-table tbody {
+        display: block;
+        width: 100%;
+    }
+
+    .cart-table tbody {
         height: 60vh; 
         max-height: 60vh;
         overflow-y: auto;
     }
+
+    .cart-table thead tr, 
+    .cart-table tbody tr {
+        display: block;
+        width: 100%;
+    }
+ 
+    .quantity-control {
+        display: flex;
+        align-items: center;
+    }
     .detail-item {
         display: flex;
         width: 100%;
-        align-items: center;
-    }
-    .quantity-control, 
-    .total-control {
-        display: flex;
-        align-items: center;
     }
     
 
@@ -221,7 +213,7 @@
 <div class="container-fluid py-3">
   <div class="row">
     <!-- Product List -->
-    <div class="col-7">
+    <div class="col-6">
         <h4>Products</h4>
         <input type="text" class="form-control" id="item_search" name="item_search" placeholder="Search item...">
         <hr class="my-4">
@@ -236,21 +228,27 @@
     </div>
 
     <!-- Cart -->
-    <div class="col-5">
+    <div class="col-6">
         <h4>Cart Pelanggan</h4>
         <div class="col-12">
             <select id="memberSelect" name="member_id" class="form-control"></select>
         </div>
 
-        <div class="cart-items pt-3" id="cartBody">
-
-            <!-- Cart items will be generated here -->
-        </div>
+        <table class="table cart-table table-bordered col-12">
+            <thead>
+            <tr>
+                <th width="35%">Barang</th>
+            </tr>
+            </thead>
+            <tbody id="cartBody"></tbody>
+        </table>
         <h2>Total: <span id="total">0</span>,-</h2>
         <hr class="my-2">
-        <button type="button" id="creditBtn" class="btn mb-2 btn-outline-warning btn-block"> KREDIT </button>
-        <hr class="my-2">
-        <button type="button" id="cashBtn" class="btn mb-2 btn-success btn-block"> C A S H </button>
+        @can('pos_createe')
+            <button type="button" id="creditBtn" class="btn mb-2 btn-outline-warning btn-block"> KREDIT </button>
+            <hr class="my-2">
+            <button type="button" id="cashBtn" class="btn mb-2 btn-success btn-block"> C A S H </button>
+        @endcan
     </div>
   </div>
 </div>
@@ -259,7 +257,7 @@
 @endsection
 
 @section('page_script')
-<script src="{{ asset('fedash/js/pos2.js')}}"></script>
+<script src="{{ asset('fedash/js/pos.js')}}"></script>
 
 <script>
     loadProducts();

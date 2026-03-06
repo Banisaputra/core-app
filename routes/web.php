@@ -246,15 +246,15 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::post('/loanPayments', [LoanPaymentController::class, 'settle'])->name('loanPayments.settle')->middleware('can:loanPayment_settle');
     
     // repayments
-    Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index');
-    Route::get('/repayment/create', [RepaymentController::class, 'create'])->name('repayments.create');
-    Route::get('/repayment/generate', [RepaymentController::class, 'generate'])->name('repayments.generate');
-    Route::post('/repayment/generate', [RepaymentController::class, 'generated'])->name('repayments.generated');
-    Route::post('/repayment', [RepaymentController::class, 'settle'])->name('repayments.settle');
-    Route::post('/repayment/settle', [RepaymentController::class, 'getSettle'])->name('repayments.getSettle');
-    Route::post('/repayment/settle-confirm', [RepaymentController::class, 'settleConfirm'])->name('repayments.settleConfirm');
+    Route::get('/repayment', [RepaymentController::class, 'index'])->name('repayments.index')->middleware('can:manage_repayments');
+    Route::get('/repayment/create', [RepaymentController::class, 'create'])->name('repayments.create')->middleware('can:repayment_create');
+    Route::get('/repayment/generate', [RepaymentController::class, 'generate'])->name('repayments.generate')->middleware('can:repayment_create');
+    Route::post('/repayment/generate', [RepaymentController::class, 'generated'])->name('repayments.generated')->middleware('can:repayment_create');
+    Route::post('/repayment', [RepaymentController::class, 'settle'])->name('repayments.settle')->middleware('can:repayment_edit');
+    Route::post('/repayment/settle', [RepaymentController::class, 'getSettle'])->name('repayments.getSettle')->middleware('can:repayment_edit');
+    Route::post('/repayment/settle-confirm', [RepaymentController::class, 'settleConfirm'])->name('repayments.settleConfirm')->middleware('can:repayment_edit');
 
-    // withdrawla
+    // withdrawal
     Route::get('/withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
     Route::get('/withdrawals/create', [WithdrawalController::class, 'create'])->name('withdrawals.create');
     Route::post('/withdrawals', [WithdrawalController::class, 'store'])->name('withdrawals.store');

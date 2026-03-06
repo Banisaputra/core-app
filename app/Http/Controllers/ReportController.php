@@ -110,12 +110,13 @@ class ReportController extends Controller
                     })
                     ->leftJoin('saving_types', 'saving_types.id', '=', 'savings.sv_type_id')
                     ->leftJoin('positions', 'positions.id', '=', 'members.position_id')
-                    ->leftJoin('devisions', 'devision.id', '=', 'members.devision_id')
+                    ->leftJoin('devisions', 'devisions.id', '=', 'members.devision_id')
                     ->groupBy(
                         'members.id',
                         'members.nip',
                         'members.name',
-                        'positions.name'
+                        'positions.name',
+                        'devisions.name'
                     )
                     ->orderBy('members.id', 'ASC') 
                     ->get();

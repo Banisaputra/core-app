@@ -259,7 +259,7 @@
 @endsection
 
 @section('page_script')
-<script src="{{ asset('fedash/js/pos2.js')}}"></script>
+<script src="{{ asset('fedash/js/pos.js')}}"></script>
 
 <script>
     loadProducts();

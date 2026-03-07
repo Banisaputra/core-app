@@ -23,10 +23,10 @@ class PosController extends Controller
         return view('pos.index', compact('items'));
     }
 
-    public function index2() 
+    public function index_old() 
     {
         $items = MasterItem::latest()->get();
-        return view('pos.index2', compact('items'));
+        return view('pos.index_old', compact('items'));
     }
 
     public function store(Request $request)
@@ -73,6 +73,7 @@ class PosController extends Controller
             $saleId = DB::table('sales')->insertGetId([
                 'sa_code' => $sa_code,
                 'sa_date' => $now,
+                'payment_type' => $payment_type,
                 'member_id' => $request->member_id,
                 'sub_total' => $total,
                 'created_by' => auth()->id(),

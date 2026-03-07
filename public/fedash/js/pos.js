@@ -265,9 +265,9 @@ function updateCart() {
       <div class="mb-2 col-12">${item.name}</div>
       <div class="detail-item">
          <div class="quantity-control col-9" style="justify-content:center;">
-            <button class="btn btn-outline-primary btn-sm py-1 px-2 btnQty" type="button" id="plus-${id}"><i id="plus-${id}" class="fe fe-plus btnQty"></i></button>
-            <input type="number" id="qty-input-${id}" class="form-control qty-input px-1 mx-2" data-name="${item.name}" data-id="${id}" min="1" value="${item.qty}">
-            <button class="btn btn-outline-secondary btn-sm py-1 px-2 btnQty" type="button" id="minus-${id}"><i id="minus-${id}" class="fe fe-minus btnQty"></i></button>
+         <button class="btn btn-outline-secondary btn-sm py-1 px-2 btnQty" type="button" id="minus-${id}"><i id="minus-${id}" class="fe fe-minus btnQty"></i></button>
+         <input type="number" id="qty-input-${id}" class="form-control qty-input px-1 mx-2" data-name="${item.name}" data-id="${id}" min="1" value="${item.qty}">
+         <button class="btn btn-outline-primary btn-sm py-1 px-2 btnQty" type="button" id="plus-${id}"><i id="plus-${id}" class="fe fe-plus btnQty"></i></button>
          </div>
       
          <div class="total-control col-3">${formatIDR(item.qty * (item.price - item.disc) ,0)}</div>

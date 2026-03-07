@@ -242,7 +242,7 @@ Route::middleware([LoginAuth::class])->group(function () {
     Route::delete('/policy-agunan/{id}', [PolicyController::class, 'agDestroy'])->name('policy.agDestroy');
 
     // pos
-    Route::get('/pos', [PosController::class, 'index2'])->name('pos.index');
+    Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
     Route::post('/submit-sale', [PosController::class, 'store']);
     Route::get('/sales/{id}/print', [PosController::class, 'printReceipt'])->name('sales.print');
 

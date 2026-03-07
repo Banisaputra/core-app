@@ -73,7 +73,7 @@ class PosController extends Controller
             $saleId = DB::table('sales')->insertGetId([
                 'sa_code' => $sa_code,
                 'sa_date' => $now,
-                'payment_type' => $payment_type,
+                'payment_type' => strtoupper($payment_type),
                 'member_id' => $request->member_id,
                 'sub_total' => $total,
                 'created_by' => auth()->id(),

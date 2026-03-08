@@ -23,21 +23,27 @@
             <tr>
                 <th>No</th>
                 <th>Kode</th>
-                <th>Tgl. Pinjaman</th>
-                <th>Jenis</th>
+                <th>Tanggal</th>
+                <th>UANG</th>
+                <th>BARANG</th>
                 <th>Total</th>
                 <th>Status</th>
             </tr>
         </thead>
         <tbody>
             @if (count($data) > 0)
-                <?php $subtotal = 0; ?>
+                <?php 
+                $subtotal = 0;
+                $subtotal_ug = 0;
+                $subtotal_br = 0;
+                ?>
                 @foreach($data as $i => $row)
                 <tr>
-                    <td>{{ $i + 1 }}</td>
+                    <td>{{ $i + 1 }}.</td>
                     <td>{{ $row['ln_code'] }}</td>
                     <td>{{ date('d M Y', strtotime($row['ln_date']))}}</td>
-                    <td>{{ $row['ln_type'] }}</td>
+                    <td style="text-align: right">{{ $row['ln_type'] == "UANG" ? number_format($row['ln_value'], 0, ',', '.') : "" }}</td>
+                    <td style="text-align: right">{{ $row['ln_type'] == "BARANG" ? number_format($row['ln_value'], 0, ',', '.') : "" }}</td>
                     <td style="text-align: right">{{ number_format($row['ln_value'], 0, ',', '.') }}</td>
                     <td>@if ($row['status'] == 1)
                         Diajukan
@@ -51,9 +57,10 @@
                 </tr>
                     @foreach ($row['payments'] as $pay)
                     <tr>
-                        <td colspan="2" style="text-align: center">{{ $pay['lp_code'] }}</td>
+                        <td colspan="2" style="text-align: center">{{  $pay['lp_code'] . " (x".$pay['tenor_month'].")" }}</td>
                         <td style="text-align: center">{{ date('d M Y', strtotime($pay['lp_date'])) }}</td>
-                        <td>{{ $pay['tenor_month']}}x</td>
+                        <td style="text-align: right">{{ $row['ln_type'] == "UANG" ? number_format($pay['lp_total'],0, ',','.') : ""}}</td>
+                        <td style="text-align: right">{{ $row['ln_type'] == "BARANG" ? number_format($pay['lp_total'],0, ',','.') : ""}}</td>
                         <td style="text-align: right">{{ number_format($pay['lp_total'],0, ',','.') }}</td>
                         <td>@if ($pay['lp_state'] == 1)
                             Pending
@@ -62,6 +69,17 @@
                         @endif</td>
                     </tr>
                     <?php 
+                        switch ($row['ln_type']) {
+                            case 'BARANG':
+                                $subtotal_br += $pay['lp_total'];
+                                break;
+                            case 'UANG':
+                                $subtotal_ug += $pay['lp_total'];
+                                break;
+                            default:
+                                // lp type not found
+                                break;
+                        }
                         $subtotal += $pay['lp_total'];
                     ?>
 
@@ -69,13 +87,15 @@
                    
                 @endforeach
                 <tr>
-                    <td colspan="4" style="text-align: right"><b>Total</b></td>
+                    <td colspan="3" style="text-align: right"><b>Total</b></td>
+                    <td colspan="" style="text-align: right"><b>{{ number_format($subtotal_ug,0,',','.')}}</td>
+                    <td colspan="" style="text-align: right"><b>{{ number_format($subtotal_br,0,',','.')}}</td>
                     <td colspan="" style="text-align: right"><b>{{ number_format($subtotal,0,',','.')}}</b></td>
                     <td></td>
                 </tr>
             @else
                 <tr>
-                    <td colspan=6 style="text-align: center">Tidak ada data</td>
+                    <td colspan=7 style="text-align: center">Tidak ada data</td>
                 </tr>
             @endif
         </tbody>
